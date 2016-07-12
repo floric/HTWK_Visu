@@ -1,29 +1,34 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
 
-# Precompiled Headers
-*.gch
-*.pch
+### Intellij
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/dictionaries
+**/.idea/vcs.xml
+**/.idea/jsLibraryMappings.xml
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Sensitive or high-churn files:
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
 
-# Fortran module files
-*.mod
-*.smod
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+/out/
 
-# Executables
-*.exe
-*.out
-*.app
+## File-based project format:
+*.iws
