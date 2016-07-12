@@ -1,0 +1,74 @@
+.background{
+    -fx-background-color: white;
+}
+
+.button {
+  -fx-background-color: grey;
+  -fx-text-fill: white;
+}
+
+.titled-pane > .title {
+    -fx-base: white;
+    -fx-text-fill: black;
+}
+
+.titled-pane:expanded > .title {
+    -fx-background-color: grey;
+}
+
+.titled-pane:expanded {
+    -fx-text-fill: white;
+}
+
+.label {
+    -fx-padding: 5;
+}
+
+.split-pane > * > * > .table-view { -fx-padding: 0px; }
+.split-pane > * > * > .list-view { -fx-padding: 0px; }
+.split-pane > * > * > .tree-view { -fx-padding: 0px; }
+.split-pane > * > * > .scroll-pane { -fx-padding: 0px; }
+.split-pane > * > * > .split-pane {
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+ }
+
+.split-pane {
+    -fx-skin: "com.sun.javafx.scene.control.skin.SplitPaneSkin";
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 1;
+}
+
+.split-pane *.split-pane-divider {
+    -fx-padding: 0 2 0 2; /* 0 3 0 3 */
+    -fx-color: grey;
+}
+
+/* horizontal the two nodes are placed to the left/right of each other. */
+.split-pane:horizontal > * > .split-pane-divider {
+   -fx-border-color: transparent -fx-box-border transparent #BBBBBB;
+   -fx-background-color: transparent, -fx-inner-border-horizontal;
+   -fx-background-insets: 0, 0 1 0 1;
+}
+
+/* vertical the two nodes are placed on top of each other. */
+.split-pane:vertical > * > .split-pane-divider {
+   -fx-border-color:  #BBBBBB transparent -fx-box-border transparent;
+   -fx-background-color: transparent, -fx-inner-border;
+   -fx-background-insets: 0, 1 0 1 0;
+}
+
+.split-pane *.horizontal-grabber {
+    -fx-padding: 5 1 5 1;
+    -fx-background-color: #FFFFFF, -fx-box-border;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-shape: "M0 0 L0 0 L2 0 L2 2 L0 2 Z M0 4 L0 4 L2 4 L2 6 L0 6 Z M0 8 L0 8 L2 8 L2 10 L0 10 Z";
+}
+
+.split-pane *.vertical-grabber {
+    -fx-padding: 1 5 1 5;
+    -fx-background-color: #FFFFFF, -fx-box-border;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-shape: "M0 0 L0 0 L2 0 L2 2 L0 2 Z M4 0 L4 0 L4 2 L6 2 L6 0 Z M8 0 L8 0 L8 2 L10 2 L10 0 Z";
+}

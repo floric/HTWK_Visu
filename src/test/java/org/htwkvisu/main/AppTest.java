@@ -1,4 +1,4 @@
-package org.htwkvisu;
+package org.htwkvisu.main;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
