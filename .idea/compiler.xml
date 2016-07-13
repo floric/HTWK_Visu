@@ -25,8 +25,8 @@
         <module name="HTWK_Visu" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="HTWK_Visu" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="HTWK_Visu" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

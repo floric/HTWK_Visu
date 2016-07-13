@@ -32,3 +32,7 @@ buildNumber.properties
 
 ## File-based project format:
 *.iws
+
+# Exclude local logging files
+*.log
+*.log.lck
