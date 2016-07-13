@@ -1,29 +1,92 @@
 package org.htwkvisu.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import org.htwkvisu.gui.MapCanvas;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Created by floric on 7/12/16.
+ * Control for GUI changes for App
+ *
+ * @author floric
  */
 public class ApplicationController implements Initializable {
 
     @FXML
-    public Button resetViewButton;
+    private Button resetViewButton;
 
     @FXML
-    public Label messageLabel;
+    private Label messageLabel;
 
     @FXML
-    public AnchorPane canvasPane;
+    private Pane canvasPane;
 
+    private MapCanvas canvas;
+
+    /**
+     * Write message to status bar.
+     *
+     * @param message            Message to show
+     * @param isImportantMessage Show the message in red if it's important
+     */
+    public void writeStatusMessage(String message, boolean isImportantMessage) {
+        if (isImportantMessage) {
+            messageLabel.setTextFill(Color.RED);
+        } else {
+            messageLabel.setTextFill(Color.GRAY);
+        }
+
+        messageLabel.setText(message);
+    }
+
+    /**
+     * Default JavaFX initilization method for controllers.
+     * Implemented from Initializable-interface.
+     *
+     * @param location
+     * @param resources
+     */
     public void initialize(URL location, ResourceBundle resources) {
-        messageLabel.setText("TEst");
+        canvas = new MapCanvas();
+
+        canvasPane.getChildren().add(canvas);
+        canvasPane.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                canvas.setWidth(newValue.doubleValue());
+            }
+        });
+        canvasPane.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                canvas.setHeight(newValue.doubleValue());
+            }
+        });
+
+        Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
+    }
+
+
+    /**
+     * Center to view to default point.
+     *
+     * @param ev Mouse click event
+     */
+    @FXML
+    public void onResetViewClicked(MouseEvent ev) {
+        //TODO replace with useful values later
+        canvas.centerView(new Point2D(51, 13)); // test value as an example!
     }
 }

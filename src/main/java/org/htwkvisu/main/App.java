@@ -6,6 +6,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.htwkvisu.controller.ApplicationController;
 
 import java.io.IOException;
 import java.util.logging.*;
@@ -19,6 +20,8 @@ public class App extends Application {
     private static final String WINDOW_TITLE = "Lifequality Visualization";
     private static final Point2D WINDOW_SIZE = new Point2D(800, 600);
     private static final String LOG_FILENAME = "lifequality.log";
+
+    private ApplicationController ctrl = null;
 
     /**
      * Main method
@@ -35,14 +38,22 @@ public class App extends Application {
      * @throws Exception Ex
      */
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/ApplicationView.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        Parent root = fxmlLoader.load(getClass().getResource("/view/ApplicationView.fxml").openStream());
         Scene scene = new Scene(root, WINDOW_SIZE.getX(), WINDOW_SIZE.getY());
+
+        ctrl = fxmlLoader.getController();
+        if (!(ctrl instanceof ApplicationController)) {
+            Logger.getGlobal().log(Level.SEVERE, "Application controller not valid!");
+            System.exit(-1);
+        }
 
         // application specific initializations
         initApp();
 
         primaryStage.setTitle(WINDOW_TITLE);
         primaryStage.setScene(scene);
+
         primaryStage.show();
     }
 
@@ -52,19 +63,36 @@ public class App extends Application {
 
     private void initLogging() {
         try {
+            // create filehandler
             FileHandler fileHandler = new FileHandler(LOG_FILENAME);
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(new SimpleFormatter());
 
-
+            // add handlers
             Logger.getGlobal().addHandler(fileHandler);
+            Logger.getGlobal().addHandler(new Handler() {
+                @Override
+                public void publish(LogRecord record) {
+                    boolean isImportantMessage = (record.getLevel() == Level.WARNING || record.getLevel() == Level.SEVERE);
+                    ctrl.writeStatusMessage(record.getMessage(), isImportantMessage);
+                }
+
+                @Override
+                public void flush() {
+
+                }
+
+                @Override
+                public void close() throws SecurityException {
+
+                }
+            });
 
             Logger.getGlobal().log(Level.INFO, "Logger initialized!");
         } catch (IOException e) {
             Logger.getGlobal().addHandler(new ConsoleHandler());
             Logger.getGlobal().log(Level.WARNING, "Log file output IO error!");
         }
-
 
     }
 }
