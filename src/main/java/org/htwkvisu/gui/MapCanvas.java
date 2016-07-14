@@ -6,6 +6,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.LinkedList;
@@ -20,9 +21,10 @@ public class MapCanvas extends Canvas {
 
     // constants
     private static final double ZOOM_SPEED = 100;
-    private static final double ZOOM_MIN = 100;
+    private static final double ZOOM_MIN = 150;
     private static final double ZOOM_MAX = 1000000;
     private static final MouseButton DRAG_BUTTON = MouseButton.MIDDLE;
+    private static final double KM_PER_COORD = 111;
 
     // default: 1 real coordinate unit = 111km => 0.01 unit = 1.11km => 100px => val: 100 * 100
     private double scale = 100000;
@@ -30,19 +32,18 @@ public class MapCanvas extends Canvas {
     // default: Leipzig
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
 
-    //TODO Use useful POI class/interface with more information.
-    private LinkedList<Point2D> points = new LinkedList<>();
+    private LinkedList<IMapDrawable> drawables = new LinkedList<>();
 
     // cached values for faster drawing
     private GraphicsContext gc = getGraphicsContext2D();
-    private double width = 0;
-    private double height = 0;
+    private double tmpWidth = 0;
+    private double tmpHeight = 0;
     private double coveredWidth = 0;
     private double coveredHeight = 0;
     private double widthDistance = 0;
     private double heightDistance = 0;
-    private BoundingBox coordsBounds = new BoundingBox(0, 0, width, height);
-    private int displayedPoints = 0;
+    private BoundingBox coordsBounds = new BoundingBox(0, 0, tmpWidth, tmpHeight);
+    private int displayedElems = 0;
 
     // canvas dragging
     private boolean isDragging = false;
@@ -60,9 +61,17 @@ public class MapCanvas extends Canvas {
 
         // test data around coordinates center
         Random rnd = new Random();
-        for (int i = 0; i < 990000; i++) {
-            addPOI(new Point2D(mapCenter.getX() + (rnd.nextDouble() * 10), mapCenter.getY() + (rnd.nextDouble() * 10)));
+        for (int i = 0; i < 999999; i++) {
+            addDrawableElement(
+                    new SimplePoint(new Point2D(51 + rnd.nextDouble(), 13 + rnd.nextDouble()), "Sample", rnd.nextDouble() * 40000)
+            );
         }
+
+        // add test cities
+        addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
+        addDrawableElement(new City(new Point2D(51.482778, 11.97), "Halle (Saale)", 0));
+        addDrawableElement(new City(new Point2D(50.927222, 11.586111), "Jena", 0));
+        addDrawableElement(new City(new Point2D(50.983333, 11.033333), "Erfurt", 0));
     }
 
     /**
@@ -110,7 +119,7 @@ public class MapCanvas extends Canvas {
                 double xChange = dragX - event.getX();
                 double yChange = dragY - event.getY();
 
-                centerView(transferPixelToCoordinate((width / 2) + xChange, (height / 2) + yChange));
+                centerView(transferPixelToCoordinate((tmpWidth / 2) + xChange, (tmpHeight / 2) - yChange));
 
                 dragX = event.getX();
                 dragY = event.getY();
@@ -129,23 +138,23 @@ public class MapCanvas extends Canvas {
      * Forces a full map redraw
      */
     private void redraw() {
-        width = getWidth();
-        height = getHeight();
-        coveredWidth = width / scale;
-        coveredHeight = height / scale;
-        coordsBounds = new BoundingBox(mapCenter.getX() - coveredWidth / 2, mapCenter.getY() - coveredHeight / 2,
-                coveredWidth, coveredHeight);
-        heightDistance = coordsBounds.getWidth() * 111;
-        widthDistance = coordsBounds.getHeight() * 111;
+        tmpWidth = getWidth();
+        tmpHeight = getHeight();
+        coveredWidth = tmpWidth / scale;
+        coveredHeight = tmpHeight / scale;
+        coordsBounds = new BoundingBox(mapCenter.getX() - coveredHeight / 2, mapCenter.getY() - coveredWidth / 2,
+                coveredHeight, coveredWidth);
+        heightDistance = coordsBounds.getWidth() * KM_PER_COORD;
+        widthDistance = coordsBounds.getHeight() * KM_PER_COORD;
 
         // clear view
-        gc.clearRect(0, 0, width, height);
+        gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
         drawGrid();
 
         // is dragging value can be used for faster redraw during map interaction
         if (!isDragging) {
-            drawPoints();
+            drawElements();
         }
 
         drawInfo();
@@ -155,48 +164,51 @@ public class MapCanvas extends Canvas {
      * Draw info about canvas in the top left corner of the canvas.
      */
     private void drawInfo() {
+        gc.setFill(Color.BLACK);
         gc.fillText("Center: " + MathUtils.roundToDecimalsAsString(mapCenter.getX(), 5) + " " +
                 MathUtils.roundToDecimalsAsString(mapCenter.getY(), 5), 10, 20);
         gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
-        gc.fillText("Points displayed: " + displayedPoints, 10, 60);
-        //gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
-        //gc.fillText("Bounds: " + coordsBounds, 10, 100);
+        gc.fillText("Elements displayed: " + displayedElems, 10, 60);
+        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
+        gc.fillText("Bounds: " + coordsBounds, 10, 100);
     }
 
     /**
      * Draw coordinates grid of full longitudes/latitude values.
      */
     private void drawGrid() {
-        double xPos;
-        double yPos;
+        double northPos;
+        double eastPos;
         gc.setStroke(Color.BLACK);
 
         double x = coordsBounds.getMinX();
         while (x < coordsBounds.getMaxX()) {
-            xPos = transferCoordinateToPixel(new Point2D(Math.ceil(x), 0)).getX();
-            gc.strokeLine(xPos, 0, xPos, height);
+            northPos = transferCoordinateToPixel(new Point2D(Math.ceil(x), Math.ceil(x))).getY();
+            gc.strokeLine(0, northPos, tmpWidth, northPos);
             x += 1;
         }
 
         double y = coordsBounds.getMinY();
         while (y < coordsBounds.getMaxY()) {
-            yPos = transferCoordinateToPixel(new Point2D(0, Math.ceil(y))).getY();
-            gc.strokeLine(0, yPos, width, yPos);
+            eastPos = transferCoordinateToPixel(new Point2D(Math.ceil(y), Math.ceil(y))).getX();
+            gc.strokeLine(eastPos, 0, eastPos, tmpHeight);
             y += 1;
         }
     }
 
     /**
-     * Draw all points.
+     * Draw all drawables.
      */
-    private void drawPoints() {
+    private void drawElements() {
         gc.setStroke(Color.BLUE);
 
-        displayedPoints = 0;
-        points.stream().filter(p -> coordsBounds.contains(p)).forEach(p -> {
-            Point2D lclPt = transferCoordinateToPixel(p);
-            gc.strokeOval(lclPt.getX() - 2.5, lclPt.getY() - 2.5, 5, 5);
-            displayedPoints++;
+        displayedElems = 0;
+        drawables.stream()
+                .filter(p -> coordsBounds.contains(p.getCoordinates()))
+                .filter(p -> p.getMinDrawScale() < scale)
+                .forEach(p -> {
+                    p.draw(gc, this);
+                    displayedElems++;
         });
     }
 
@@ -206,9 +218,11 @@ public class MapCanvas extends Canvas {
      * @param p Earth coordinates
      * @return Pixel coordinates
      */
-    private Point2D transferCoordinateToPixel(Point2D p) {
-        return new Point2D((p.getX() - mapCenter.getX()) * scale + width / 2,
-                (p.getY() - mapCenter.getY()) * scale + height / 2);
+    public Point2D transferCoordinateToPixel(Point2D p) {
+        /*return new Point2D((p.getX() - mapCenter.getX()) * scale + tmpWidth / 2,
+                (p.getY() - mapCenter.getY()) * scale + tmpHeight / 2);*/
+        return new Point2D((p.getY() - mapCenter.getY()) * scale + tmpWidth / 2,
+                (mapCenter.getX() - p.getX()) * scale + tmpHeight / 2);
     }
 
     /**
@@ -218,9 +232,11 @@ public class MapCanvas extends Canvas {
      * @param y Pixel position
      * @return Earth coordinates
      */
-    private Point2D transferPixelToCoordinate(double x, double y) {
-        return new Point2D(coordsBounds.getMinX() + (x / width) * coordsBounds.getWidth(),
-                coordsBounds.getMinY() + (y / height) * coordsBounds.getHeight());
+    public Point2D transferPixelToCoordinate(double x, double y) {
+        /*return new Point2D(coordsBounds.getMinY() + (y / tmpHeight) * coordsBounds.getHeight(),
+                coordsBounds.getMinX() + (x / tmpWidth) * coordsBounds.getWidth());*/
+        return new Point2D(coordsBounds.getMinX() + (y / tmpHeight) * coordsBounds.getWidth(),
+                coordsBounds.getMinY() + (x / tmpWidth) * coordsBounds.getHeight());
     }
 
     /**
@@ -237,11 +253,10 @@ public class MapCanvas extends Canvas {
     /**
      * Add point. Needs to be refactored for more specific point information.
      *
-     * @param pt Point to add
+     * @param elem Point to add
      */
-    // TODO Use more information for POIs (like: coordinates, category, influence, name, ...)
-    public void addPOI(Point2D pt) {
-        points.add(pt);
+    public void addDrawableElement(IMapDrawable elem) {
+        drawables.add(elem);
     }
 
     @Override

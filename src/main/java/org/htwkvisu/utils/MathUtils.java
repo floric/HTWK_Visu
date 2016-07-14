@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 public class MathUtils {
 
     private MathUtils() {
-
     }
 
     public static String roundToDecimalsAsString(double d, int scale) throws IllegalArgumentException {

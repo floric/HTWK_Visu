@@ -75,7 +75,6 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     public void onResetViewClicked(MouseEvent ev) {
-        //TODO replace with useful values later
         canvas.centerView(new Point2D(51, 13)); // test value as an example!
     }
 }
