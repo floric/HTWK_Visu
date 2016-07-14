@@ -1,7 +1,5 @@
 package org.htwkvisu.controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -61,19 +59,10 @@ public class ApplicationController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         canvas = new MapCanvas();
 
+        // add mapcanvas to pane
         canvasPane.getChildren().add(canvas);
-        canvasPane.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                canvas.setWidth(newValue.doubleValue());
-            }
-        });
-        canvasPane.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                canvas.setHeight(newValue.doubleValue());
-            }
-        });
+        canvasPane.widthProperty().addListener((observable, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
+        canvasPane.heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
         Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
     }

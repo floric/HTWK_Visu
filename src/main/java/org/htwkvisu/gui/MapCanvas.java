@@ -20,7 +20,7 @@ public class MapCanvas extends Canvas {
 
     // constants
     private static final double ZOOM_SPEED = 100;
-    private static final double ZOOM_MIN = 50;
+    private static final double ZOOM_MIN = 100;
     private static final double ZOOM_MAX = 1000000;
     private static final MouseButton DRAG_BUTTON = MouseButton.MIDDLE;
 
@@ -39,6 +39,8 @@ public class MapCanvas extends Canvas {
     private double height = 0;
     private double coveredWidth = 0;
     private double coveredHeight = 0;
+    private double widthDistance = 0;
+    private double heightDistance = 0;
     private BoundingBox coordsBounds = new BoundingBox(0, 0, width, height);
     private int displayedPoints = 0;
 
@@ -58,8 +60,8 @@ public class MapCanvas extends Canvas {
 
         // test data around coordinates center
         Random rnd = new Random();
-        for (int i = 0; i < 50; i++) {
-            addPOI(new Point2D(mapCenter.getX() + (rnd.nextDouble() - 0.5), mapCenter.getY() + (rnd.nextDouble() - 0.5)));
+        for (int i = 0; i < 990000; i++) {
+            addPOI(new Point2D(mapCenter.getX() + (rnd.nextDouble() * 10), mapCenter.getY() + (rnd.nextDouble() * 10)));
         }
     }
 
@@ -133,6 +135,8 @@ public class MapCanvas extends Canvas {
         coveredHeight = height / scale;
         coordsBounds = new BoundingBox(mapCenter.getX() - coveredWidth / 2, mapCenter.getY() - coveredHeight / 2,
                 coveredWidth, coveredHeight);
+        heightDistance = coordsBounds.getWidth() * 111;
+        widthDistance = coordsBounds.getHeight() * 111;
 
         // clear view
         gc.clearRect(0, 0, width, height);
@@ -153,9 +157,10 @@ public class MapCanvas extends Canvas {
     private void drawInfo() {
         gc.fillText("Center: " + MathUtils.roundToDecimalsAsString(mapCenter.getX(), 5) + " " +
                 MathUtils.roundToDecimalsAsString(mapCenter.getY(), 5), 10, 20);
-        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 40);
-        gc.fillText("Bounds: " + coordsBounds, 10, 60);
-        gc.fillText("Points displayed: " + displayedPoints, 10, 80);
+        gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
+        gc.fillText("Points displayed: " + displayedPoints, 10, 60);
+        //gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
+        //gc.fillText("Bounds: " + coordsBounds, 10, 100);
     }
 
     /**
@@ -179,7 +184,6 @@ public class MapCanvas extends Canvas {
             gc.strokeLine(0, yPos, width, yPos);
             y += 1;
         }
-
     }
 
     /**
@@ -207,11 +211,14 @@ public class MapCanvas extends Canvas {
                 (p.getY() - mapCenter.getY()) * scale + height / 2);
     }
 
+    /**
+     * Transfers pixel coordinates to earth coordinates.
+     *
+     * @param x Pixel position
+     * @param y Pixel position
+     * @return Earth coordinates
+     */
     private Point2D transferPixelToCoordinate(double x, double y) {
-        /*if(x < 0 || x >= width || y < 0 || y >= height) {
-            throw new IllegalArgumentException("Pixel out of image!");
-        }*/
-
         return new Point2D(coordsBounds.getMinX() + (x / width) * coordsBounds.getWidth(),
                 coordsBounds.getMinY() + (y / height) * coordsBounds.getHeight());
     }
