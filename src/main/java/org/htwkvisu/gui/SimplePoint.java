@@ -41,4 +41,9 @@ public class SimplePoint implements IMapDrawable {
         Point2D lclPt = canvas.transferCoordinateToPixel(pt);
         gc.strokeOval(lclPt.getX() - POINT_SIZE / 2, lclPt.getY() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
     }
+
+    @Override
+    public boolean showDuringGrab() {
+        return false;
+    }
 }

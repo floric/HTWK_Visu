@@ -44,4 +44,9 @@ public class City implements IMapDrawable {
         gc.fillText(name, lclPt.getX(), lclPt.getY() - 10);
         gc.strokeOval(lclPt.getX() - POINT_SIZE / 2, lclPt.getY() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
     }
+
+    @Override
+    public boolean showDuringGrab() {
+        return true;
+    }
 }

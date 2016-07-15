@@ -10,7 +10,9 @@ import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Canvas for map.
@@ -153,9 +155,7 @@ public class MapCanvas extends Canvas {
         drawGrid();
 
         // is dragging value can be used for faster redraw during map interaction
-        if (!isDragging) {
-            drawElements();
-        }
+        drawElements();
 
         drawInfo();
     }
@@ -200,16 +200,16 @@ public class MapCanvas extends Canvas {
      * Draw all drawables.
      */
     private void drawElements() {
-        gc.setStroke(Color.BLUE);
-
-        displayedElems = 0;
-        drawables.stream()
-                .filter(p -> coordsBounds.contains(p.getCoordinates()))
+        List<IMapDrawable> toDraw = drawables.parallelStream()
+                .filter(p -> !isDragging || p.showDuringGrab())
                 .filter(p -> p.getMinDrawScale() < scale)
-                .forEach(p -> {
-                    p.draw(gc, this);
-                    displayedElems++;
-        });
+                .filter(p -> coordsBounds.contains(p.getCoordinates()))
+                .collect(Collectors.toList());
+
+        displayedElems = toDraw.size();
+        for (IMapDrawable elem : toDraw) {
+            elem.draw(gc, this);
+        }
     }
 
     /**

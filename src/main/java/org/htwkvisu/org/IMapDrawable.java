@@ -15,4 +15,6 @@ public interface IMapDrawable {
     double getMinDrawScale();
 
     void draw(GraphicsContext gc, MapCanvas canvas);
+
+    boolean showDuringGrab();
 }
