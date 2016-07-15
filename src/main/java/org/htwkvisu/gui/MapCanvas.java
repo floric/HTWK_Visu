@@ -65,7 +65,7 @@ public class MapCanvas extends Canvas {
         Random rnd = new Random();
         for (int i = 0; i < 999999; i++) {
             addDrawableElement(
-                    new SimplePoint(new Point2D(51 + rnd.nextDouble(), 13 + rnd.nextDouble()), "Sample", rnd.nextDouble() * 40000)
+                    new SimplePoint(new Point2D(51 + rnd.nextDouble(), 13 + rnd.nextDouble()), rnd.nextDouble() * 40000)
             );
         }
 
@@ -256,6 +256,10 @@ public class MapCanvas extends Canvas {
      * @param elem Point to add
      */
     public void addDrawableElement(IMapDrawable elem) {
+        if (elem == null) {
+            throw new IllegalArgumentException("No valid element!");
+        }
+
         drawables.add(elem);
     }
 

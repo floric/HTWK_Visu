@@ -10,14 +10,12 @@ import org.htwkvisu.org.IMapDrawable;
 public class SimplePoint implements IMapDrawable {
 
     private Point2D pt;
-    private String name;
     private double minScale;
 
     private static final double POINT_SIZE = 5;
 
-    public SimplePoint(Point2D pt, String name, double minScale) {
+    public SimplePoint(Point2D pt, double minScale) {
         this.pt = pt;
-        this.name = name;
         this.minScale = minScale;
     }
 
@@ -28,7 +26,7 @@ public class SimplePoint implements IMapDrawable {
 
     @Override
     public String getName() {
-        return name;
+        return "Point";
     }
 
     @Override
