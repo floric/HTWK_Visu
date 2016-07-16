@@ -76,9 +76,6 @@ public class MapCanvasTest {
     public void transferPixelToCoordinate() throws Exception {
         Random rnd = new Random();
 
-        for (int i = 0; i < 10; i++) {
-
-        }
         canvas.setScale(1);
         canvas.centerView(new Point2D(0, 0));
 
@@ -86,12 +83,13 @@ public class MapCanvasTest {
         assertPointToCoordinate(new Point2D(MAP_WIDTH / 2, MAP_HEIGHT / 2), new Point2D(0, 0));
 
         // top left corner
-        //assertPointToCoordinate(new Point2D(0, 0), new Point2D(MAP_HEIGHT / 2, -MAP_WIDTH / 2));
-        for (int i = 0; i < 50; i++) {
-            Point2D p = new Point2D(rnd.nextDouble() * 100, rnd.nextDouble() * 100);
-            assertEquals(0.0, p.distance(canvas.transferCoordinateToPixel(canvas.transferPixelToCoordinate(p))), 0.01);
-            assertEquals(0.0, p.distance(canvas.transferPixelToCoordinate(canvas.transferCoordinateToPixel(p))), 0.01);
-        }
+        assertPointToCoordinate(new Point2D(0, 0), new Point2D(MAP_HEIGHT / 2, -MAP_WIDTH / 2));
+        // top right corner
+        assertPointToCoordinate(new Point2D(MAP_WIDTH, 0), new Point2D(MAP_HEIGHT / 2, MAP_WIDTH / 2));
+        // bottom left corner
+        assertPointToCoordinate(new Point2D(0, MAP_HEIGHT), new Point2D(-MAP_HEIGHT / 2, -MAP_WIDTH / 2));
+        // bottom right corner
+        assertPointToCoordinate(new Point2D(MAP_WIDTH, MAP_HEIGHT), new Point2D(-MAP_HEIGHT / 2, MAP_WIDTH / 2));
     }
 
     @Test
@@ -101,8 +99,12 @@ public class MapCanvasTest {
         canvas.setScale(1);
         canvas.centerView(new Point2D(0, 0));
 
+        // create random points with random map centers and scales
+        // then transfer them to pixel space and back to earth space
         for (int i = 0; i < 50; i++) {
             Point2D p = new Point2D(rnd.nextDouble() * 100, rnd.nextDouble() * 100);
+            canvas.setScale(rnd.nextDouble());
+            canvas.centerView(new Point2D(rnd.nextDouble() * 50, rnd.nextDouble() * 50));
             assertEquals(0.0, p.distance(canvas.transferCoordinateToPixel(canvas.transferPixelToCoordinate(p))), 0.01);
             assertEquals(0.0, p.distance(canvas.transferPixelToCoordinate(canvas.transferCoordinateToPixel(p))), 0.01);
         }

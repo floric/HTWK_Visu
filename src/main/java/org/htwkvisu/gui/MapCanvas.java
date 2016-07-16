@@ -12,6 +12,7 @@ import org.htwkvisu.utils.MathUtils;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -25,10 +26,12 @@ public class MapCanvas extends Canvas {
     private static final double ZOOM_SPEED = 100;
     private static final double ZOOM_MIN = 150;
     private static final double ZOOM_MAX = 1000000;
-    private static final MouseButton DRAG_BUTTON = MouseButton.MIDDLE;
-    private static final double KM_PER_COORD = 111;
+    private static final MouseButton MOUSEBUTTON_DRAG = MouseButton.SECONDARY;
+    private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
+    private static final int SELECTION_MAX_PX_TOLERANCE = 10;
 
     // default: 1 real coordinate unit = 111km => 0.01 unit = 1.11km => 100px => val: 100 * 100
+    private static final double KM_PER_COORD = 111;
     private double scale = 100000;
 
     // default: Leipzig
@@ -63,9 +66,9 @@ public class MapCanvas extends Canvas {
 
         // test data around coordinates center
         Random rnd = new Random();
-        for (int i = 0; i < 999999; i++) {
+        for (int i = 0; i < 9999; i++) {
             addDrawableElement(
-                    new SimplePoint(new Point2D(51 + rnd.nextDouble(), 13 + rnd.nextDouble()), rnd.nextDouble() * 40000)
+                    new SimplePoint(new Point2D(50.5 + rnd.nextDouble(), 11.5 + rnd.nextDouble()), rnd.nextDouble() * 40000)
             );
         }
 
@@ -117,6 +120,8 @@ public class MapCanvas extends Canvas {
      * Add event handlers for mouse and keyboard interactions with map.
      */
     private void addEventHandlers() {
+
+        // scroll to zoom
         setOnScroll(event -> {
             double addedVal = event.getDeltaY() * (scale / ZOOM_SPEED);
 
@@ -126,8 +131,9 @@ public class MapCanvas extends Canvas {
             }
         });
 
+        // drag press
         setOnMousePressed(event -> {
-            if (event.getButton() == DRAG_BUTTON) {
+            if (event.getButton() == MOUSEBUTTON_DRAG) {
                 dragX = event.getX();
                 dragY = event.getY();
                 isDragging = true;
@@ -135,35 +141,46 @@ public class MapCanvas extends Canvas {
             }
         });
 
+        // drag move
         setOnMouseDragged(event -> {
-            if (event.getButton() == DRAG_BUTTON) {
+            if (event.getButton() == MOUSEBUTTON_DRAG) {
                 double xChange = dragX - event.getX();
                 double yChange = dragY - event.getY();
 
-                centerView(transferPixelToCoordinate((tmpWidth / 2) + xChange, (tmpHeight / 2) - yChange));
+                centerView(transferPixelToCoordinate((tmpWidth / 2) + xChange, (tmpHeight / 2) + yChange));
 
                 dragX = event.getX();
                 dragY = event.getY();
             }
         });
 
+        // drag release
         setOnMouseReleased(event -> {
-            if (event.getButton() == DRAG_BUTTON) {
+            if (event.getButton() == MOUSEBUTTON_DRAG) {
                 isDragging = false;
                 redraw();
             }
         });
 
-        setOnContextMenuRequested(event -> {
-            System.out.println("Click: " + event.getX() + "; " + event.getY());
-            Point2D coords = transferPixelToCoordinate(event.getX(), event.getY());
-            System.out.println("Coords: N" + coords.getX() + "; E" + coords.getY());
-            gc.setFill(Color.GREEN);
-            gc.setStroke(Color.GREEN);
-            Point2D pixelPos = transferCoordinateToPixel(coords);
-            gc.fillRect(pixelPos.getX(), pixelPos.getY(), 2, 2);
-            System.out.println("Pos: " + pixelPos);
+        // selection
+        setOnMouseClicked(event -> {
+            if (event.getButton() == MOUSEBUTTON_SELECT) {
+                List<IMapDrawable> drawablesToSelect = drawables.parallelStream()
+                        .filter(elem -> elem.getMinDrawScale() < scale)
+                        .filter(elem -> coordsBounds.contains(elem.getCoordinates())).collect(Collectors.toList());
+
+                Point2D clickPos = new Point2D(event.getX(), event.getY());
+
+                for (IMapDrawable elem : drawablesToSelect) {
+                    Point2D lclPos = transferCoordinateToPixel(elem.getCoordinates());
+                    if (lclPos.distance(clickPos) < SELECTION_MAX_PX_TOLERANCE) {
+                        Logger.getGlobal().info("Selected: " + elem.getName() + " at " + MathUtils.formatCoordinates(elem.getCoordinates()));
+                        break;
+                    }
+                }
+            }
         });
+
     }
 
     /**
@@ -211,17 +228,23 @@ public class MapCanvas extends Canvas {
         double eastPos;
         gc.setStroke(Color.BLACK);
 
+        // Latitude
         double x = coordsBounds.getMinX();
         while (x < coordsBounds.getMaxX()) {
-            northPos = transferCoordinateToPixel(new Point2D(Math.ceil(x), Math.ceil(x))).getY();
+            double fullVal = Math.ceil(x);
+            northPos = transferCoordinateToPixel(new Point2D(fullVal, Math.ceil(x))).getY();
             gc.strokeLine(0, northPos, tmpWidth, northPos);
+            gc.fillText(MathUtils.roundToDecimalsAsString(fullVal, 0), 10, northPos - 10);
             x += 1;
         }
 
+        // Longitude
         double y = coordsBounds.getMinY();
         while (y < coordsBounds.getMaxY()) {
-            eastPos = transferCoordinateToPixel(new Point2D(Math.ceil(y), Math.ceil(y))).getX();
+            double fullVal = Math.ceil(y);
+            eastPos = transferCoordinateToPixel(new Point2D(Math.ceil(y), fullVal)).getX();
             gc.strokeLine(eastPos, 0, eastPos, tmpHeight);
+            gc.fillText(MathUtils.roundToDecimalsAsString(fullVal, 0), eastPos + 10, tmpHeight - 10);
             y += 1;
         }
     }
@@ -249,10 +272,8 @@ public class MapCanvas extends Canvas {
      * @return Pixel coordinates
      */
     public Point2D transferCoordinateToPixel(Point2D p) {
-        /*return new Point2D((p.getX() - mapCenter.getX()) * scale + tmpWidth / 2,
-                (p.getY() - mapCenter.getY()) * scale + tmpHeight / 2);*/
         return new Point2D((p.getY() - mapCenter.getY()) * scale + tmpWidth / 2,
-                (p.getX() - mapCenter.getX()) * scale + tmpHeight / 2);
+                ((mapCenter.getX() - p.getX()) * scale + tmpHeight / 2));
     }
 
     /**
@@ -263,9 +284,7 @@ public class MapCanvas extends Canvas {
      * @return Earth coordinates
      */
     public Point2D transferPixelToCoordinate(double x, double y) {
-        /*return new Point2D(coordsBounds.getMinY() + (y / tmpHeight) * coordsBounds.getHeight(),
-                coordsBounds.getMinX() + (x / tmpWidth) * coordsBounds.getWidth());*/
-        return new Point2D(coordsBounds.getMinX() + (y / tmpHeight) * coordsBounds.getWidth(),
+        return new Point2D(coordsBounds.getMaxX() - (y / tmpHeight) * coordsBounds.getWidth(),
                 coordsBounds.getMinY() + (x / tmpWidth) * coordsBounds.getHeight());
     }
 
