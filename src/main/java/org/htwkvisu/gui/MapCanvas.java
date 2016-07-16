@@ -94,6 +94,25 @@ public class MapCanvas extends Canvas {
         return coordsBounds;
     }
 
+
+    /**
+     * Get the map scale.
+     *
+     * @return scale of map
+     */
+    public double getScale() {
+        return scale;
+    }
+
+    /**
+     * Set the maps scale.
+     *
+     * @param scale of map
+     */
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
     /**
      * Add event handlers for mouse and keyboard interactions with map.
      */
@@ -133,6 +152,17 @@ public class MapCanvas extends Canvas {
                 isDragging = false;
                 redraw();
             }
+        });
+
+        setOnContextMenuRequested(event -> {
+            System.out.println("Click: " + event.getX() + "; " + event.getY());
+            Point2D coords = transferPixelToCoordinate(event.getX(), event.getY());
+            System.out.println("Coords: N" + coords.getX() + "; E" + coords.getY());
+            gc.setFill(Color.GREEN);
+            gc.setStroke(Color.GREEN);
+            Point2D pixelPos = transferCoordinateToPixel(coords);
+            gc.fillRect(pixelPos.getX(), pixelPos.getY(), 2, 2);
+            System.out.println("Pos: " + pixelPos);
         });
     }
 
@@ -222,7 +252,7 @@ public class MapCanvas extends Canvas {
         /*return new Point2D((p.getX() - mapCenter.getX()) * scale + tmpWidth / 2,
                 (p.getY() - mapCenter.getY()) * scale + tmpHeight / 2);*/
         return new Point2D((p.getY() - mapCenter.getY()) * scale + tmpWidth / 2,
-                (mapCenter.getX() - p.getX()) * scale + tmpHeight / 2);
+                (p.getX() - mapCenter.getX()) * scale + tmpHeight / 2);
     }
 
     /**
@@ -237,6 +267,10 @@ public class MapCanvas extends Canvas {
                 coordsBounds.getMinX() + (x / tmpWidth) * coordsBounds.getWidth());*/
         return new Point2D(coordsBounds.getMinX() + (y / tmpHeight) * coordsBounds.getWidth(),
                 coordsBounds.getMinY() + (x / tmpWidth) * coordsBounds.getHeight());
+    }
+
+    public Point2D transferPixelToCoordinate(Point2D p) {
+        return transferPixelToCoordinate(p.getX(), p.getY());
     }
 
     /**
