@@ -2,7 +2,7 @@
 
 ## Build status
 
-[![Branch: master](https://travis-ci.org/floric/HTWK_Visu.svg?branch=master)](https://travis-ci.org/floric/HTWK_Visu)
+[![Branch: master](https://travis-ci.org/floric/HTWK_Visu.svg?branch=master)](https://travis-ci.org/floric/HTWK_Visu) [![codecov](https://codecov.io/gh/floric/HTWK_Visu/branch/master/graph/badge.svg)](https://codecov.io/gh/floric/HTWK_Visu)
 
 # Depedencies
 
