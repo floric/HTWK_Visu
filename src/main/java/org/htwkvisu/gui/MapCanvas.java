@@ -78,15 +78,6 @@ public class MapCanvas extends Canvas {
     }
 
     /**
-     * Get center of map.
-     *
-     * @return Point2D Center of map
-     */
-    public Point2D getMapCenter() {
-        return mapCenter;
-    }
-
-    /**
      * Get coordinates bounds currently drawn on map.
      *
      * @return BoundingBox Coordinates Boundingbox
@@ -105,25 +96,26 @@ public class MapCanvas extends Canvas {
         return scale;
     }
 
-    //check not null is unnecessary, because of the primitive type of height and weight
+    // The following functions return the coordinate bounds of the Canvas.
+
     public Point2D getLeftTopCorner() {
-        return new Point2D(getHeight() / 2, -getWidth() / 2);
+        return new Point2D(coordsBounds.getMaxX(), coordsBounds.getMinY());
     }
 
     public Point2D getRightTopCorner() {
-        return new Point2D(getHeight() / 2, getWidth() / 2);
+        return new Point2D(coordsBounds.getMaxX(), coordsBounds.getMaxY());
     }
 
     public Point2D getLeftBottomCorner() {
-        return new Point2D(-getHeight() / 2, -getWidth() / 2);
+        return new Point2D(coordsBounds.getMinX(), coordsBounds.getMinY());
     }
 
     public Point2D getRightBottomCorner() {
-        return new Point2D(-getHeight() / 2, getWidth() / 2);
+        return new Point2D(coordsBounds.getMinX(), coordsBounds.getMaxY());
     }
 
     public Point2D getCenter() {
-        return new Point2D(getWidth() / 2, getHeight() / 2);
+        return mapCenter;
     }
 
     /**
@@ -141,6 +133,7 @@ public class MapCanvas extends Canvas {
         } else {
             this.scale = ZOOM_MAX;
         }
+        redraw();
     }
 
     /**

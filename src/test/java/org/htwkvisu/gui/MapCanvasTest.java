@@ -57,32 +57,14 @@ public class MapCanvasTest {
 
     @Test
     public void transferCoordinateToPixel() throws Exception {
-        canvas.centerView(new Point2D(ZERO, ZERO));
-        canvas.setScale(MapCanvas.ZOOM_MIN);
-
-        //TODO test scale invariance
-
-        assertBounds(new Point2D(ZERO, ZERO), new Point2D(MAP_WIDTH, ZERO), new Point2D(ZERO, MAP_HEIGHT)
-                , new Point2D(MAP_WIDTH, MAP_HEIGHT));
-
-        // test offsets with scale = 1
-        Random rnd = new Random();
-        for (int i = 0; i < 10; i++) {
-            Point2D ptOffset = new Point2D(rnd.nextDouble() * ONE_HUNDRED, rnd.nextDouble() * ONE_HUNDRED);
-            canvas.centerView(ptOffset);
-
-            assertBounds(new Point2D(ZERO, ZERO).add(new Point2D(-ptOffset.getY(), ptOffset.getX()))
-                    , new Point2D(MAP_WIDTH, ZERO).add(new Point2D(-ptOffset.getY(), ptOffset.getX()))
-                    , new Point2D(ZERO, MAP_HEIGHT).add(new Point2D(-ptOffset.getY(), ptOffset.getX()))
-                    , new Point2D(MAP_WIDTH, MAP_HEIGHT).add(new Point2D(-ptOffset.getY(), ptOffset.getX())));
-        }
-
+        // test center
         canvas.centerView(new Point2D(ZERO, ZERO));
         for (int i = 0; i < 10; i++) {
             canvas.setScale((double) MapCanvas.ZOOM_MIN + i);
-
-            assertPointToPixel(new Point2D(ZERO, ZERO), canvas.getCenter());
+            assertCoordToPixel(canvas.getCenter(), new Point2D(MAP_WIDTH / 2, MAP_HEIGHT / 2));
         }
+
+        // other cases automatically catched with testBothTransersTogether
     }
 
     @Test
@@ -90,9 +72,11 @@ public class MapCanvasTest {
         canvas.setScale(MapCanvas.ZOOM_MIN);
         canvas.centerView(new Point2D(ZERO, ZERO));
 
-        assertPointToPixel(new Point2D(ZERO, ZERO), canvas.getCenter());
-        assertBounds(new Point2D(ZERO, ZERO), new Point2D(MAP_WIDTH, ZERO), new Point2D(ZERO, MAP_HEIGHT)
-                , new Point2D(MAP_WIDTH, MAP_HEIGHT));
+        assertPixelToCoord(new Point2D(MAP_WIDTH / 2, MAP_HEIGHT / 2), canvas.getCenter());
+        assertPixelToCoord(new Point2D(ZERO, ZERO), canvas.getLeftTopCorner());
+        assertPixelToCoord(new Point2D(MAP_WIDTH, ZERO), canvas.getRightTopCorner());
+        assertPixelToCoord(new Point2D(ZERO, MAP_HEIGHT), canvas.getLeftBottomCorner());
+        assertPixelToCoord(new Point2D(MAP_WIDTH, MAP_HEIGHT), canvas.getRightBottomCorner());
     }
 
     @Test
@@ -123,7 +107,7 @@ public class MapCanvasTest {
         for (int i = 0; i < 10; i++) {
             newCenter = new Point2D(rnd.nextDouble(), rnd.nextDouble());
             canvas.centerView(newCenter);
-            assertEquals(newCenter, canvas.getMapCenter());
+            assertEquals(newCenter, canvas.getCenter());
         }
     }
 
@@ -141,15 +125,13 @@ public class MapCanvasTest {
         canvas.addDrawableElement(null);
     }
 
-    private void assertBounds(Point2D leftTop, Point2D rightTop, Point2D leftBottom, Point2D rightBottom) {
-        assertPointToPixel(canvas.getLeftTopCorner(), leftTop);
-        assertPointToPixel(canvas.getRightTopCorner(), rightTop);
-        assertPointToPixel(canvas.getLeftBottomCorner(), leftBottom);
-        assertPointToPixel(canvas.getRightBottomCorner(), rightBottom);
+    private void assertCoordToPixel(Point2D testPt, Point2D expPt) {
+        Point2D pt = canvas.transferCoordinateToPixel(testPt);
+        assertEquals(ZERO_DOUBLE, pt.distance(expPt), TINY_DELTA);
     }
 
-    private void assertPointToPixel(Point2D testPt, Point2D expPt) {
-        Point2D pt = canvas.transferCoordinateToPixel(testPt);
+    private void assertPixelToCoord(Point2D testPt, Point2D expPt) {
+        Point2D pt = canvas.transferPixelToCoordinate(testPt);
         assertEquals(ZERO_DOUBLE, pt.distance(expPt), TINY_DELTA);
     }
 }
