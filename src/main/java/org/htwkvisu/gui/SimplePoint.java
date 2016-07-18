@@ -5,7 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import org.htwkvisu.org.IMapDrawable;
 
 /**
- * Created by floric on 7/14/16.
+ * Sample class for simple points.
  */
 public class SimplePoint implements IMapDrawable {
 

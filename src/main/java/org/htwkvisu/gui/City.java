@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import org.htwkvisu.org.IMapDrawable;
 
 /**
- * Created by floric on 7/14/16.
+ * Sample class for cities.
  */
 public class City implements IMapDrawable {
 

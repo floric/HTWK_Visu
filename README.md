@@ -4,7 +4,7 @@
 
 [![Branch: master](https://travis-ci.org/floric/HTWK_Visu.svg?branch=master)](https://travis-ci.org/floric/HTWK_Visu) [![codecov](https://codecov.io/gh/floric/HTWK_Visu/branch/master/graph/badge.svg)](https://codecov.io/gh/floric/HTWK_Visu)
 
-# Depedencies
+# Dependencies
 
 * Java 8 bundled with JavaFX
 * JUnit for testing

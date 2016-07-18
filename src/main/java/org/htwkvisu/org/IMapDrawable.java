@@ -5,7 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import org.htwkvisu.gui.MapCanvas;
 
 /**
- * Created by floric on 7/14/16.
+ * Interface for drawable objects for MapCanvas.
  */
 public interface IMapDrawable {
     Point2D getCoordinates();

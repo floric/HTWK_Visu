@@ -13,7 +13,6 @@ import java.util.logging.*;
 
 /**
  *  Main App
- *  @author floric
  */
 public class App extends Application {
 

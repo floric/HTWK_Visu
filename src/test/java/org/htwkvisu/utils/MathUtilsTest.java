@@ -7,9 +7,6 @@ import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by floric on 7/14/16.
- */
 public class MathUtilsTest {
 
     @Rule

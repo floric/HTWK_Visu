@@ -10,9 +10,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by floric on 7/14/16.
- */
 public class MapCanvasTest {
 
     private static final int ZERO = 0;
@@ -35,10 +32,33 @@ public class MapCanvasTest {
         canvas.setHeight(MAP_HEIGHT);
     }
 
+
+    @Test
+    public void testScaleChanging() throws Exception {
+        Random rnd = new Random();
+
+        // random valid and lower values
+        for (int i = 0; i < 5; i++) {
+            double newScale = (rnd.nextDouble() - 0.5) * MapCanvas.ZOOM_MIN * 2;
+            canvas.setScale(newScale);
+            if (newScale < MapCanvas.ZOOM_MIN) {
+                assertEquals(MapCanvas.ZOOM_MIN, canvas.getScale(), TINY_DELTA);
+            } else {
+                assertEquals(newScale, canvas.getScale(), TINY_DELTA);
+            }
+        }
+
+        // upper zoom border
+        canvas.setScale(MapCanvas.ZOOM_MAX + 1);
+        assertEquals(MapCanvas.ZOOM_MAX, canvas.getScale(), TINY_DELTA);
+        canvas.setScale(MapCanvas.ZOOM_MAX);
+        assertEquals(MapCanvas.ZOOM_MAX, canvas.getScale(), TINY_DELTA);
+    }
+
     @Test
     public void transferCoordinateToPixel() throws Exception {
         canvas.centerView(new Point2D(ZERO, ZERO));
-        canvas.setScale(1);
+        canvas.setScale(MapCanvas.ZOOM_MIN);
 
         //TODO test scale invariance
 
@@ -59,7 +79,7 @@ public class MapCanvasTest {
 
         canvas.centerView(new Point2D(ZERO, ZERO));
         for (int i = 0; i < 10; i++) {
-            canvas.setScale((double) i);
+            canvas.setScale((double) MapCanvas.ZOOM_MIN + i);
 
             assertPointToPixel(new Point2D(ZERO, ZERO), canvas.getCenter());
         }
@@ -67,7 +87,7 @@ public class MapCanvasTest {
 
     @Test
     public void transferPixelToCoordinate() throws Exception {
-        canvas.setScale(1);
+        canvas.setScale(MapCanvas.ZOOM_MIN);
         canvas.centerView(new Point2D(ZERO, ZERO));
 
         assertPointToPixel(new Point2D(ZERO, ZERO), canvas.getCenter());
@@ -79,14 +99,14 @@ public class MapCanvasTest {
     public void testBothTransfersTogether() {
         Random rnd = new Random();
 
-        canvas.setScale(1);
+        canvas.setScale(MapCanvas.ZOOM_MIN);
         canvas.centerView(new Point2D(ZERO, ZERO));
 
         // create random points with random map centers and scales
         // then transfer them to pixel space and back to earth space
         for (int i = 0; i < 50; i++) {
             Point2D p = new Point2D(rnd.nextDouble() * ONE_HUNDRED, rnd.nextDouble() * ONE_HUNDRED);
-            canvas.setScale(rnd.nextDouble());
+            canvas.setScale(rnd.nextDouble() + MapCanvas.ZOOM_MIN);
             canvas.centerView(new Point2D(rnd.nextDouble() * 50, rnd.nextDouble() * 50));
             assertEquals(ZERO_DOUBLE, p.distance(canvas.transferCoordinateToPixel(canvas.transferPixelToCoordinate(p)))
                     , DELTA);

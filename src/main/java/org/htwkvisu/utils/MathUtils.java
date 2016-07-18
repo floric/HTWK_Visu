@@ -5,7 +5,7 @@ import javafx.geometry.Point2D;
 import java.math.BigDecimal;
 
 /**
- * Created by floric on 7/14/16.
+ * mathematical utils.
  */
 public class MathUtils {
 

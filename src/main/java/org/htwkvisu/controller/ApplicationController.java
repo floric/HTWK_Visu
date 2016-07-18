@@ -17,8 +17,6 @@ import java.util.logging.Logger;
 
 /**
  * Control for GUI changes for App
- *
- * @author floric
  */
 public class ApplicationController implements Initializable {
 

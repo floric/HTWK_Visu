@@ -17,15 +17,13 @@ import java.util.stream.Collectors;
 
 /**
  * Canvas for map.
- *
- * @author floric
  */
 public class MapCanvas extends Canvas {
 
     // constants
     private static final double ZOOM_SPEED = 100;
-    private static final double ZOOM_MIN = 150;
-    private static final double ZOOM_MAX = 1000000;
+    public static final double ZOOM_MIN = 150;
+    public static final double ZOOM_MAX = 1000000;
     private static final MouseButton MOUSEBUTTON_DRAG = MouseButton.SECONDARY;
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
@@ -134,7 +132,15 @@ public class MapCanvas extends Canvas {
      * @param scale of map
      */
     public void setScale(double scale) {
-        this.scale = scale;
+        if (scale < ZOOM_MAX) {
+            if (scale > ZOOM_MIN) {
+                this.scale = scale;
+            } else {
+                this.scale = ZOOM_MIN;
+            }
+        } else {
+            this.scale = ZOOM_MAX;
+        }
     }
 
     /**
@@ -145,11 +151,8 @@ public class MapCanvas extends Canvas {
         // scroll to zoom
         setOnScroll(event -> {
             double addedVal = event.getDeltaY() * (scale / ZOOM_SPEED);
-
-            if ((scale + addedVal) > ZOOM_MIN && (scale + addedVal) < ZOOM_MAX) {
-                scale += addedVal;
-                redraw();
-            }
+            setScale(scale + addedVal);
+            redraw();
         });
 
         // drag press

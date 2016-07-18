@@ -2,9 +2,6 @@ package org.htwkvisu.controller;
 
 import org.junit.Before;
 
-/**
- * Created by floric on 7/15/16.
- */
 public class ApplicationControllerTest {
 
     private ApplicationController ctrl;
