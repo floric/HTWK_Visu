@@ -10,10 +10,8 @@ buildNumber.properties
 .mvn/timing.properties
 
 ### Intellij
-**/.idea/workspace.xml
 **/.idea/tasks.xml
 **/.idea/dictionaries
-**/.idea/vcs.xml
 **/.idea/jsLibraryMappings.xml
 
 # Sensitive or high-churn files:
@@ -26,7 +24,6 @@ buildNumber.properties
 
 # Gradle:
 .idea/gradle.xml
-.idea/libraries
 
 /out/
 
@@ -36,3 +33,4 @@ buildNumber.properties
 # Exclude local logging files
 *.log
 *.log.lck
+/.idea/
