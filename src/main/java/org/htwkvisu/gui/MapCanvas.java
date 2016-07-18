@@ -107,6 +107,27 @@ public class MapCanvas extends Canvas {
         return scale;
     }
 
+    //check not null is unnecessary, because of the primitive type of height and weight
+    public Point2D getLeftTopCorner() {
+        return new Point2D(getHeight() / 2, -getWidth() / 2);
+    }
+
+    public Point2D getRightTopCorner() {
+        return new Point2D(getHeight() / 2, getWidth() / 2);
+    }
+
+    public Point2D getLeftBottomCorner() {
+        return new Point2D(-getHeight() / 2, -getWidth() / 2);
+    }
+
+    public Point2D getRightBottomCorner() {
+        return new Point2D(-getHeight() / 2, getWidth() / 2);
+    }
+
+    public Point2D getCenter() {
+        return new Point2D(getWidth() / 2, getHeight() / 2);
+    }
+
     /**
      * Set the maps scale.
      *
