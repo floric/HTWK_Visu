@@ -26,6 +26,14 @@ public class ScoringCalculator {
         categories.add(cat);
     }
 
+    public void removeCategory(String cat) {
+        categories.remove(cat);
+    }
+
+    public void resetCategories() {
+        categories.clear();
+    }
+
     public List<String> getCategories() {
         return categories;
     }

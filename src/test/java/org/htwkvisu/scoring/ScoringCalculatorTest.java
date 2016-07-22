@@ -8,9 +8,6 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by floric on 7/22/16.
- */
 public class ScoringCalculatorTest {
 
     private ScoringCalculator calculator;
@@ -46,6 +43,27 @@ public class ScoringCalculatorTest {
         calculator.addCategory(category);
         assertEquals(1, calculator.getCategories().size());
         assertEquals(category, calculator.getCategories().get(0));
+    }
+
+    @Test
+    public void removeCategory() throws Exception {
+        String category = "Test";
+
+        calculator.addCategory(category);
+        assertEquals(1, calculator.getCategories().size());
+        calculator.removeCategory(category);
+        assertEquals(0, calculator.getCategories().size());
+    }
+
+    @Test
+    public void resetCategories() throws Exception {
+
+        calculator.addCategory("Test");
+        calculator.addCategory("Bla");
+        calculator.addCategory("123");
+        assertEquals(true, !calculator.getCategories().isEmpty());
+        calculator.resetCategories();
+        assertEquals(0, calculator.getCategories().size());
     }
 
     @Test
