@@ -21,4 +21,9 @@ public class LinearFallOf implements IFallOf {
     public double getMaximumValue() {
         return maxVal;
     }
+
+    @Override
+    public double getRadius() {
+        return radius;
+    }
 }

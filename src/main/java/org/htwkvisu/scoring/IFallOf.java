@@ -9,4 +9,6 @@ public interface IFallOf {
     double getValue(Point2D pt, Point2D sample);
 
     double getMaximumValue();
+
+    double getRadius();
 }

@@ -1,5 +1,7 @@
 package org.htwkvisu.scoring;
 
+import javafx.geometry.Point2D;
+
 import java.util.HashMap;
 
 /*
@@ -7,4 +9,6 @@ import java.util.HashMap;
  */
 public interface IScorable {
     HashMap<String, IFallOf> getValues();
+
+    Point2D getPosition();
 }

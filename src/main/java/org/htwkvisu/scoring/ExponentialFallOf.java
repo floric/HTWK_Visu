@@ -23,4 +23,9 @@ public class ExponentialFallOf implements IFallOf {
     public double getMaximumValue() {
         return maxVal;
     }
+
+    @Override
+    public double getRadius() {
+        return radius;
+    }
 }
