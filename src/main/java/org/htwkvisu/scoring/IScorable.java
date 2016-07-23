@@ -8,7 +8,7 @@ import java.util.HashMap;
 * Interface for all POIs which have an influence for the scoring.
  */
 public interface IScorable {
-    HashMap<String, IFallOf> getValues();
+    HashMap<String, IFallOf> getCategoryFallOfs();
 
     Point2D getPosition();
 }
