@@ -4,8 +4,8 @@ import javafx.geometry.Point2D;
 
 public class LinearFallOf implements IFallOf {
 
-    protected double maxVal = 0;
-    protected double radius = 0;
+    private double maxVal = 0;
+    private double radius = 0;
 
     public LinearFallOf(double radius, double maxVal) {
         this.maxVal = maxVal;

@@ -60,7 +60,7 @@ public class MapCanvasTest {
         // test center
         canvas.centerView(new Point2D(ZERO, ZERO));
         for (int i = 0; i < 10; i++) {
-            canvas.setScale((double) MapCanvas.ZOOM_MIN + i);
+            canvas.setScale(MapCanvas.ZOOM_MIN + i);
             assertCoordToPixel(canvas.getCenter(), new Point2D(MAP_WIDTH / 2, MAP_HEIGHT / 2));
         }
 

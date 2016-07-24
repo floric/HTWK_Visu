@@ -13,7 +13,7 @@ public class AirportTest {
     private static final String NAME = "Test";
     private static final Point2D POSITION = new Point2D(0.123, -1.234);
     private Airport airport;
-    public static final double TINY_DELTA = 0.0001;
+    private static final double TINY_DELTA = 0.0001;
 
     @Before
     public void setUp() throws Exception {

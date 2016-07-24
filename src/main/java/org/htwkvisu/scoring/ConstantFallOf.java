@@ -3,8 +3,8 @@ package org.htwkvisu.scoring;
 import javafx.geometry.Point2D;
 
 public class ConstantFallOf implements IFallOf {
-    protected double val = 0;
-    protected double radius = 0;
+    private double val = 0;
+    private double radius = 0;
 
     public ConstantFallOf(double radius, double val) {
         this.val = val;

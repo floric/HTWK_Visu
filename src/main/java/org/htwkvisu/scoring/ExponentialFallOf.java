@@ -4,9 +4,9 @@ import javafx.geometry.Point2D;
 
 public class ExponentialFallOf implements IFallOf {
 
-    protected double maxVal = 0;
-    protected double radius = 0;
-    protected double exp = 0;
+    private double maxVal = 0;
+    private double radius = 0;
+    private double exp = 0;
 
     public ExponentialFallOf(double radius, double maxVal, double exp) {
         this.maxVal = maxVal;

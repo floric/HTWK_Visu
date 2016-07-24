@@ -72,6 +72,15 @@ public class ScoringCalculator {
     public HashMap<String, Double> calculateValue(Point2D pt) {
         HashMap<String, Double> values = new HashMap<>();
 
+        // check if there are no POIs present, then return 0 for each category
+        if (weights.isEmpty()) {
+            categories.parallelStream().forEach(catStr -> {
+                values.put(catStr, 0.0);
+            });
+
+            return values;
+        }
+
         // calculate total weights sum
         double totalWeightSum = weights.values().parallelStream().reduce((a, b) -> a + b).get();
 
@@ -87,11 +96,9 @@ public class ScoringCalculator {
     private double calculateCategoryValue(String catStr, Point2D pt) {
 
         // filter unused points and sum calculated values to category value
-        double result = pois.parallelStream().filter(poi -> {
+        return pois.parallelStream().filter(poi -> {
             IFallOf fallOf = poi.getCategoryFallOfs().get(catStr);
             return (pt.distance(poi.getCoordinates())) < fallOf.getRadius();
         }).mapToDouble(poi -> poi.getCategoryFallOfs().get(catStr).getValue(pt, poi.getCoordinates())).sum();
-
-        return result;
     }
 }

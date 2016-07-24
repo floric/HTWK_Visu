@@ -30,7 +30,7 @@ public class ScoringCalculatorTest {
         calculator.addPOI(new IScorable() {
             @Override
             public Map<String, IFallOf> getCategoryFallOfs() {
-                return new HashMap<String, IFallOf>();
+                return new HashMap<>();
             }
 
             @Override

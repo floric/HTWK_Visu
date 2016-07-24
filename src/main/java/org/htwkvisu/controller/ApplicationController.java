@@ -51,8 +51,8 @@ public class ApplicationController implements Initializable {
      * Default JavaFX initilization method for controllers.
      * Implemented from Initializable-interface.
      *
-     * @param location
-     * @param resources
+     * @param location Location
+     * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
         canvas = new MapCanvas();

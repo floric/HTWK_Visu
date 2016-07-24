@@ -18,9 +18,9 @@ import java.util.Map;
  */
 public class Airport implements IScorable, IMapDrawable {
 
-    public static final double INFLUENCE_RADIUS = MathUtils.convertKilometresToUnits(100);
-    public static final double INFLUENCE_MAX_VAL = 100;
-    public static final double INFLUENCE_EXP = 3;
+    private static final double INFLUENCE_RADIUS = MathUtils.convertKilometresToUnits(100);
+    private static final double INFLUENCE_MAX_VAL = 100;
+    private static final double INFLUENCE_EXP = 3;
 
     private String name = "Airport";
     private Point2D position = new Point2D(0, 0);

@@ -21,7 +21,7 @@ public class MathUtils {
      * @param d     Number
      * @param scale Digits count
      * @return Formatted number with scale digits
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException Exception
      */
     public static String roundToDecimalsAsString(double d, int scale) throws IllegalArgumentException {
         if (scale < 0) {
