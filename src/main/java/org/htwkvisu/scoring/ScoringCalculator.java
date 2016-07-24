@@ -22,15 +22,32 @@ public class ScoringCalculator {
 
     }
 
+    /**
+     * Add new POI (IScorable).
+     *
+     * @param poi POI
+     */
     public void addPOI(IScorable poi) {
         pois.add(poi);
     }
 
+    /**
+     * Add category.
+     *
+     * @param cat    Category
+     * @param weight Weight
+     */
     public void addCategory(String cat, double weight) {
         categories.add(cat);
         weights.put(cat, weight);
     }
 
+    /**
+     * Set weight of specific category.
+     *
+     * @param cat Category
+     * @param weight Weight value
+     */
     public void setCategoryWeight(String cat, double weight) {
         if (categories.contains(cat) && weights.containsKey(cat)) {
             weights.put(cat, weight);
@@ -39,6 +56,12 @@ public class ScoringCalculator {
         }
     }
 
+    /**
+     * Get weight of specific category.
+     *
+     * @param cat Category
+     * @return Weight value
+     */
     public double getCategoryWeight(String cat) {
         if (!weights.containsKey(cat)) {
             throw new IllegalArgumentException("Weight not known!");
@@ -47,6 +70,11 @@ public class ScoringCalculator {
         return weights.get(cat);
     }
 
+    /**
+     * Remove specific category.
+     *
+     * @param cat Category
+     */
     public void removeCategory(String cat) {
         if (!categories.contains(cat) || !weights.containsKey(cat)) {
             throw new IllegalArgumentException("Category not known!");
@@ -56,33 +84,44 @@ public class ScoringCalculator {
         weights.remove(cat);
     }
 
+    /**
+     * Removes all categories
+     */
     public void resetCategories() {
         categories.clear();
         weights.clear();
     }
 
+    /**
+     * Get all categories as list.
+     *
+     * @return List of category identifiers
+     */
     public List<String> getCategories() {
         return new LinkedList<>(categories);
     }
 
+    /**
+     * Get all POIs as list.
+     *
+     * @return List of POIs
+     */
     public List<IScorable> getPOIs() {
         return pois;
     }
 
+
+    /**
+     * Calculate scores for all added categories.
+     *
+     * @param pt Point
+     * @return Score values in map with categories as keys.
+     */
     public HashMap<String, Double> calculateValue(Point2D pt) {
         HashMap<String, Double> values = new HashMap<>();
 
-        // check if there are no POIs present, then return 0 for each category
-        if (weights.isEmpty()) {
-            categories.parallelStream().forEach(catStr -> {
-                values.put(catStr, 0.0);
-            });
-
-            return values;
-        }
-
         // calculate total weights sum
-        double totalWeightSum = weights.values().parallelStream().reduce((a, b) -> a + b).get();
+        double totalWeightSum = weights.values().parallelStream().reduce((a, b) -> a + b).orElse(0.0);
 
         // calculate category scores
         categories.parallelStream().forEach(catStr -> {
@@ -93,6 +132,13 @@ public class ScoringCalculator {
         return values;
     }
 
+    /**
+     * Calculate score for specific category.
+     *
+     * @param catStr Category identifier
+     * @param pt Point
+     * @return Score value
+     */
     private double calculateCategoryValue(String catStr, Point2D pt) {
 
         // filter unused points and sum calculated values to category value

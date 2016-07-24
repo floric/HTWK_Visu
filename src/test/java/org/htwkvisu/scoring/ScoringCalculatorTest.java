@@ -100,9 +100,13 @@ public class ScoringCalculatorTest {
         String category = "Test";
         double constantVal = 10;
 
-        calculator.addCategory(category, 1);
         HashMap<String, Double> values = calculator.calculateValue(new Point2D(0, 0));
+        assertEquals(0, values.size());
+
+        calculator.addCategory(category, 1);
+        values = calculator.calculateValue(new Point2D(0, 0));
         assertEquals(0, values.get(category), TINY_DELTA);
+        assertEquals(1, values.size());
 
         calculator.addPOI(new IScorable() {
             @Override
@@ -118,6 +122,7 @@ public class ScoringCalculatorTest {
                 return new Point2D(0, 0);
             }
         });
+
         values = calculator.calculateValue(new Point2D(0, 0));
         assertEquals(constantVal, values.get(category), TINY_DELTA);
     }
