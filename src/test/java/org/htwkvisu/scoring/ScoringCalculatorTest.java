@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,12 +29,12 @@ public class ScoringCalculatorTest {
         assertEquals(0, calculator.getPOIs().size());
         calculator.addPOI(new IScorable() {
             @Override
-            public HashMap<String, IFallOf> getCategoryFallOfs() {
+            public Map<String, IFallOf> getCategoryFallOfs() {
                 return new HashMap<String, IFallOf>();
             }
 
             @Override
-            public Point2D getPosition() {
+            public Point2D getCoordinates() {
                 return new Point2D(0, 0);
             }
         });
@@ -105,7 +106,7 @@ public class ScoringCalculatorTest {
 
         calculator.addPOI(new IScorable() {
             @Override
-            public HashMap<String, IFallOf> getCategoryFallOfs() {
+            public Map<String, IFallOf> getCategoryFallOfs() {
                 HashMap<String, IFallOf> fallofs = new HashMap<>();
                 fallofs.put(category, new ConstantFallOf(1, constantVal));
 
@@ -113,7 +114,7 @@ public class ScoringCalculatorTest {
             }
 
             @Override
-            public Point2D getPosition() {
+            public Point2D getCoordinates() {
                 return new Point2D(0, 0);
             }
         });

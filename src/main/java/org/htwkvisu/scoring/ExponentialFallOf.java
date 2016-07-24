@@ -16,7 +16,7 @@ public class ExponentialFallOf implements IFallOf {
 
     @Override
     public double getValue(Point2D pt, Point2D sample) {
-        return Math.pow(1 - (pt.distance(sample) / radius), exp) * maxVal;
+        return (1 - Math.pow(pt.distance(sample) / radius, exp)) * maxVal;
     }
 
     @Override

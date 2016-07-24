@@ -2,13 +2,13 @@ package org.htwkvisu.scoring;
 
 import javafx.geometry.Point2D;
 
-import java.util.HashMap;
+import java.util.Map;
 
-/*
-* Interface for all POIs which have an influence for the scoring.
+/**
+ * Interface for all POIs which have an influence for the scoring.
  */
 public interface IScorable {
-    HashMap<String, IFallOf> getCategoryFallOfs();
+    Map<String, IFallOf> getCategoryFallOfs();
 
-    Point2D getPosition();
+    Point2D getCoordinates();
 }

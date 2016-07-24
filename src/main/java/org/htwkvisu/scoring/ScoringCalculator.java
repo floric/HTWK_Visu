@@ -10,6 +10,10 @@ import java.util.*;
  */
 public class ScoringCalculator {
 
+    public static final String CATEGORY_HEALTH = "Health";
+    public static final String CATEGORY_INFRASTRUCTURE = "Infrastructure";
+    public static final String CATEGORY_EDUCATION = "Education";
+
     private Set<String> categories = new HashSet<>();
     private Map<String, Double> weights = new HashMap<>();
     private List<IScorable> pois = new LinkedList<>();
@@ -85,8 +89,8 @@ public class ScoringCalculator {
         // filter unused points and sum calculated values to category value
         double result = pois.parallelStream().filter(poi -> {
             IFallOf fallOf = poi.getCategoryFallOfs().get(catStr);
-            return (pt.distance(poi.getPosition())) < fallOf.getRadius();
-        }).mapToDouble(poi -> poi.getCategoryFallOfs().get(catStr).getValue(pt, poi.getPosition())).sum();
+            return (pt.distance(poi.getCoordinates())) < fallOf.getRadius();
+        }).mapToDouble(poi -> poi.getCategoryFallOfs().get(catStr).getValue(pt, poi.getCoordinates())).sum();
 
         return result;
     }

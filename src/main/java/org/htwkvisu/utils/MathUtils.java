@@ -9,6 +9,9 @@ import java.math.BigDecimal;
  */
 public class MathUtils {
 
+    // default: 1 real coordinate unit = 111km => 0.01 unit = 1.11km => 100px => val: 100 * 100
+    private static final double KM_PER_COORD = 111;
+
     private MathUtils() {
     }
 
@@ -43,5 +46,25 @@ public class MathUtils {
         strBld.append(roundToDecimalsAsString(Math.abs(pt.getY()), 5));
 
         return strBld.toString();
+    }
+
+    /**
+     * Return distance from units converted in kilometres.
+     *
+     * @param distInUnits Distance in units
+     * @return Distance in Kilometres
+     */
+    public static double convertUnitsToKilometres(double distInUnits) {
+        return distInUnits * KM_PER_COORD;
+    }
+
+    /**
+     * Return distance from kilometres converted in units.
+     *
+     * @param distInKMs Distance in kilometres
+     * @return Distance in Units
+     */
+    public static double convertKilometresToUnits(double distInKMs) {
+        return distInKMs / KM_PER_COORD;
     }
 }
