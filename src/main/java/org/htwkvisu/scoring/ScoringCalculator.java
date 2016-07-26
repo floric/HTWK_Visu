@@ -125,7 +125,11 @@ public class ScoringCalculator {
 
         // calculate category scores
         categories.parallelStream().forEach(catStr -> {
-            double score = calculateCategoryValue(catStr, pt) * weights.get(catStr) / totalWeightSum;
+
+            // use logarithmic for categories to soften high differences between categories
+            // the total score is the sum of each used category
+            double score = Math.log(calculateCategoryValue(catStr, pt) * weights.get(catStr) / totalWeightSum);
+
             values.put(catStr, score);
         });
 
