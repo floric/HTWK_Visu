@@ -117,23 +117,37 @@ public class ScoringCalculator {
      * @param pt Point
      * @return Score values in map with categories as keys.
      */
-    public HashMap<String, Double> calculateValue(Point2D pt) {
-        HashMap<String, Double> values = new HashMap<>();
+    public Map<String, Double> calculateValue(Point2D pt) {
+        Map<String, Double> values = new HashMap<>();
 
         // calculate total weights sum
         double totalWeightSum = weights.values().parallelStream().reduce((a, b) -> a + b).orElse(0.0);
 
         // calculate category scores
         categories.parallelStream().forEach(catStr -> {
-
-            // use logarithmic for categories to soften high differences between categories
-            // the total score is the sum of each used category
-            double score = Math.log(calculateCategoryValue(catStr, pt) * weights.get(catStr) / totalWeightSum);
+            double score = calculateCategoryValue(catStr, pt) * weights.get(catStr) / totalWeightSum;
+            if (score < 0) {
+                score = 0;
+            }
 
             values.put(catStr, score);
         });
 
         return values;
+    }
+
+
+    /**
+     * Calculate total score from values.
+     * The scores of the categories are added in a logarithmic scale.
+     *
+     * @param values Values from categories
+     * @return Total Score of point
+     */
+    public double calculateScoreFromCategorys(Map<String, Double> values) {
+        // use logarithmic for categories to soften high differences between categories
+        // the total score is the sum of each used category
+        return values.values().parallelStream().mapToDouble(a -> Math.log(a.doubleValue())).sum();
     }
 
     /**
