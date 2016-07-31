@@ -5,9 +5,31 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 
 public class MathUtilsTest {
+
+    public static final double TINY_DELTA = 0.0001;
+
+    @Test
+    public void convertUnitsToKilometres() throws Exception {
+
+    }
+
+    @Test
+    public void convertKilometresToUnits() throws Exception {
+        Random rnd = new Random();
+        for (int i = 0; i < 10; i++) {
+            double val = rnd.nextDouble() * 100;
+            assertEquals(val, MathUtils.convertKilometresToUnits(MathUtils.convertUnitsToKilometres(val)), TINY_DELTA);
+        }
+
+        assertEquals(1, MathUtils.convertKilometresToUnits(MathUtils.KM_PER_COORD), TINY_DELTA);
+        assertEquals(MathUtils.KM_PER_COORD, MathUtils.convertUnitsToKilometres(1), TINY_DELTA);
+
+    }
 
     @Rule
     public ExpectedException exception = ExpectedException.none();

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class MathUtils {
 
     // default: 1 real coordinate unit = 111km => 0.01 unit = 1.11km => 100px => val: 100 * 100
-    private static final double KM_PER_COORD = 111;
+    public static final double KM_PER_COORD = 111;
 
     private MathUtils() {
     }
