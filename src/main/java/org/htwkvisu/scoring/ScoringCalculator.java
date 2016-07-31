@@ -147,7 +147,7 @@ public class ScoringCalculator {
     public double calculateScoreFromCategorys(Map<String, Double> values) {
         // use logarithmic for categories to soften high differences between categories
         // the total score is the sum of each used category
-        return values.values().parallelStream().mapToDouble(a -> Math.log(a.doubleValue())).sum();
+        return values.values().parallelStream().mapToDouble(Math::log).sum();
     }
 
     /**
