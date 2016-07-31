@@ -28,8 +28,6 @@ public class MapCanvas extends Canvas {
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
 
-    // default: 1 real coordinate unit = 111km => 0.01 unit = 1.11km => 100px => val: 100 * 100
-    private static final double KM_PER_COORD = 111;
     private double scale = 100000;
 
     // default: Leipzig
@@ -210,8 +208,8 @@ public class MapCanvas extends Canvas {
         coveredHeight = tmpHeight / scale;
         coordsBounds = new BoundingBox(mapCenter.getX() - coveredHeight / 2, mapCenter.getY() - coveredWidth / 2,
                 coveredHeight, coveredWidth);
-        heightDistance = coordsBounds.getWidth() * KM_PER_COORD;
-        widthDistance = coordsBounds.getHeight() * KM_PER_COORD;
+        heightDistance = MathUtils.convertUnitsToKilometres(coordsBounds.getWidth());
+        widthDistance = MathUtils.convertUnitsToKilometres(coordsBounds.getHeight());
 
         // clear view
         gc.clearRect(0, 0, tmpWidth, tmpHeight);

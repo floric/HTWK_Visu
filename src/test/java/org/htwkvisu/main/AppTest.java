@@ -1,9 +1,8 @@
 package org.htwkvisu.main;
 
-import junit.framework.TestCase;
 import org.junit.Test;
 
-public class AppTest extends TestCase {
+public class AppTest {
 
     @Test
     public void testMain() throws Exception {

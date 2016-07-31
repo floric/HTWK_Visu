@@ -15,8 +15,6 @@ jdk:
 #  - openjdk8
 
 branches:
-  only:
-  - master
 
 notifications:
   email: false
