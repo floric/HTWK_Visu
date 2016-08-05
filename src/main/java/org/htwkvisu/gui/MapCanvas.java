@@ -122,7 +122,9 @@ public class MapCanvas extends Canvas {
     }
 
     public void setSamplingPixelDensity(int samplingPixelDensity) {
-        this.samplingPixelDensity = samplingPixelDensity;
+        if (samplingPixelDensity > 0) {
+            this.samplingPixelDensity = samplingPixelDensity;
+        }
     }
 
     /**
