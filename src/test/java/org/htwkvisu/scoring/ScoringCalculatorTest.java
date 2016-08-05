@@ -100,11 +100,11 @@ public class ScoringCalculatorTest {
         String category = "Test";
         double constantVal = 10;
 
-        Map<String, Double> values = calculator.calculateValue(new Point2D(0, 0));
+        Map<String, Double> values = calculator.calculateValues(new Point2D(0, 0));
         assertEquals(0, values.size());
 
         calculator.addCategory(category, 1);
-        values = calculator.calculateValue(new Point2D(0, 0));
+        values = calculator.calculateValues(new Point2D(0, 0));
         assertEquals(0, values.get(category), TINY_DELTA);
         assertEquals(1, values.size());
 
@@ -123,7 +123,7 @@ public class ScoringCalculatorTest {
             }
         });
 
-        values = calculator.calculateValue(new Point2D(0, 0));
+        values = calculator.calculateValues(new Point2D(0, 0));
         assertEquals(constantVal, values.get(category), TINY_DELTA);
 
         assertEquals(true, calculator.calculateScoreFromCategorys(values) > 0);

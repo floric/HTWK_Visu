@@ -27,14 +27,12 @@ public class MapCanvas extends Canvas {
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
 
-    private double scale = 100000;
-
     // default: Leipzig
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
-
     private LinkedList<IMapDrawable> drawables = new LinkedList<>();
-
     private int samplingPixelDensity = 20;
+    private double scale = 100000;
+    private ScoringCalculator calculator;
 
     // cached values for faster drawing
     private GraphicsContext gc = getGraphicsContext2D();
@@ -55,7 +53,9 @@ public class MapCanvas extends Canvas {
     /**
      * Construct and init canvas
      */
-    public MapCanvas() {
+    public MapCanvas(ScoringCalculator calculator) {
+        this.calculator = calculator;
+
         widthProperty().addListener(evt -> redraw());
         heightProperty().addListener(evt -> redraw());
 
@@ -292,18 +292,14 @@ public class MapCanvas extends Canvas {
         // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
         ArrayList<ArrayList<Point2D>> sampleCoords = getSampleCoordPoints(samplingPixelDensity);
 
-        // where to store the reference for ScoringCalculator?
-        // attention! this is just sample code without input data. The value will be always zero!
-        ScoringCalculator calc = new ScoringCalculator();
-
         // now calculate the values
         for (ArrayList<Point2D> line : sampleCoords) {
             for (Point2D pt : line) {
-                Map<String, Double> scores = calc.calculateValue(pt);
+                Map<String, Double> scores = calculator.calculateValues(pt);
 
                 // if we should draw only the final scoring value, then use this value
                 // else: use the values from our scores map with specific categories
-                double scoreVal = calc.calculateScoreFromCategorys(scores);
+                double scoreVal = calculator.calculateScoreFromCategorys(scores);
             }
         }
 

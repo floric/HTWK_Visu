@@ -1,6 +1,7 @@
 package org.htwkvisu.gui;
 
 import javafx.geometry.Point2D;
+import org.htwkvisu.scoring.ScoringCalculator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class MapCanvasTest {
 
     @Before
     public void setUp() {
-        canvas = new MapCanvas();
+        canvas = new MapCanvas(new ScoringCalculator());
         canvas.setWidth(MAP_WIDTH);
         canvas.setHeight(MAP_HEIGHT);
     }

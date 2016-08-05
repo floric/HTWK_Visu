@@ -117,7 +117,7 @@ public class ScoringCalculator {
      * @param pt Point
      * @return Score values in map with categories as keys.
      */
-    public Map<String, Double> calculateValue(Point2D pt) {
+    public Map<String, Double> calculateValues(Point2D pt) {
         Map<String, Double> values = new HashMap<>();
 
         // calculate total weights sum
