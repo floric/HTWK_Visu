@@ -6,6 +6,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.scoring.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
@@ -19,13 +20,16 @@ import java.util.stream.Collectors;
  */
 public class MapCanvas extends Canvas {
 
-    // constants
-    private static final double ZOOM_SPEED = 100;
     public static final double ZOOM_MIN = 150;
     public static final double ZOOM_MAX = 1000000;
+    // constants
+    private static final double ZOOM_SPEED = 100;
     private static final MouseButton MOUSEBUTTON_DRAG = MouseButton.SECONDARY;
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
+
+    private static final double MIN_SCORING_VALUE = 0;
+    private static final double MAX_SCORING_VALUE = 1000; //TODO MAX?
 
     // default: Leipzig
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
@@ -97,6 +101,24 @@ public class MapCanvas extends Canvas {
 
     // The following functions return the coordinate bounds of the Canvas.
 
+    /**
+     * Set the maps scale.
+     *
+     * @param scale of map
+     */
+    public void setScale(double scale) {
+        if (scale < ZOOM_MAX) {
+            if (scale > ZOOM_MIN) {
+                this.scale = scale;
+            } else {
+                this.scale = ZOOM_MIN;
+            }
+        } else {
+            this.scale = ZOOM_MAX;
+        }
+        redraw();
+    }
+
     public Point2D getLeftTopCorner() {
         return new Point2D(coordsBounds.getMaxX(), coordsBounds.getMinY());
     }
@@ -161,24 +183,6 @@ public class MapCanvas extends Canvas {
 
     public double getCoordDistanceFromPixelDistance(float pixelDistance) {
         return transferPixelToCoordinate(pixelDistance, 0).getY() - transferPixelToCoordinate(0, 0).getY();
-    }
-
-    /**
-     * Set the maps scale.
-     *
-     * @param scale of map
-     */
-    public void setScale(double scale) {
-        if (scale < ZOOM_MAX) {
-            if (scale > ZOOM_MIN) {
-                this.scale = scale;
-            } else {
-                this.scale = ZOOM_MIN;
-            }
-        } else {
-            this.scale = ZOOM_MAX;
-        }
-        redraw();
     }
 
     /**
@@ -292,14 +296,23 @@ public class MapCanvas extends Canvas {
         // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
         ArrayList<ArrayList<Point2D>> sampleCoords = getSampleCoordPoints(samplingPixelDensity);
 
+        // save previous colors
+        final Paint curFillPaint = gc.getFill();
+        final Paint curStrokePaint = gc.getStroke();
+
         // now calculate the values
         for (ArrayList<Point2D> line : sampleCoords) {
-            for (Point2D pt : line) {
-                Map<String, Double> scores = calculator.calculateValues(pt);
+            for (Point2D coord : line) {
 
-                // if we should draw only the final scoring value, then use this value
-                // else: use the values from our scores map with specific categories
-                double scoreVal = calculator.calculateScoreFromCategorys(scores);
+                Map<String, Double> scoresWithCategory = calculator.calculateValues(coord);
+
+                final double completeScore = calculator.calculateScoreFromCategorys(scoresWithCategory);
+
+                gc.setFill(getColorForValue(completeScore));
+
+                Point2D pixelPos = transferCoordinateToPixel(coord);
+                //Current as oval
+                gc.fillOval(pixelPos.getX(), pixelPos.getY(), samplingPixelDensity/2, samplingPixelDensity/2);
             }
         }
 
@@ -308,6 +321,12 @@ public class MapCanvas extends Canvas {
         // now map the score value to a color function for visualization
         // and use the GraphicsContext to draw the final colors to the canvas
         // interpolate between the samples points with simple linear interpolation in our matrix/grid
+        // Using PixelWriter is recommended (faster)
+
+
+        //Restore previous colors
+        gc.setFill(curFillPaint);
+        gc.setStroke(curStrokePaint);
     }
 
     /**
@@ -325,7 +344,7 @@ public class MapCanvas extends Canvas {
             northPos = transferCoordinateToPixel(new Point2D(fullVal, Math.ceil(x))).getY();
             gc.strokeLine(0, northPos, tmpWidth, northPos);
             gc.fillText(MathUtils.roundToDecimalsAsString(fullVal, 0), 10, northPos - 10);
-            x += 1;
+            x++;
         }
 
         // Longitude
@@ -335,7 +354,7 @@ public class MapCanvas extends Canvas {
             eastPos = transferCoordinateToPixel(new Point2D(Math.ceil(y), fullVal)).getX();
             gc.strokeLine(eastPos, 0, eastPos, tmpHeight);
             gc.fillText(MathUtils.roundToDecimalsAsString(fullVal, 0), eastPos + 10, tmpHeight - 10);
-            y += 1;
+            y++;
         }
     }
 
@@ -351,7 +370,7 @@ public class MapCanvas extends Canvas {
 
         displayedElems = toDraw.size();
         for (IMapDrawable elem : toDraw) {
-            elem.draw(gc, this);
+            elem.draw(this.gc, this);
         }
     }
 
@@ -419,5 +438,21 @@ public class MapCanvas extends Canvas {
     @Override
     public double prefHeight(double width) {
         return getHeight();
+    }
+
+    /**
+     * Calculats a color for a given scoring value
+     *
+     * @param value the scoring value
+     * @return color for scoring value
+     */
+    private Color getColorForValue(double value) {
+        //TODO Current only simple color calculation
+
+        if (value < MIN_SCORING_VALUE || value > MAX_SCORING_VALUE)
+            return Color.BLACK;
+
+        double hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue()) * (value - MIN_SCORING_VALUE) / (MAX_SCORING_VALUE - MIN_SCORING_VALUE);
+        return Color.hsb(hue, 1.0, 1.0);
     }
 }
