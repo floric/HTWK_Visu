@@ -156,8 +156,8 @@ public class MapCanvas extends Canvas {
      * @param pixelDensity Distance between samples in pixels
      * @return Sample positions in a grid
      */
-    public ArrayList<ArrayList<Point2D>> getSampleCoordPoints(float pixelDensity) {
-        ArrayList<ArrayList<Point2D>> matrix = new ArrayList<>();
+    public List<List<Point2D>> getSampleCoordPoints(float pixelDensity) {
+        List<List<Point2D>> matrix = new ArrayList<>();
 
         double coordsDistance = getCoordDistanceFromPixelDistance(pixelDensity);
 
@@ -166,7 +166,7 @@ public class MapCanvas extends Canvas {
 
         // longitude
         for (double x = getLeftBottomCorner().getX() - coordsDistance; x < getLeftTopCorner().getX() + coordsDistance; x = x + coordsDistance) {
-            ArrayList<Point2D> currentLine = new ArrayList<>();
+            List<Point2D> currentLine = new ArrayList<>();
 
             // latitude
             for (double y = getLeftTopCorner().getY() - coordsDistance; y < getRightTopCorner().getY() + coordsDistance; y = y + coordsDistance) {
@@ -294,14 +294,14 @@ public class MapCanvas extends Canvas {
     private void drawScoringValues() {
         // get sample points for canvas
         // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
-        ArrayList<ArrayList<Point2D>> sampleCoords = getSampleCoordPoints(samplingPixelDensity);
+        List<List<Point2D>> sampleCoords = getSampleCoordPoints(samplingPixelDensity);
 
         // save previous colors
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
         // now calculate the values
-        for (ArrayList<Point2D> line : sampleCoords) {
+        for (List<Point2D> line : sampleCoords) {
             for (Point2D coord : line) {
 
                 Map<String, Double> scoresWithCategory = calculator.calculateValues(coord);
