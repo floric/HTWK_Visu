@@ -31,11 +31,10 @@ public class MapCanvas extends Canvas {
     private static final double MIN_SCORING_VALUE = 0;
     private static final double MAX_SCORING_VALUE = 1000; //TODO MAX?
 
-    // default: Leipzig
+    // scores
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
     private LinkedList<IMapDrawable> drawables = new LinkedList<>();
     private int samplingPixelDensity = 20;
-    private double scale = 100000;
     private ScoringCalculator calculator;
 
     // cached values for faster drawing
@@ -50,6 +49,7 @@ public class MapCanvas extends Canvas {
     private int displayedElems = 0;
 
     // canvas dragging
+    private double scale = 100000;
     private boolean isDragging = false;
     private double dragX = 0;
     private double dragY = 0;
@@ -162,7 +162,7 @@ public class MapCanvas extends Canvas {
         double coordsDistance = getCoordDistanceFromPixelDistance(pixelDensity);
 
         // create sample coordinates for the currently drawn map area
-        // important: to get scoring values for all shown pixles, the code will create samples around the canvas as well
+        // important: to get scoring values for all shown pixels, the code will create samples around the canvas as well
 
         // longitude
         for (double x = getLeftBottomCorner().getX() - coordsDistance; x < getLeftTopCorner().getX() + coordsDistance; x = x + coordsDistance) {
@@ -265,13 +265,10 @@ public class MapCanvas extends Canvas {
         // clear view
         gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
+        // draw map content
         drawScoringValues();
-
         drawGrid();
-
-        // is dragging value can be used for faster redraw during map interaction
         drawElements();
-
         drawInfo();
     }
 
@@ -446,9 +443,8 @@ public class MapCanvas extends Canvas {
      * @param value the scoring value
      * @return color for scoring value
      */
-    private Color getColorForValue(double value) {
-        //TODO Current only simple color calculation
-
+    private static Color getColorForValue(double value) {
+        // maybe return the blue for lower values then MIN_ as well and red for higher values then MAX_?
         if (value < MIN_SCORING_VALUE || value > MAX_SCORING_VALUE)
             return Color.BLACK;
 
