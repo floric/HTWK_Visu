@@ -176,8 +176,6 @@ public class MapCanvas extends Canvas {
             matrix.add(currentLine);
         }
 
-        Logger.getGlobal().info("Samples: " + matrix.size() + ":" + matrix.get(0).size());
-
         return matrix;
     }
 
