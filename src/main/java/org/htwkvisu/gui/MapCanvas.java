@@ -1,6 +1,5 @@
 package org.htwkvisu.gui;
 
-import com.sun.istack.internal.NotNull;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
