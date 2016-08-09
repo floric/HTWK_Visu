@@ -1,5 +1,6 @@
 package org.htwkvisu.gui;
 
+import com.sun.istack.internal.NotNull;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -442,11 +443,14 @@ public class MapCanvas extends Canvas {
      * @return color for scoring value
      */
     private static Color getColorForValue(double value) {
-        // maybe return the blue for lower values then MIN_ as well and red for higher values then MAX_?
-        if (value < MIN_SCORING_VALUE || value > MAX_SCORING_VALUE)
-            return Color.BLACK;
+        double hue;
+        if (value < MIN_SCORING_VALUE)
+            hue = Color.BLUE.getHue();
+        else if(value > MAX_SCORING_VALUE)
+            hue = Color.RED.getHue();
+        else
+            hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue()) * (value - MIN_SCORING_VALUE) / (MAX_SCORING_VALUE - MIN_SCORING_VALUE);
 
-        double hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue()) * (value - MIN_SCORING_VALUE) / (MAX_SCORING_VALUE - MIN_SCORING_VALUE);
         return Color.hsb(hue, 1.0, 1.0);
     }
 }
