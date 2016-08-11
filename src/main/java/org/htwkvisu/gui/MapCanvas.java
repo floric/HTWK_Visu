@@ -4,6 +4,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -31,13 +32,13 @@ public class MapCanvas extends Canvas {
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
 
-    private static final double MIN_SCORING_VALUE = 0;
-    private static final double MAX_SCORING_VALUE = 1000; //TODO MAX?
+    private static final double MIN_SCORING_VALUE = 0; //TODO GUI-editable
+    private static final double MAX_SCORING_VALUE = 130000; //TODO GUI-editable
 
     // scores
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
     private LinkedList<IMapDrawable> drawables = new LinkedList<>();
-    private int samplingPixelDensity = 50;
+    private int samplingPixelDensity = 25; //TODO GUI-editable
 
     // cached values for faster drawing
     private GraphicsContext gc = getGraphicsContext2D();
@@ -265,14 +266,13 @@ public class MapCanvas extends Canvas {
 
         // now calculate the values
         for (List<Point2D> line : gridPoints) {
-            ScoreType.BUS.setCustomPOIs(line);
             for (Point2D coord : line) {
-                final double scoreForCoord = Category.INFRASTRUCTURE.calculateCategoryValueForCustom(coord);
+                final double scoreForCoord = Category.INFRASTRUCTURE.calculateScoreValue(coord);
                 gc.setFill(getColorForValue(scoreForCoord));
 
                 Point2D pixelPos = transferCoordinateToPixel(coord);
                 //Current as oval
-                gc.fillOval(pixelPos.getX(), pixelPos.getY(), samplingPixelDensity/2, samplingPixelDensity/2);
+                gc.fillRect(pixelPos.getX(), pixelPos.getY(), samplingPixelDensity, samplingPixelDensity);
             }
         }
 

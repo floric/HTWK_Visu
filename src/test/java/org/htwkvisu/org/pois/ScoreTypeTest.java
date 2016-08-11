@@ -5,7 +5,6 @@ import org.htwkvisu.scoring.ConstantFallOf;
 import org.htwkvisu.scoring.ExponentialFallOf;
 import org.htwkvisu.scoring.LinearFallOf;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,7 +44,7 @@ public class ScoreTypeTest {
 
         assertEquals(TEN, values, TINY_DELTA);
 
-        assertTrue(INFRASTRUCTURE.calculateCategoryValueForCustom(SAMPLE_POINT) > 0);
+        assertTrue(INFRASTRUCTURE.calculateScoreValueForCustom(SAMPLE_POINT) > 0);
     }
 
     @Test
@@ -55,7 +54,7 @@ public class ScoreTypeTest {
         double values = SCHOOL.calculateScoreValueForCustom(POINT_WITH_TWOS);
 
         assertEquals(EXPECTED_LINEAR_VALUE, values, TINY_DELTA);
-        assertTrue(EDUCATION.calculateCategoryValueForCustom(POINT_WITH_TWOS) == EXPECTED_LINEAR_VALUE);
+        assertTrue(EDUCATION.calculateScoreValueForCustom(POINT_WITH_TWOS) == EXPECTED_LINEAR_VALUE);
     }
 
     @Test
@@ -64,7 +63,7 @@ public class ScoreTypeTest {
         SCHOOL.setCustomPOIs(POINT_WITH_TWOS);
         double values = SCHOOL.calculateScoreValueForCustom(POINT_FOR_EXPONENTIAL);
         assertEquals(EXPECTED_EXPONENTIAL_VALUE, values, TINY_DELTA);
-        assertTrue(EDUCATION.calculateCategoryValueForCustom(POINT_FOR_EXPONENTIAL) == EXPECTED_EXPONENTIAL_VALUE);
+        assertTrue(EDUCATION.calculateScoreValueForCustom(POINT_FOR_EXPONENTIAL) == EXPECTED_EXPONENTIAL_VALUE);
     }
 
     @Test
@@ -81,7 +80,7 @@ public class ScoreTypeTest {
         BUS.setCustomPOIs(POINT_THREE);
         value += BUS.calculateScoreValueForCustom(POINT_THREE);
 
-        assertTrue(INFRASTRUCTURE.calculateCategoryValueForCustom(POINT_THREE) == value);
+        assertTrue(INFRASTRUCTURE.calculateScoreValueForCustom(POINT_THREE) == value);
         assertEquals(VALUE_FROM_SCORING_WITHOUT_WEIGHT,value,TINY_DELTA);
     }
 
@@ -106,7 +105,7 @@ public class ScoreTypeTest {
         value += BUS.calculateScoreValueForCustom(POINT_THREE);
         weightedValue += BUS.calculateScoreValueForCustom(POINT_THREE);
 
-        assertTrue(INFRASTRUCTURE.calculateCategoryValueForCustom(POINT_THREE) == weightedValue);
+        assertTrue(INFRASTRUCTURE.calculateScoreValueForCustom(POINT_THREE) == weightedValue);
         assertNotEquals(VALUE_FROM_SCORING_WITHOUT_WEIGHT,value,TINY_DELTA);
     }
 

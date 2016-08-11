@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import static org.htwkvisu.domain.NamedQueryConstants.*;
 
-public enum ScoreType {
+public enum ScoreType implements IScorable{
     TERMINAL(FIND_TERMINAL, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
     , HELIPAD(FIND_HELIPAD, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
     , AERODROME(FIND_AERODROME, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
@@ -43,6 +43,7 @@ public enum ScoreType {
     private IFallOf fallOf;
     private List<BasicPOI> customPOIs = new ArrayList<>();
     private double weight = NEUTRAL_WEIGHT;
+    private List<BasicPOI> drawable = new ArrayList<>();
 
     ScoreType(String namedQuery, IFallOf fallOf) {
         this.namedQuery = namedQuery;
@@ -54,16 +55,20 @@ public enum ScoreType {
     }
 
     public List<BasicPOI> generateDrawable() {
-        return findAll().stream().map(scoreValue ->
-                new BasicPOI(this, new Point2D(scoreValue.getPoint().getX(), scoreValue.getPoint().getY())))
-                .collect(Collectors.toList());
+        if(drawable.isEmpty()){
+            drawable.addAll(findAll().stream().map(scoreValue ->
+                    new BasicPOI(this, new Point2D(scoreValue.getPoint().getX(), scoreValue.getPoint().getY())))
+                    .collect(Collectors.toList()));
+        }
+        return drawable;
     }
 
+    @Override
     public double calculateScoreValue(Point2D pt) {
         return calScoreValueForInput(pt,this.generateDrawable());
     }
 
-
+    @Override
     public double calculateScoreValueForCustom(Point2D pt) {
         return calScoreValueForInput(pt, this.getCustomPOIs());
     }
