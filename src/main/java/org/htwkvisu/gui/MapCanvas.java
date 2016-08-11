@@ -6,12 +6,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
+import org.htwkvisu.scoring.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -20,20 +20,22 @@ import java.util.stream.Collectors;
  */
 public class MapCanvas extends Canvas {
 
-    // constants
-    private static final double ZOOM_SPEED = 100;
     public static final double ZOOM_MIN = 150;
     public static final double ZOOM_MAX = 1000000;
+    // constants
+    private static final double ZOOM_SPEED = 100;
     private static final MouseButton MOUSEBUTTON_DRAG = MouseButton.SECONDARY;
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
 
-    private double scale = 100000;
+    private static final double MIN_SCORING_VALUE = 0;
+    private static final double MAX_SCORING_VALUE = 1000; //TODO MAX?
 
-    // default: Leipzig
+    // scores
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
-
     private LinkedList<IMapDrawable> drawables = new LinkedList<>();
+    private int samplingPixelDensity = 20;
+    private ScoringCalculator calculator;
 
     // cached values for faster drawing
     private GraphicsContext gc = getGraphicsContext2D();
@@ -47,6 +49,7 @@ public class MapCanvas extends Canvas {
     private int displayedElems = 0;
 
     // canvas dragging
+    private double scale = 100000;
     private boolean isDragging = false;
     private double dragX = 0;
     private double dragY = 0;
@@ -54,7 +57,9 @@ public class MapCanvas extends Canvas {
     /**
      * Construct and init canvas
      */
-    public MapCanvas() {
+    public MapCanvas(ScoringCalculator calculator) {
+        this.calculator = calculator;
+
         widthProperty().addListener(evt -> redraw());
         heightProperty().addListener(evt -> redraw());
 
@@ -96,6 +101,24 @@ public class MapCanvas extends Canvas {
 
     // The following functions return the coordinate bounds of the Canvas.
 
+    /**
+     * Set the maps scale.
+     *
+     * @param scale of map
+     */
+    public void setScale(double scale) {
+        if (scale < ZOOM_MAX) {
+            if (scale > ZOOM_MIN) {
+                this.scale = scale;
+            } else {
+                this.scale = ZOOM_MIN;
+            }
+        } else {
+            this.scale = ZOOM_MAX;
+        }
+        redraw();
+    }
+
     public Point2D getLeftTopCorner() {
         return new Point2D(coordsBounds.getMaxX(), coordsBounds.getMinY());
     }
@@ -116,22 +139,48 @@ public class MapCanvas extends Canvas {
         return mapCenter;
     }
 
-    /**
-     * Set the maps scale.
-     *
-     * @param scale of map
-     */
-    public void setScale(double scale) {
-        if (scale < ZOOM_MAX) {
-            if (scale > ZOOM_MIN) {
-                this.scale = scale;
-            } else {
-                this.scale = ZOOM_MIN;
-            }
-        } else {
-            this.scale = ZOOM_MAX;
+    public int getSamplingPixelDensity() {
+        return samplingPixelDensity;
+    }
+
+    public void setSamplingPixelDensity(int samplingPixelDensity) {
+        if (samplingPixelDensity > 0) {
+            this.samplingPixelDensity = samplingPixelDensity;
         }
-        redraw();
+    }
+
+    /**
+     * Returns coordinates for samples where to calculate scoring values.
+     * They are positioned in a XY-grid with pixelDensity pixels distance between each sample.
+     *
+     * @param pixelDensity Distance between samples in pixels
+     * @return Sample positions in a grid
+     */
+    public List<List<Point2D>> getSampleCoordPoints(float pixelDensity) {
+        List<List<Point2D>> matrix = new ArrayList<>();
+
+        double coordsDistance = getCoordDistanceFromPixelDistance(pixelDensity);
+
+        // create sample coordinates for the currently drawn map area
+        // important: to get scoring values for all shown pixels, the code will create samples around the canvas as well
+
+        // longitude
+        for (double x = getLeftBottomCorner().getX() - coordsDistance; x < getLeftTopCorner().getX() + coordsDistance; x = x + coordsDistance) {
+            List<Point2D> currentLine = new ArrayList<>();
+
+            // latitude
+            for (double y = getLeftTopCorner().getY() - coordsDistance; y < getRightTopCorner().getY() + coordsDistance; y = y + coordsDistance) {
+                currentLine.add(new Point2D(x, y));
+            }
+
+            matrix.add(currentLine);
+        }
+
+        return matrix;
+    }
+
+    public double getCoordDistanceFromPixelDistance(float pixelDistance) {
+        return transferPixelToCoordinate(pixelDistance, 0).getY() - transferPixelToCoordinate(0, 0).getY();
     }
 
     /**
@@ -214,11 +263,10 @@ public class MapCanvas extends Canvas {
         // clear view
         gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
+        // draw map content
+        drawScoringValues();
         drawGrid();
-
-        // is dragging value can be used for faster redraw during map interaction
         drawElements();
-
         drawInfo();
     }
 
@@ -236,6 +284,47 @@ public class MapCanvas extends Canvas {
     }
 
     /**
+     * Draw scoring values in our canvas.
+     */
+    private void drawScoringValues() {
+        // get sample points for canvas
+        // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
+        List<List<Point2D>> sampleCoords = getSampleCoordPoints(samplingPixelDensity);
+
+        // save previous colors
+        final Paint curFillPaint = gc.getFill();
+        final Paint curStrokePaint = gc.getStroke();
+
+        // now calculate the values
+        for (List<Point2D> line : sampleCoords) {
+            for (Point2D coord : line) {
+
+                Map<String, Double> scoresWithCategory = calculator.calculateValues(coord);
+
+                final double completeScore = calculator.calculateScoreFromCategorys(scoresWithCategory);
+
+                gc.setFill(getColorForValue(completeScore));
+
+                Point2D pixelPos = transferCoordinateToPixel(coord);
+                //Current as oval
+                gc.fillOval(pixelPos.getX(), pixelPos.getY(), samplingPixelDensity/2, samplingPixelDensity/2);
+            }
+        }
+
+        // draw score values
+
+        // now map the score value to a color function for visualization
+        // and use the GraphicsContext to draw the final colors to the canvas
+        // interpolate between the samples points with simple linear interpolation in our matrix/grid
+        // Using PixelWriter is recommended (faster)
+
+
+        //Restore previous colors
+        gc.setFill(curFillPaint);
+        gc.setStroke(curStrokePaint);
+    }
+
+    /**
      * Draw coordinates grid of full longitudes/latitude values.
      */
     private void drawGrid() {
@@ -250,7 +339,7 @@ public class MapCanvas extends Canvas {
             northPos = transferCoordinateToPixel(new Point2D(fullVal, Math.ceil(x))).getY();
             gc.strokeLine(0, northPos, tmpWidth, northPos);
             gc.fillText(MathUtils.roundToDecimalsAsString(fullVal, 0), 10, northPos - 10);
-            x += 1;
+            x++;
         }
 
         // Longitude
@@ -260,7 +349,7 @@ public class MapCanvas extends Canvas {
             eastPos = transferCoordinateToPixel(new Point2D(Math.ceil(y), fullVal)).getX();
             gc.strokeLine(eastPos, 0, eastPos, tmpHeight);
             gc.fillText(MathUtils.roundToDecimalsAsString(fullVal, 0), eastPos + 10, tmpHeight - 10);
-            y += 1;
+            y++;
         }
     }
 
@@ -276,7 +365,7 @@ public class MapCanvas extends Canvas {
 
         displayedElems = toDraw.size();
         for (IMapDrawable elem : toDraw) {
-            elem.draw(gc, this);
+            elem.draw(this.gc, this);
         }
     }
 
@@ -344,5 +433,23 @@ public class MapCanvas extends Canvas {
     @Override
     public double prefHeight(double width) {
         return getHeight();
+    }
+
+    /**
+     * Calculats a color for a given scoring value
+     *
+     * @param value the scoring value
+     * @return color for scoring value
+     */
+    private static Color getColorForValue(double value) {
+        double hue;
+        if (value < MIN_SCORING_VALUE)
+            hue = Color.BLUE.getHue();
+        else if(value > MAX_SCORING_VALUE)
+            hue = Color.RED.getHue();
+        else
+            hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue()) * (value - MIN_SCORING_VALUE) / (MAX_SCORING_VALUE - MIN_SCORING_VALUE);
+
+        return Color.hsb(hue, 1.0, 1.0);
     }
 }
