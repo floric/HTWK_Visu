@@ -9,7 +9,10 @@ import org.htwkvisu.scoring.IFallOf;
 import org.htwkvisu.scoring.LinearFallOf;
 import org.htwkvisu.utils.MathUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,24 +38,19 @@ public enum ScoreType {
     , RESEARCH_INSTITUTION(FIND_RESEARCH_INSTITUTION, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
     , THEATRE(FIND_THEATRE, new LinearFallOf(MathUtils.convertKilometresToUnits(50), 50));
 
+    private static final double NEUTRAL_WEIGHT = 1.0;
     private final String namedQuery;
     private IFallOf fallOf;
+    private List<BasicPOI> customPOIs = new ArrayList<>();
+    private double weight = NEUTRAL_WEIGHT;
 
     ScoreType(String namedQuery, IFallOf fallOf) {
         this.namedQuery = namedQuery;
         this.fallOf = fallOf;
     }
 
-    public String getNamedQuery() {
-        return namedQuery;
-    }
-
     public List<ScoreValue> findAll() {
         return ScoreValueDAO.exeNamedQuery(namedQuery);
-    }
-
-    public IFallOf getFallOf() {
-        return fallOf;
     }
 
     public List<BasicPOI> generateDrawable() {
@@ -61,15 +59,75 @@ public enum ScoreType {
                 .collect(Collectors.toList());
     }
 
-    public List<ScoreType> allScoreTypes(){
+    public double calculateScoreValue(Point2D pt) {
+        return calScoreValueForInput(pt,this.generateDrawable());
+    }
+
+
+    public double calculateScoreValueForCustom(Point2D pt) {
+        return calScoreValueForInput(pt, this.getCustomPOIs());
+    }
+
+    private double calScoreValueForInput(Point2D pt, List<BasicPOI> inputPOIs) {
+        double totalWeightSum = calcTotalWeight();
+        double weightQuotient = weight / totalWeightSum;
+        return inputPOIs.parallelStream()
+                .filter(poi -> (pt.distance(poi.getCoordinates())) < fallOf.getRadius())
+                .mapToDouble(poi -> fallOf.getValue(pt, poi.getCoordinates())).sum() * weightQuotient;
+    }
+
+    /**
+     * Ignores the weight if neutral element is set for all
+     * @return totalweight - the weight of all scoretypes in all categories
+     */
+    private double calcTotalWeight() {
+        List<Double> weights = allScoreTypes().parallelStream().map(ScoreType::getWeight).collect(Collectors.toList());
+        return weights.parallelStream().allMatch(x -> x == NEUTRAL_WEIGHT)
+                ? NEUTRAL_WEIGHT
+                : weights.stream().reduce((a, b) -> a + b).orElse(NEUTRAL_WEIGHT);
+    }
+
+    public List<ScoreType> allScoreTypes() {
         return Stream.of(TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM, HOSPITAL, PHARMACY, DENTIST, VETERINARY, DOCTORS
                 , BLOOD_DONATION, SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE)
                 .collect(Collectors.toList());
     }
 
-    public double calculateScoreValue(Point2D pt) {
-        return generateDrawable().parallelStream()
-                .filter(poi -> (pt.distance(poi.getCoordinates())) < fallOf.getRadius())
-                .mapToDouble(poi -> fallOf.getValue(pt, poi.getCoordinates())).sum();
+    public String getNamedQuery() {
+        return namedQuery;
+    }
+
+    public IFallOf getFallOf() {
+        return fallOf;
+    }
+
+    public void setFallOf(IFallOf fallOf) {
+        this.fallOf = fallOf;
+    }
+
+    public List<BasicPOI> getCustomPOIs() {
+        Objects.requireNonNull(customPOIs);
+        return customPOIs;
+    }
+
+    public void setCustomPOIs(Point2D... customPoints) {
+        Objects.requireNonNull(customPoints);
+        this.customPOIs = Arrays.asList(customPoints).stream().map(p -> new BasicPOI(this, p)).collect(Collectors.toList());
+    }
+
+    public void setCustomPOIs(List<Point2D> customPoints) {
+        Objects.requireNonNull(customPoints);
+        this.customPOIs = customPoints.stream().map(p -> new BasicPOI(this, p)).collect(Collectors.toList());
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        if(weight == 0.0){
+            throw new IllegalArgumentException("Weight shouldn't be 0.0 .");
+        }
+        this.weight = weight;
     }
 }

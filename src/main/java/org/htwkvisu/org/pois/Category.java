@@ -35,15 +35,19 @@ public enum Category {
         return types.stream().collect(Collectors.toMap(Function.identity(), ScoreType::generateDrawable));
     }
 
-    public List<ScoreValue> findAll(){
-        return types.stream().flatMap(t->t.findAll().stream()).collect(Collectors.toList());
+    public List<ScoreValue> findAll() {
+        return types.stream().flatMap(t -> t.findAll().stream()).collect(Collectors.toList());
     }
 
-    public List<BasicPOI> generateDrawable(){
-        return types.stream().flatMap(t->t.generateDrawable().stream()).collect(Collectors.toList());
+    public List<BasicPOI> generateDrawable() {
+        return types.stream().flatMap(t -> t.generateDrawable().stream()).collect(Collectors.toList());
     }
 
     public double calculateCategoryValue(Point2D pt) {
-        return types.stream().mapToDouble(t->t.calculateScoreValue(pt)).sum();
+        return types.stream().mapToDouble(t -> t.calculateScoreValue(pt)).sum();
+    }
+
+    public double calculateCategoryValueForCustom(Point2D pt) {
+        return types.stream().mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
     }
 }

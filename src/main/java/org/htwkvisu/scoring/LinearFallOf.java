@@ -14,6 +14,7 @@ public class LinearFallOf implements IFallOf {
 
     @Override
     public double getValue(Point2D pt, Point2D sample) {
+
         return (1 - (pt.distance(sample) / radius)) * maxVal;
     }
 

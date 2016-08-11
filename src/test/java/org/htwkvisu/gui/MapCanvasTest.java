@@ -1,7 +1,6 @@
 package org.htwkvisu.gui;
 
 import javafx.geometry.Point2D;
-import org.htwkvisu.scoring.ScoringCalculator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +28,7 @@ public class MapCanvasTest {
 
     @Before
     public void setUp() {
-        canvas = new MapCanvas(new ScoringCalculator());
+        canvas = new MapCanvas();
         canvas.setWidth(MAP_WIDTH);
         canvas.setHeight(MAP_HEIGHT);
     }
@@ -142,14 +141,16 @@ public class MapCanvasTest {
         // sample just one point and border samples
         canvas.setWidth(1);
         canvas.setHeight(1);
-        List<List<Point2D>> pts = canvas.getSampleCoordPoints(1000);
+        Grid gridOne = new Grid(canvas);
+        List<List<Point2D>> pts = gridOne.calcGridPoints(1000);
         assertEquals(3, pts.size());
         assertEquals(3, pts.get(0).size());
 
         // sample two points and border samples
         canvas.setWidth(10);
         canvas.setHeight(10);
-        pts = canvas.getSampleCoordPoints(5);
+        Grid gridTwo = new Grid(canvas);
+        pts = gridTwo.calcGridPoints(5);
         assertEquals(4, pts.size());
         assertEquals(4, pts.get(0).size());
 

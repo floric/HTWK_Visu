@@ -9,7 +9,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.htwkvisu.gui.MapCanvas;
-import org.htwkvisu.scoring.ScoringCalculator;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -31,7 +30,6 @@ public class ApplicationController implements Initializable {
     private Pane canvasPane;
 
     private MapCanvas canvas;
-    private ScoringCalculator calculator;
 
     /**
      * Write message to status bar.
@@ -57,8 +55,7 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
-        calculator = new ScoringCalculator();
-        canvas = new MapCanvas(calculator);
+        canvas = new MapCanvas();
 
         // add mapcanvas to pane
         canvasPane.getChildren().add(canvas);

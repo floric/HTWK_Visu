@@ -4,13 +4,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.scoring.IFallOf;
-import org.htwkvisu.scoring.IScorable;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class BasicPOI implements IScorable, IMapDrawable {
+public class BasicPOI implements IMapDrawable {
     private final ScoreType type;
     private Point2D position = new Point2D(0, 0);
 
@@ -31,20 +26,11 @@ public class BasicPOI implements IScorable, IMapDrawable {
 
     @Override
     public void draw(GraphicsContext gc, MapCanvas canvas) {
-        // draw code for airports
     }
 
     @Override
     public boolean showDuringGrab() {
         return true;
-    }
-
-    @Override
-    public Map<String, IFallOf> getCategoryFallOfs() {
-        //TODO: change interface to need only the score-type, because the score-type hold all needed values
-        Map<String, IFallOf> categoryFallOfs = new HashMap<>();
-        categoryFallOfs.put(type.name(), type.getFallOf());
-        return categoryFallOfs;
     }
 
     @Override
