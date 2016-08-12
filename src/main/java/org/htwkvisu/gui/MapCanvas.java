@@ -4,19 +4,17 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.ScoreType;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -33,14 +31,13 @@ public class MapCanvas extends Canvas {
     private static final MouseButton MOUSEBUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
 
-    private static final double MIN_SCORING_VALUE = 0; //TODO GUI-editable
-    private static final double MAX_SCORING_VALUE = 130000; //TODO GUI-editable
-
     // scores
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
     private LinkedList<IMapDrawable> drawables = new LinkedList<>();
 
-    private int samplingPixelDensity = 50;
+    private int samplingPixelDensity = 500;
+    private int minScoringValue = 0;
+    private int maxScoringValue = 100000;
 
     // cached values for faster drawing
     private GraphicsContext gc = getGraphicsContext2D();
@@ -69,19 +66,16 @@ public class MapCanvas extends Canvas {
 
         addEventHandlers();
 
-        // test data around coordinates center
-     /*   Random rnd = new Random();
-        for (int i = 0; i < 9999; i++) {
-            addDrawableElement(
-                    new SimplePoint(new Point2D(50.5 + rnd.nextDouble(), 11.5 + rnd.nextDouble()), rnd.nextDouble() * 40000)
-            );
-        }*/
+        // add POIs
+        for (ScoreType scoreType: ScoreType.values()) {
+            scoreType.generateDrawable().forEach(this::addDrawableElement);
+        }
 
         // add test cities
         addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
-        addDrawableElement(new City(new Point2D(51.482778, 11.97), "Halle (Saale)", 0));
-        addDrawableElement(new City(new Point2D(50.927222, 11.586111), "Jena", 0));
-        addDrawableElement(new City(new Point2D(50.983333, 11.033333), "Erfurt", 0));
+        addDrawableElement(new City(new Point2D(51.049259, 13.73836112), "Dresden", 0));
+        addDrawableElement(new City(new Point2D(50.832222, 12.92416666), "Chemnitz", 0));
+        addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
     }
 
     /**
@@ -90,14 +84,40 @@ public class MapCanvas extends Canvas {
      * @return BoundingBox Coordinates Boundingbox
      */
     public BoundingBox getCoordsBounds() {
-        return coordsBounds;
+        return this.coordsBounds;
     }
 
+    public void setMinScoringValue(int minScoringValue) {
+        if(minScoringValue >= 0 && minScoringValue < maxScoringValue) {
+            this.minScoringValue = minScoringValue;
+            this.redraw();
+        } else {
+            Logger.getGlobal().log(Level.INFO, "Min Score should be greater zero and lesser Max Score!");
+        }
+    }
+
+    public void setMaxScoringValue(int maxScoringValue) {
+        if(maxScoringValue> minScoringValue){
+            this.maxScoringValue = maxScoringValue;
+            this.redraw();
+        } else {
+             Logger.getGlobal().log(Level.INFO, "Max Score should be greater Min Score!");
+        }
+    }
+
+    public int getMinScoringValue() {
+        return minScoringValue;
+    }
+
+    public  int getMaxScoringValue() {
+        return maxScoringValue;
+    }
 
     /**
      * Get the map scale.
      *
      * @return scale of map
+
      */
     public double getScale() {
         return scale;
@@ -150,8 +170,10 @@ public class MapCanvas extends Canvas {
     public void setSamplingPixelDensity(int samplingPixelDensity) {
         if (samplingPixelDensity > 0) {
             this.samplingPixelDensity = samplingPixelDensity;
+            this.redraw();
+        } else {
+            Logger.getGlobal().log(Level.INFO, "Pixel Density should be greater zero!");
         }
-        this.redraw();
     }
 
     /**
@@ -235,10 +257,11 @@ public class MapCanvas extends Canvas {
         gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
         // draw map content
+        drawScoringValues();
         drawInfo();
         drawGrid();
         drawElements();
-        drawScoringValues();
+
     }
 
     /**
@@ -270,7 +293,7 @@ public class MapCanvas extends Canvas {
         // now calculate the values
         for (List<Point2D> line : gridPoints) {
             for (Point2D coord : line) {
-                final double scoreForCoord = Category.INFRASTRUCTURE.calculateScoreValue(coord);
+                final double scoreForCoord = Category.EDUCATION.calculateScoreValue(coord);
                 gc.setFill(getColorForValue(scoreForCoord));
 
                 Point2D pixelPos = transferCoordinateToPixel(coord);
@@ -407,14 +430,14 @@ public class MapCanvas extends Canvas {
      * @param value the scoring value
      * @return color for scoring value
      */
-    private static Color getColorForValue(double value) {
+    private Color getColorForValue(double value) {
         double hue;
-        if (value < MIN_SCORING_VALUE) {
+        if (value < minScoringValue) {
             hue = Color.BLUE.getHue();
-        } else if (value > MAX_SCORING_VALUE) {
+        } else if (value > maxScoringValue) {
             hue = Color.RED.getHue();
         } else {
-            hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue()) * (value - MIN_SCORING_VALUE) / (MAX_SCORING_VALUE - MIN_SCORING_VALUE);
+            hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue()) * (value - minScoringValue) / (maxScoringValue - minScoringValue);
         }
 
         return Color.hsb(hue, 1.0, 1.0);

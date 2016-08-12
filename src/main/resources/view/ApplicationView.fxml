@@ -39,12 +39,12 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 </rowConstraints>
                                 <Label text="Pixel Density:"/>
-                                <Label text="Minimum Scoring:" GridPane.rowIndex="1"/>
-                                <Label text="Maximum Scoring" GridPane.rowIndex="2"/>
+                                <Label text="Min Score:" GridPane.rowIndex="1" />
+                                <Label text="Max Score" GridPane.rowIndex="2" />
                                 <NumericTextField fx:id="pixelDensityTextField" GridPane.columnIndex="1"
                                                   onKeyPressed="#onEnterPressed"/>
-                                <TextField text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                <TextField text="20000" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                <NumericTextField fx:id="minScoringTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" onKeyPressed="#onEnterPressed"/>
+                                <NumericTextField fx:id="maxScoringTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" onKeyPressed="#onEnterPressed"/>
                             </GridPane>
                         </AnchorPane>
                     </TitledPane>

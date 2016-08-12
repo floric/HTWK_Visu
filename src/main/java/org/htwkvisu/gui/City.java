@@ -40,9 +40,9 @@ public class City implements IMapDrawable {
     @Override
     public void draw(GraphicsContext gc, MapCanvas canvas) {
         Point2D lclPt = canvas.transferCoordinateToPixel(pt);
-        gc.setFill(Color.RED);
+        gc.setFill(Color.BLACK);
         gc.fillText(name, lclPt.getX(), lclPt.getY() - 10);
-        gc.strokeOval(lclPt.getX() - POINT_SIZE / 2, lclPt.getY() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
+        gc.fillOval(lclPt.getX() - POINT_SIZE / 2, lclPt.getY() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
     }
 
     @Override

@@ -30,8 +30,8 @@ public class NumericTextField extends TextField
 
     public void setDefaultValue(int value)
     {
-        if(value <= 0){
-            throw new IllegalArgumentException("Default Value must be greater then Zero");
+        if(value < 0){
+            throw new IllegalArgumentException("Default Value must be greater or equal zero");
         }
         this.defaultValue = Optional.of(value);
     }
