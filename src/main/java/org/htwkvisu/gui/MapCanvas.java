@@ -9,6 +9,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
+import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.ScoreType;
 import org.htwkvisu.utils.MathUtils;
@@ -38,7 +39,8 @@ public class MapCanvas extends Canvas {
     // scores
     private Point2D mapCenter = new Point2D(51.343479, 12.387772);
     private LinkedList<IMapDrawable> drawables = new LinkedList<>();
-    private int samplingPixelDensity = 25; //TODO GUI-editable
+
+    private int samplingPixelDensity = 50;
 
     // cached values for faster drawing
     private GraphicsContext gc = getGraphicsContext2D();
@@ -68,12 +70,12 @@ public class MapCanvas extends Canvas {
         addEventHandlers();
 
         // test data around coordinates center
-        Random rnd = new Random();
+     /*   Random rnd = new Random();
         for (int i = 0; i < 9999; i++) {
             addDrawableElement(
                     new SimplePoint(new Point2D(50.5 + rnd.nextDouble(), 11.5 + rnd.nextDouble()), rnd.nextDouble() * 40000)
             );
-        }
+        }*/
 
         // add test cities
         addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
@@ -149,6 +151,7 @@ public class MapCanvas extends Canvas {
         if (samplingPixelDensity > 0) {
             this.samplingPixelDensity = samplingPixelDensity;
         }
+        this.redraw();
     }
 
     /**
@@ -232,10 +235,10 @@ public class MapCanvas extends Canvas {
         gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
         // draw map content
-        drawScoringValues();
+        drawInfo();
         drawGrid();
         drawElements();
-        drawInfo();
+        drawScoringValues();
     }
 
     /**
@@ -271,7 +274,6 @@ public class MapCanvas extends Canvas {
                 gc.setFill(getColorForValue(scoreForCoord));
 
                 Point2D pixelPos = transferCoordinateToPixel(coord);
-                //Current as oval
                 gc.fillRect(pixelPos.getX(), pixelPos.getY(), samplingPixelDensity, samplingPixelDensity);
             }
         }
@@ -281,8 +283,7 @@ public class MapCanvas extends Canvas {
         // now map the score value to a color function for visualization
         // and use the GraphicsContext to draw the final colors to the canvas
         // interpolate between the samples points with simple linear interpolation in our matrix/grid
-        // Using PixelWriter is recommended (faster)
-
+        // Using PixelWriter ?
 
         //Restore previous colors
         gc.setFill(curFillPaint);

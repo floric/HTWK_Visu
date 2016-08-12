@@ -5,10 +5,14 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.htwkvisu.gui.MapCanvas;
+import org.htwkvisu.gui.NumericTextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,6 +23,12 @@ import java.util.logging.Logger;
  * Control for GUI changes for App
  */
 public class ApplicationController implements Initializable {
+
+    @FXML
+    private NumericTextField pixelDensityTextField;
+
+    private static final int DEFAULT_PIXEL_DENSITY = 50;
+    private static final int MAX_NUMERIC_FIELD_LENGTH = 5;
 
     @FXML
     private Button resetViewButton;
@@ -55,14 +65,22 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
-        canvas = new MapCanvas();
 
-        // add mapcanvas to pane
+        initCanvas();
+
+        pixelDensityTextField.setText(Integer.toString(DEFAULT_PIXEL_DENSITY));
+        pixelDensityTextField.setMaxlength(MAX_NUMERIC_FIELD_LENGTH);
+        pixelDensityTextField.setDefaultValue(DEFAULT_PIXEL_DENSITY);
+
+        Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
+    }
+
+    private void initCanvas() {
+        canvas = new MapCanvas();
+        canvas.setSamplingPixelDensity(DEFAULT_PIXEL_DENSITY);
         canvasPane.getChildren().add(canvas);
         canvasPane.widthProperty().addListener((observable, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         canvasPane.heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
-
-        Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
     }
 
 
@@ -75,4 +93,22 @@ public class ApplicationController implements Initializable {
     public void onResetViewClicked(MouseEvent ev) {
         canvas.centerView(new Point2D(51, 13)); // test value as an example!
     }
+
+    /**
+     * Refreshes Values
+     *
+     * @param ev Key Event
+     */
+    @FXML
+    public void onEnterPressed(KeyEvent ev) {
+        if(ev.getCode().equals(KeyCode.ENTER)){
+
+            if(pixelDensityTextField.getText().isEmpty()){
+                pixelDensityTextField.setText(Integer.toString(pixelDensityTextField.getDefaultValue()));
+            }
+
+            canvas.setSamplingPixelDensity(Integer.parseInt(pixelDensityTextField.getText()));
+        }
+    }
+
 }
