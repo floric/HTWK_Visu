@@ -22,7 +22,9 @@ public class MapCanvasTest {
     private static final int MAP_HEIGHT = 200;
     private static final double TINY_DELTA = 0.001;
     private static final int ONE_HUNDRED = 100;
-
+    private static final int DEFAULT_PIXEL_DENSITY = 30;
+    private static final int DEFAULT_MIN_SCORING_VALUE = 0;
+    private static final int DEFAULT_MAX_SCORING_VALUE = 100000;
     private MapCanvas canvas;
 
     @Rule
@@ -30,7 +32,7 @@ public class MapCanvasTest {
 
     @Before
     public void setUp() {
-        canvas = new MapCanvas();
+        canvas = new MapCanvas(DEFAULT_PIXEL_DENSITY,DEFAULT_MIN_SCORING_VALUE,DEFAULT_MAX_SCORING_VALUE);
         canvas.setWidth(MAP_WIDTH);
         canvas.setHeight(MAP_HEIGHT);
     }

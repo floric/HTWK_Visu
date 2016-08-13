@@ -59,7 +59,10 @@ public class MapCanvas extends Canvas {
     /**
      * Construct and init canvas
      */
-    public MapCanvas() {
+    public MapCanvas(int samplingPixelDensity, int minScoringValue, int maxScoringValue) {
+        this.samplingPixelDensity = samplingPixelDensity;
+        this.minScoringValue = minScoringValue;
+        this.maxScoringValue = maxScoringValue;
 
         widthProperty().addListener(evt -> redraw());
         heightProperty().addListener(evt -> redraw());
@@ -78,11 +81,6 @@ public class MapCanvas extends Canvas {
         addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
     }
 
-    /**
-     * Get coordinates bounds currently drawn on map.
-     *
-     * @return BoundingBox Coordinates Boundingbox
-     */
     public BoundingBox getCoordsBounds() {
         return this.coordsBounds;
     }
@@ -301,12 +299,7 @@ public class MapCanvas extends Canvas {
             }
         }
 
-        // draw score values
-
-        // now map the score value to a color function for visualization
-        // and use the GraphicsContext to draw the final colors to the canvas
         // interpolate between the samples points with simple linear interpolation in our matrix/grid
-        // Using PixelWriter ?
 
         //Restore previous colors
         gc.setFill(curFillPaint);

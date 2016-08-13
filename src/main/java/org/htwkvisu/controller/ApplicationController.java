@@ -1,5 +1,6 @@
 package org.htwkvisu.controller;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -10,10 +11,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.control.ComboBox;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.gui.NumericTextField;
-
+import org.htwkvisu.org.pois.Category;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +25,11 @@ import java.util.logging.Logger;
  * Control for GUI changes for App
  */
 public class ApplicationController implements Initializable {
+
+    @FXML
+    private ComboBox categoryBox;
+    @FXML
+    private ComboBox scoreTypeBox;
 
     @FXML
     private NumericTextField pixelDensityTextField;
@@ -68,17 +76,36 @@ public class ApplicationController implements Initializable {
      * Default JavaFX initilization method for controllers.
      * Implemented from Initializable-interface.
      *
-     * @param location Location
+     * @param location  Location
      * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
 
         initCanvas();
-        initNumericTextFields(pixelDensityTextField,DEFAULT_PIXEL_DENSITY);
-        initNumericTextFields(minScoringTextField,DEFAULT_MIN_SCORING_VALUE);
-        initNumericTextFields(maxScoringTextField,DEFAULT_MAX_SCORING_VALUE);
+        initNumericTextFields(pixelDensityTextField, DEFAULT_PIXEL_DENSITY);
+        initNumericTextFields(minScoringTextField, DEFAULT_MIN_SCORING_VALUE);
+        initNumericTextFields(maxScoringTextField, DEFAULT_MAX_SCORING_VALUE);
+
+        initComboBox();
 
         Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
+
+    }
+
+    private void initComboBox() {
+        categoryBox.setItems(FXCollections.observableList(Arrays.asList(Category.values())));
+        categoryBox.setValue(categoryBox.getItems().get(0));
+
+        Category category = (Category) categoryBox.getItems().get(0);
+
+        scoreTypeBox.setItems(FXCollections.observableList(category.getTypes()));
+        scoreTypeBox.setValue(scoreTypeBox.getItems().get(0));
+
+        categoryBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            Category newCat = (Category) newValue;
+            scoreTypeBox.setItems(FXCollections.observableList(newCat.getTypes()));
+            scoreTypeBox.setValue(scoreTypeBox.getItems().get(0));
+        });
 
     }
 
@@ -89,8 +116,7 @@ public class ApplicationController implements Initializable {
     }
 
     private void initCanvas() {
-        canvas = new MapCanvas();
-        canvas.setSamplingPixelDensity(DEFAULT_PIXEL_DENSITY);
+        canvas = new MapCanvas(DEFAULT_PIXEL_DENSITY, DEFAULT_MIN_SCORING_VALUE, DEFAULT_MAX_SCORING_VALUE);
         canvasPane.getChildren().add(canvas);
         canvasPane.widthProperty().addListener((observable, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         canvasPane.heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
@@ -114,25 +140,25 @@ public class ApplicationController implements Initializable {
      */
     @FXML
     public void onEnterPressed(KeyEvent ev) {
-        if(ev.getCode().equals(KeyCode.ENTER)){
+        if (ev.getCode().equals(KeyCode.ENTER)) {
 
             NumericTextField temp = (NumericTextField) ev.getSource();
 
-            if(temp.getText().isEmpty()){
+            if (temp.getText().isEmpty()) {
                 temp.setText(Integer.toString(temp.getDefaultValue()));
             }
 
             int value = Integer.parseInt(temp.getText());
 
-            if(pixelDensityTextField.equals(temp)){
+            if (pixelDensityTextField.equals(temp)) {
                 canvas.setSamplingPixelDensity(value);
-                temp.setText( Integer.toString(canvas.getSamplingPixelDensity()));
-            }else if (minScoringTextField.equals(temp)){
+                temp.setText(Integer.toString(canvas.getSamplingPixelDensity()));
+            } else if (minScoringTextField.equals(temp)) {
                 canvas.setMinScoringValue(value);
-                temp.setText( Integer.toString(canvas.getMinScoringValue()));
-            }else if (maxScoringTextField.equals(temp)){
+                temp.setText(Integer.toString(canvas.getMinScoringValue()));
+            } else if (maxScoringTextField.equals(temp)) {
                 canvas.setMaxScoringValue(value);
-                temp.setText( Integer.toString(canvas.getMaxScoringValue()));
+                temp.setText(Integer.toString(canvas.getMaxScoringValue()));
             }
 
         }

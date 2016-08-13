@@ -23,7 +23,7 @@ public class Grid {
     public List<List<Point2D>> calcGridPoints(float pixelDensity) {
         List<List<Point2D>> matrix = new ArrayList<>();
 
-        final double coordsDistance = getCoordDistanceFromPixelDistance(pixelDensity);
+        final double coordsDistance = calcCoordDistanceFromPixelDistance(pixelDensity);
 
         // create sample coordinates for the currently drawn map area
         // important: to get scoring values for all shown pixels, the code will create samples around the canvas as well
@@ -43,7 +43,7 @@ public class Grid {
         return matrix;
     }
 
-    public double getCoordDistanceFromPixelDistance(float pixelDistance) {
+    public double calcCoordDistanceFromPixelDistance(float pixelDistance) {
         return parent.transferPixelToCoordinate(pixelDistance, 0).getY() - parent.transferPixelToCoordinate(0, 0).getY();
     }
 }
