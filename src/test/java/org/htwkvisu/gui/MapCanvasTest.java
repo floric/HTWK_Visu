@@ -32,7 +32,8 @@ public class MapCanvasTest {
 
     @Before
     public void setUp() {
-        canvas = new MapCanvas(DEFAULT_PIXEL_DENSITY,DEFAULT_MIN_SCORING_VALUE,DEFAULT_MAX_SCORING_VALUE);
+        canvas = new MapCanvas(new ScoringConfig(DEFAULT_PIXEL_DENSITY
+                , DEFAULT_MIN_SCORING_VALUE, DEFAULT_MAX_SCORING_VALUE));
         canvas.setWidth(MAP_WIDTH);
         canvas.setHeight(MAP_HEIGHT);
     }
