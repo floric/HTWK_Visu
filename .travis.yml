@@ -1,10 +1,19 @@
 language: java
 
+dist: trusty
 sudo: required
+addons:
+  apt:
+    packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
 
 install: true
-
 ## maven-invoker-plugin is called after deploying javafx-maven-plugin into local repository, so change default-test-call to "install" (because its called at that maven-phase)
+
+services:
+  - mysql
 
 script:
   - mvn install -B
@@ -13,6 +22,9 @@ jdk:
   - oraclejdk8
 ## openjdk8 currently does not provide openjfx, so every PR would have to get checked by looking at the oraclejdk-build
 #  - openjdk8
+
+before_script:
+  - bin/import.sh -f data/sachsen-filtered.osm -c
 
 branches:
 
