@@ -11,6 +11,8 @@ import org.htwkvisu.controller.ApplicationController;
 import java.io.IOException;
 import java.util.logging.*;
 
+import static java.util.logging.Level.OFF;
+
 /**
  *  Main App
  */
@@ -28,6 +30,8 @@ public class App extends Application {
      * @param args Program arguments
      */
     public static void main(String[] args) {
+
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(OFF);
         Application.launch(args);
     }
 

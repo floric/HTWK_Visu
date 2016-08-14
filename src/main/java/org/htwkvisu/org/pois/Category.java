@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import static org.htwkvisu.org.pois.ScoreType.*;
 
-public enum Category {
+public enum Category implements IScorable {
     HEALTH(PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION)
     , INFRASTRUCTURE(TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM)
     , EDUCATION(SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE);
@@ -35,15 +35,21 @@ public enum Category {
         return types.stream().collect(Collectors.toMap(Function.identity(), ScoreType::generateDrawable));
     }
 
-    public List<ScoreValue> findAll(){
-        return types.stream().flatMap(t->t.findAll().stream()).collect(Collectors.toList());
+    public List<ScoreValue> findAll() {
+        return types.stream().flatMap(t -> t.findAll().stream()).collect(Collectors.toList());
     }
 
-    public List<BasicPOI> generateDrawable(){
-        return types.stream().flatMap(t->t.generateDrawable().stream()).collect(Collectors.toList());
+    public List<BasicPOI> generateDrawable() {
+        return types.stream().flatMap(t -> t.generateDrawable().stream()).collect(Collectors.toList());
     }
 
-    public double calculateCategoryValue(Point2D pt) {
-        return types.stream().mapToDouble(t->t.calculateScoreValue(pt)).sum();
+    @Override
+    public double calculateScoreValue(Point2D pt) {
+        return types.stream().mapToDouble(t -> t.calculateScoreValue(pt)).sum();
+    }
+
+    @Override
+    public double calculateScoreValueForCustom(Point2D pt) {
+        return types.stream().mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
     }
 }
