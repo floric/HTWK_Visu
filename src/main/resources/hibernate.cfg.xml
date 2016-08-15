@@ -17,7 +17,7 @@
 
         <property name="hibernate.connection.url">
             jdbc:mysql://localhost:3306/life_quality?
-            ?useTimezone=true&amp;serverTimezone=Europe/Berlin
+            ?useTimezone=true&amp;useSSL=false&amp;serverTimezone=Europe/Berlin
         </property>
         <property name="hibernate.connection.username">
             root

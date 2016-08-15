@@ -1,18 +1,12 @@
 package org.htwkvisu.org.pois;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * This test class is ignored, because of the ci-server.
- * TODO: please fix the integration of the score_values with the import-script
- */
-@Ignore
 public class CategoryIntegrationTest {
 
     private static final int EDUCATION_SIZE = 2521;
