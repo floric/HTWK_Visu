@@ -51,6 +51,6 @@ public class ExponentialFallOf implements IFallOf {
 
     @Override
     public String toString() {
-        return "ExponentialFallOf";
+        return "exponential";
     }
 }

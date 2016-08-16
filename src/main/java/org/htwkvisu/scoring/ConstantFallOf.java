@@ -47,6 +47,6 @@ public class ConstantFallOf implements IFallOf {
 
     @Override
     public String toString() {
-        return "ConstantFallOf";
+        return "constant";
     }
 }

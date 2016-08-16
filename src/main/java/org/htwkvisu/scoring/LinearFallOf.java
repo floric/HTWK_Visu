@@ -49,6 +49,6 @@ public class LinearFallOf implements IFallOf {
 
     @Override
     public String toString() {
-        return "LinearFallOf";
+        return "linear";
     }
 }

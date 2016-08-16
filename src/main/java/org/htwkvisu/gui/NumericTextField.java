@@ -82,6 +82,5 @@ public class NumericTextField extends TextField
         }
 
         return getText().length() - (end - start) + text.length() <= this.maxlength;
-
     }
 }

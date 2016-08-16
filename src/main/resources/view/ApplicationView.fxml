@@ -28,20 +28,28 @@
                             <content>
                                 <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="enabled" prefWidth="25.0" sortable="false" text=""/>
-                                        <TableColumn fx:id="categoryColumn" prefWidth="129.0" sortable="false"
+                                        <TableColumn fx:id="enabled" prefWidth="25.0" editable="true" sortable="false"
+                                                     text=""/>
+                                        <TableColumn fx:id="categoryColumn" prefWidth="129.0" editable="true"
+                                                     sortable="false"
                                                      text="Category"/>
-                                        <TableColumn fx:id="scoreColumn" prefWidth="98.0" sortable="false"
+                                        <TableColumn fx:id="scoreColumn" prefWidth="98.0" editable="true"
+                                                     sortable="false"
                                                      text="Scoretype"/>
-                                        <TableColumn fx:id="fallOfColumn" prefWidth="135.0" sortable="false"
+                                        <TableColumn fx:id="fallOfColumn" prefWidth="101.0" editable="true"
+                                                     sortable="false"
                                                      text="FallOf"/>
-                                        <TableColumn fx:id="paramOneColumn" prefWidth="101.0" sortable="false"
+                                        <TableColumn fx:id="paramOneColumn" prefWidth="101.0" editable="true"
+                                                     sortable="false"
                                                      text="Radius"/>
-                                        <TableColumn fx:id="paramTwoColumn" prefWidth="101.0" sortable="false"
+                                        <TableColumn fx:id="paramTwoColumn" prefWidth="101.0" editable="true"
+                                                     sortable="false"
                                                      text="Maximum"/>
-                                        <TableColumn fx:id="paramThreeColumn" prefWidth="101.0" sortable="false"
+                                        <TableColumn fx:id="paramThreeColumn" prefWidth="101.0" editable="true"
+                                                     sortable="false"
                                                      text="Exponent"/>
-                                        <TableColumn fx:id="weightColumn" prefWidth="91.0" sortable="false"
+                                        <TableColumn fx:id="weightColumn" prefWidth="91.0" editable="true"
+                                                     sortable="false"
                                                      text="Gewicht"/>
                                     </columns>
                                 </TableView>

@@ -4,8 +4,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.ScoreType;
 import org.htwkvisu.scoring.IFallOf;
@@ -137,12 +135,43 @@ public class ScoreTableModel {
     }
 
     public void onClick() {
-        enabledProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                type.setEnabled(newValue);
-                Logger.getGlobal().info("set enabled of type:" + type.name() + ", value: " + newValue);
+        enabledProperty().addListener((observable, oldValue, newValue) -> {
+            type.setEnabled(newValue);
+            Logger.getGlobal().info("set enabled of type:" + type.name() + ", value: " + newValue);
+        });
+    }
+
+    public void onKeyPressed() {
+        paramOneProperty().addListener((observable, oldValue, newValue) -> {
+            long value = newValue.longValue();
+            if (value > 0) {
+                type.getFallOf().setRadius((double) value);
             }
+            Logger.getGlobal().info("set radius of type:" + type.name() + ", value: " + newValue);
+        });
+
+        paramTwoProperty().addListener((observable, oldValue, newValue) -> {
+            long value = newValue.longValue();
+            if (value > 0) {
+                type.getFallOf().setMaxVal((double) value);
+            }
+            Logger.getGlobal().info("set maxval of type:" + type.name() + ", value: " + newValue);
+        });
+
+        paramThreeProperty().addListener((observable, oldValue, newValue) -> {
+            long value = newValue.longValue();
+            if (value > 0) {
+                type.getFallOf().setExp((double) value);
+            }
+            Logger.getGlobal().info("set exp of type:" + type.name() + ", value: " + newValue);
+        });
+
+        weightProperty().addListener((observable, oldValue, newValue) -> {
+            long value = newValue.longValue();
+            if (value > 0) {
+                type.setWeight((double) value);
+            }
+            Logger.getGlobal().info("set weight of type:" + type.name() + ", value: " + newValue);
         });
     }
 }

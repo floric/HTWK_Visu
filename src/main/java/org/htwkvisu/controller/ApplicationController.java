@@ -141,14 +141,7 @@ public class ApplicationController implements Initializable {
 
     private void initTable() {
         tableView.setEditable(true);
-
-     /*   enabled.setCellValueFactory(f -> {
-            CheckBox check = new CheckBox();
-            check.setSelected(f.getValue());
-            return new SimpleObjectProperty<>(check);
-        });
-        enabled.setCellFactory(tc -> new CheckBoxTableCell<>());
-*/
+        onDoubleTableColumnKeyPressed();
         enabled.setCellValueFactory(new PropertyValueFactory<>("enabled"));
         enabled.setCellFactory(CheckBoxTableCell.forTableColumn(enabled));
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
@@ -158,13 +151,43 @@ public class ApplicationController implements Initializable {
         paramTwoColumn.setCellValueFactory(new PropertyValueFactory<>("paramTwo"));
         paramThreeColumn.setCellValueFactory(new PropertyValueFactory<>("paramThree"));
         weightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
+        paramOneColumn.setEditable(true);
 
         //TODO: please remove this - read property-file and set value from them
         Category.EDUCATION.setEnabledForCategory(true);
 
         List<ScoreTableModel> tableModels = ScoringCalculator.calcAllTableModels();
         tableView.setItems(FXCollections.observableList(tableModels));
-        //  enabled.getColumns().addAll( FXCollections.observableList(Category.HEALTH.calcEnabledList(Category.HEALTH)));
+    }
+
+    private void onDoubleTableColumnKeyPressed() {
+        paramOneColumn.setOnEditCommit(event -> {
+            long value = event.getNewValue().longValue();
+            Logger.getGlobal().info("radius pressed");
+            if (value > 0) {
+                ScoreTableModel scoreTableModel = tableView.getItems().get(event.getTablePosition().getRow());
+                scoreTableModel.setParamOne(value);
+                Logger.getGlobal().info("set radius of type:" + scoreTableModel.getType().name() + ", value: " + value);
+            }
+        });
+        paramTwoColumn.setOnEditCommit(event -> {
+            long value = event.getNewValue().longValue();
+            if (value > 0) {
+                tableView.getItems().get(event.getTablePosition().getRow()).setParamTwo(value);
+            }
+        });
+        paramThreeColumn.setOnEditCommit(event -> {
+            long value = event.getNewValue().longValue();
+            if (value > 0) {
+                tableView.getItems().get(event.getTablePosition().getRow()).setParamThree(value);
+            }
+        });
+        weightColumn.setOnEditCommit(event -> {
+            long value = event.getNewValue().longValue();
+            if (value > 0) {
+                tableView.getItems().get(event.getTablePosition().getRow()).setWeight(value);
+            }
+        });
     }
 
     private void initNumericTextFields(NumericTextField numericTextField, final int value) {
