@@ -75,7 +75,8 @@ public class ApplicationController implements Initializable {
 
     @FXML
     private Button resetViewButton;
-
+    @FXML
+    private Button redrawButton;
     @FXML
     private Label messageLabel;
 
@@ -204,17 +205,6 @@ public class ApplicationController implements Initializable {
         canvasPane.heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
     }
 
-
-    /**
-     * Center to view to default point.
-     *
-     * @param ev Mouse click event
-     */
-    @FXML
-    public void onResetViewClicked(MouseEvent ev) {
-        canvas.centerView(new Point2D(51, 13)); // test value as an example!
-    }
-
     /**
      * Refreshes Values for textFields
      *
@@ -226,6 +216,21 @@ public class ApplicationController implements Initializable {
             config.changeValueOfNumericScoringTextField(
                     (NumericTextField) ev.getSource(),
                     pixelDensityTextField, minScoringTextField, maxScoringTextField);
+        }
+    }
+
+    /**
+     * Redraw or Resets view of canvas
+     * @param ev MouseEvent
+     */
+    @FXML
+    public void onClicked(MouseEvent ev) {
+        if (ev.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+           if(ev.getSource().equals(redrawButton)){
+                canvas.redraw();
+            }else if(ev.getSource().equals(resetViewButton)){
+               canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
+            }
         }
     }
 

@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.htwkvisu.gui.NumericTextField?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="581.0" prefWidth="969.0"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.htwkvisu.controller.ApplicationController">
+<?import org.htwkvisu.gui.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="581.0" prefWidth="969.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.htwkvisu.controller.ApplicationController">
     <bottom>
         <HBox prefHeight="0.0" prefWidth="0.0" BorderPane.alignment="CENTER">
             <children>
                 <Label text="Status:">
                     <HBox.margin>
-                        <Insets right="5.0"/>
+                        <Insets right="5.0" />
                     </HBox.margin>
                 </Label>
-                <Label fx:id="messageLabel" text="Message"/>
+                <Label fx:id="messageLabel" text="Message" />
             </children>
         </HBox>
     </bottom>
@@ -26,31 +28,16 @@
                     <panes>
                         <TitledPane animated="false" text="Data">
                             <content>
-                                <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0">
+                                <TableView fx:id="tableView" editable="true" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
-                                        <TableColumn fx:id="enabled" prefWidth="25.0" editable="true" sortable="false"
-                                                     text=""/>
-                                        <TableColumn fx:id="categoryColumn" prefWidth="129.0" editable="true"
-                                                     sortable="false"
-                                                     text="Category"/>
-                                        <TableColumn fx:id="scoreColumn" prefWidth="98.0" editable="true"
-                                                     sortable="false"
-                                                     text="Scoretype"/>
-                                        <TableColumn fx:id="fallOfColumn" prefWidth="101.0" editable="true"
-                                                     sortable="false"
-                                                     text="FallOf"/>
-                                        <TableColumn fx:id="paramOneColumn" prefWidth="101.0" editable="true"
-                                                     sortable="false"
-                                                     text="Radius"/>
-                                        <TableColumn fx:id="paramTwoColumn" prefWidth="101.0" editable="true"
-                                                     sortable="false"
-                                                     text="Maximum"/>
-                                        <TableColumn fx:id="paramThreeColumn" prefWidth="101.0" editable="true"
-                                                     sortable="false"
-                                                     text="Exponent"/>
-                                        <TableColumn fx:id="weightColumn" prefWidth="91.0" editable="true"
-                                                     sortable="false"
-                                                     text="Gewicht"/>
+                                        <TableColumn fx:id="enabled" editable="true" prefWidth="25.0" sortable="false" text="" />
+                                        <TableColumn fx:id="categoryColumn" editable="true" prefWidth="129.0" sortable="false" text="Category" />
+                                        <TableColumn fx:id="scoreColumn" editable="true" prefWidth="98.0" sortable="false" text="Scoretype" />
+                                        <TableColumn fx:id="fallOfColumn" editable="true" prefWidth="101.0" sortable="false" text="FallOf" />
+                                        <TableColumn fx:id="paramOneColumn" editable="true" prefWidth="101.0" sortable="false" text="Radius" />
+                                        <TableColumn fx:id="paramTwoColumn" editable="true" prefWidth="101.0" sortable="false" text="Maximum" />
+                                        <TableColumn fx:id="paramThreeColumn" editable="true" prefWidth="101.0" sortable="false" text="Exponent" />
+                                        <TableColumn fx:id="weightColumn" editable="true" prefWidth="91.0" sortable="false" text="Gewicht" />
                                     </columns>
                                 </TableView>
                             </content>
@@ -59,31 +46,28 @@
                             <content>
                                 <GridPane layoutY="-2.0" prefHeight="310.0" prefWidth="200.0">
                                     <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     </columnConstraints>
                                     <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                     <children>
-                                        <Label text="Pixel Density:"/>
-                                        <Label text="Min Score:" GridPane.rowIndex="1"/>
-                                        <Label text="Max Score" GridPane.rowIndex="2"/>
-                                        <NumericTextField fx:id="pixelDensityTextField" onKeyPressed="#onEnterPressed"
-                                                          GridPane.columnIndex="1"/>
-                                        <NumericTextField fx:id="minScoringTextField" onKeyPressed="#onEnterPressed"
-                                                          GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                        <NumericTextField fx:id="maxScoringTextField" onKeyPressed="#onEnterPressed"
-                                                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                        <Label text="Pixel Density:" />
+                                        <Label text="Min Score:" GridPane.rowIndex="1" />
+                                        <Label text="Max Score" GridPane.rowIndex="2" />
+                                        <NumericTextField fx:id="pixelDensityTextField" onKeyPressed="#onEnterPressed" GridPane.columnIndex="1" />
+                                        <NumericTextField fx:id="minScoringTextField" onKeyPressed="#onEnterPressed" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <NumericTextField fx:id="maxScoringTextField" onKeyPressed="#onEnterPressed" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     </children>
                                 </GridPane>
                             </content>
                         </TitledPane>
                         <TitledPane animated="false" text="Info">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                             </content>
                         </TitledPane>
                     </panes>
@@ -92,11 +76,11 @@
                     <children>
                         <ToolBar prefHeight="40.0" prefWidth="200.0">
                             <items>
-                                <Button fx:id="resetViewButton" mnemonicParsing="false"
-                                        onMouseClicked="#onResetViewClicked" text="Reset view"/>
+                                <Button fx:id="resetViewButton" mnemonicParsing="false" onMouseClicked="#onClicked" text="Reset view" />
+                        <Button fx:id="redrawButton" onMouseClicked="#onClicked" mnemonicParsing="false" text="Redraw" textAlignment="CENTER" />
                             </items>
                         </ToolBar>
-                        <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS"/>
+                        <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                     </children>
                 </VBox>
             </items>

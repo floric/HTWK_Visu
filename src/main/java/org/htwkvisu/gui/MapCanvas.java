@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
+import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.ScoreType;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
@@ -18,9 +19,8 @@ import java.util.stream.Collectors;
  */
 public class MapCanvas extends BasicCanvas {
 
-    private Point2D mapCenter = new Point2D(51.343479, 12.387772);
+    private Point2D mapCenter = new Point2D(50.832222, 12.92416666); //Chemnitz
     private GraphicsContext gc = getGraphicsContext2D();
-    // cached values for faster drawing
     private double widthDistance = 0;
     private double heightDistance = 0;
     private int displayedElems = 0;
@@ -29,11 +29,6 @@ public class MapCanvas extends BasicCanvas {
      */
     public MapCanvas(ScoringConfig config) {
         super(config);
-        // add POIs
-        //TODO dynamisch
-        for (ScoreType scoreType : ScoreType.values()) {
-            scoreType.generateDrawable().forEach(this::addDrawableElement);
-        }
 
         // add test cities
         addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
@@ -67,8 +62,6 @@ public class MapCanvas extends BasicCanvas {
         // now calculate the values
         for (List<Point2D> line : gridPoints) {
             for (Point2D pt : line) {
-                //TODO: ScoringCalculator
-
                 final double scoreForCoord = ScoringCalculator.calculateEnabledScoreValue(pt);
                 gc.setFill(getColorForValue(scoreForCoord));
 
@@ -120,6 +113,20 @@ public class MapCanvas extends BasicCanvas {
 
         drawables.add(elem);
     }
+
+
+    private void drawPOIS(){
+        final Paint curFillPaint = gc.getFill();
+        final Paint curStrokePaint = gc.getStroke();
+
+        for (BasicPOI poi :  ScoringCalculator.generateEnabled()) {
+            poi.draw(this.gc, this);
+        }
+
+        gc.setFill(curFillPaint);
+        gc.setStroke(curStrokePaint);
+    }
+
 
     @Override
     public void drawElements() {
@@ -180,7 +187,9 @@ public class MapCanvas extends BasicCanvas {
         drawScoringValues();
         drawInfo();
         drawGrid();
+        drawPOIS();
         drawElements();
+
     }
 
     @Override
