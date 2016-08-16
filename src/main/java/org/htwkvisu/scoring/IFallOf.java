@@ -11,4 +11,12 @@ public interface IFallOf {
     double getMaximumValue();
 
     double getRadius();
+
+    double getExp();
+
+    void setMaxVal(double maxVal);
+
+    void setRadius(double radius);
+
+    void setExp(double exp);
 }

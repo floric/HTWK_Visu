@@ -5,8 +5,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -15,10 +18,14 @@ import javafx.scene.paint.Color;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.gui.NumericTextField;
 import org.htwkvisu.gui.ScoringConfig;
+import org.htwkvisu.model.ScoreTableModel;
 import org.htwkvisu.org.pois.Category;
+import org.htwkvisu.org.pois.ScoreType;
+import org.htwkvisu.org.pois.ScoringCalculator;
+import org.htwkvisu.scoring.IFallOf;
 
 import java.net.URL;
-import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,13 +35,32 @@ import java.util.logging.Logger;
  */
 public class ApplicationController implements Initializable {
 
-    @FXML
-    private ComboBox categoryBox;
-    @FXML
-    private ComboBox scoreTypeBox;
 
     @FXML
+    private TableColumn<Double, Double> weightColumn;
+    @FXML
+    private TableColumn<Double, Double> paramOneColumn;
+    @FXML
+    private TableColumn<Double, Double> paramTwoColumn;
+    @FXML
+    private TableColumn<Double, Double> paramThreeColumn;
+    /*@FXML
+            private ComboBox categoryBox;
+            @FXML
+            private ComboBox scoreTypeBox;*/
+    @FXML
+    private TableColumn<Boolean, Boolean> enabled;
+    @FXML
+    private TableColumn<Category, String> categoryColumn;
+    @FXML
+    private TableColumn<ScoreType, String> scoreColumn;
+    @FXML
+    public TableColumn<IFallOf, String> fallOfColumn;
+    @FXML
     private NumericTextField pixelDensityTextField;
+
+    @FXML
+    private TableView<ScoreTableModel> tableView;
 
     private static final int DEFAULT_PIXEL_DENSITY = 30;
     private static final int MAX_NUMERIC_FIELD_LENGTH = 6;
@@ -89,13 +115,14 @@ public class ApplicationController implements Initializable {
         initNumericTextFields(minScoringTextField, DEFAULT_MIN_SCORING_VALUE);
         initNumericTextFields(maxScoringTextField, DEFAULT_MAX_SCORING_VALUE);
 
-        initComboBox();
+        initTable();
+        // initComboBox();
 
         Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
 
     }
 
-    private void initComboBox() {
+   /* private void initComboBox() {
         categoryBox.setItems(FXCollections.observableList(Arrays.asList(Category.values())));
         categoryBox.setValue(categoryBox.getItems().get(0));
 
@@ -110,6 +137,34 @@ public class ApplicationController implements Initializable {
             scoreTypeBox.setValue(scoreTypeBox.getItems().get(0));
         });
 
+    } */
+
+    private void initTable() {
+        tableView.setEditable(true);
+
+     /*   enabled.setCellValueFactory(f -> {
+            CheckBox check = new CheckBox();
+            check.setSelected(f.getValue());
+            return new SimpleObjectProperty<>(check);
+        });
+        enabled.setCellFactory(tc -> new CheckBoxTableCell<>());
+*/
+        enabled.setCellValueFactory(new PropertyValueFactory<>("enabled"));
+        enabled.setCellFactory(CheckBoxTableCell.forTableColumn(enabled));
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+        scoreColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        fallOfColumn.setCellValueFactory(new PropertyValueFactory<>("fallOf"));
+        paramOneColumn.setCellValueFactory(new PropertyValueFactory<>("paramOne"));
+        paramTwoColumn.setCellValueFactory(new PropertyValueFactory<>("paramTwo"));
+        paramThreeColumn.setCellValueFactory(new PropertyValueFactory<>("paramThree"));
+        weightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
+
+        //TODO: please remove this - read property-file and set value from them
+        Category.EDUCATION.setEnabledForCategory(true);
+
+        List<ScoreTableModel> tableModels = ScoringCalculator.calcAllTableModels();
+        tableView.setItems(FXCollections.observableList(tableModels));
+        //  enabled.getColumns().addAll( FXCollections.observableList(Category.HEALTH.calcEnabledList(Category.HEALTH)));
     }
 
     private void initNumericTextFields(NumericTextField numericTextField, final int value) {

@@ -43,6 +43,19 @@ public enum Category implements IScorable {
         return types.stream().flatMap(t -> t.generateDrawable().stream()).collect(Collectors.toList());
     }
 
+    public List<ScoreValue> findAllEnabled() {
+        return types.stream().filter(ScoreType::isEnabled).flatMap(t -> t.findAll().stream())
+                .collect(Collectors.toList());
+    }
+
+    public List<BasicPOI> generateEnabledDrawable() {
+        return types.stream().filter(ScoreType::isEnabled).flatMap(t -> t.generateDrawable().stream())
+                .collect(Collectors.toList());
+    }
+
+    public void setEnabledForCategory(boolean enabled) {
+        types.stream().forEach(t -> t.setEnabled(enabled));
+    }
     @Override
     public double calculateScoreValue(Point2D pt) {
         return types.stream().mapToDouble(t -> t.calculateScoreValue(pt)).sum();

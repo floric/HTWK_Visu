@@ -6,8 +6,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.ScoreType;
+import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.List;
@@ -30,6 +30,7 @@ public class MapCanvas extends BasicCanvas {
     public MapCanvas(ScoringConfig config) {
         super(config);
         // add POIs
+        //TODO dynamisch
         for (ScoreType scoreType : ScoreType.values()) {
             scoreType.generateDrawable().forEach(this::addDrawableElement);
         }
@@ -65,11 +66,13 @@ public class MapCanvas extends BasicCanvas {
 
         // now calculate the values
         for (List<Point2D> line : gridPoints) {
-            for (Point2D coord : line) {
-                final double scoreForCoord = Category.EDUCATION.calculateScoreValue(coord);
+            for (Point2D pt : line) {
+                //TODO: ScoringCalculator
+
+                final double scoreForCoord = ScoringCalculator.calculateEnabledScoreValue(pt);
                 gc.setFill(getColorForValue(scoreForCoord));
 
-                Point2D pixelPos = transferCoordinateToPixel(coord);
+                Point2D pixelPos = transferCoordinateToPixel(pt);
                 gc.fillRect(pixelPos.getX(), pixelPos.getY(), config.getSamplingPixelDensity()
                         , config.getSamplingPixelDensity());
             }

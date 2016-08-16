@@ -27,4 +27,28 @@ public class LinearFallOf implements IFallOf {
     public double getRadius() {
         return radius;
     }
+
+    @Override
+    public double getExp() {
+        return 0;
+    }
+
+    @Override
+    public void setMaxVal(double maxVal) {
+        this.maxVal = maxVal;
+    }
+
+    @Override
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    @Override
+    public void setExp(double exp) {
+    }
+
+    @Override
+    public String toString() {
+        return "LinearFallOf";
+    }
 }
