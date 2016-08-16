@@ -6,6 +6,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.log4j.varia.NullAppender;
 import org.htwkvisu.controller.ApplicationController;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class App extends Application {
      * @param args Program arguments
      */
     public static void main(String[] args) {
-
+        org.apache.log4j.BasicConfigurator.configure(new NullAppender());
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(OFF);
         Application.launch(args);
     }
