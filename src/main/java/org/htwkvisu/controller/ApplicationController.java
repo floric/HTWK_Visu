@@ -1,20 +1,23 @@
 package org.htwkvisu.controller;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
+import org.htwkvisu.gui.EditingDoubleCell;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.gui.NumericTextField;
 import org.htwkvisu.gui.ScoringConfig;
@@ -35,19 +38,15 @@ import java.util.logging.Logger;
  */
 public class ApplicationController implements Initializable {
 
-
     @FXML
     private TableColumn<Double, Double> weightColumn;
     @FXML
-    private TableColumn<Double, Double> paramOneColumn;
+    private TableColumn<Double, Double> radiusColumn;
     @FXML
-    private TableColumn<Double, Double> paramTwoColumn;
+    private TableColumn<Double, Double> maximumColumn;
     @FXML
-    private TableColumn<Double, Double> paramThreeColumn;
-    /*@FXML
-            private ComboBox categoryBox;
-            @FXML
-            private ComboBox scoreTypeBox;*/
+    private TableColumn<Double, Double> exponentColumn;
+
     @FXML
     private TableColumn<Boolean, Boolean> enabled;
     @FXML
@@ -110,6 +109,8 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
+        //TODO: please remove this - read property-file and set value from them
+        Category.EDUCATION.setEnabledForCategory(true);
 
         initCanvas();
         initNumericTextFields(pixelDensityTextField, DEFAULT_PIXEL_DENSITY);
@@ -117,78 +118,51 @@ public class ApplicationController implements Initializable {
         initNumericTextFields(maxScoringTextField, DEFAULT_MAX_SCORING_VALUE);
 
         initTable();
-        // initComboBox();
 
         Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
 
     }
 
-   /* private void initComboBox() {
-        categoryBox.setItems(FXCollections.observableList(Arrays.asList(Category.values())));
-        categoryBox.setValue(categoryBox.getItems().get(0));
-
-        Category category = (Category) categoryBox.getItems().get(0);
-
-        scoreTypeBox.setItems(FXCollections.observableList(category.getTypes()));
-        scoreTypeBox.setValue(scoreTypeBox.getItems().get(0));
-
-        categoryBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            Category newCat = (Category) newValue;
-            scoreTypeBox.setItems(FXCollections.observableList(newCat.getTypes()));
-            scoreTypeBox.setValue(scoreTypeBox.getItems().get(0));
-        });
-
-    } */
-
     private void initTable() {
-        tableView.setEditable(true);
-        onDoubleTableColumnKeyPressed();
+
         enabled.setCellValueFactory(new PropertyValueFactory<>("enabled"));
         enabled.setCellFactory(CheckBoxTableCell.forTableColumn(enabled));
+
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
         scoreColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        fallOfColumn.setCellValueFactory(new PropertyValueFactory<>("fallOf"));
-        paramOneColumn.setCellValueFactory(new PropertyValueFactory<>("paramOne"));
-        paramTwoColumn.setCellValueFactory(new PropertyValueFactory<>("paramTwo"));
-        paramThreeColumn.setCellValueFactory(new PropertyValueFactory<>("paramThree"));
-        weightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
-        paramOneColumn.setEditable(true);
 
-        //TODO: please remove this - read property-file and set value from them
-        Category.EDUCATION.setEnabledForCategory(true);
+        fallOfColumn.setCellValueFactory(new PropertyValueFactory<>("fallOf"));
+        //TODO setCellFactory
+
+        radiusColumn.setCellValueFactory(new PropertyValueFactory<>("paramOne"));
+        radiusColumn.setCellFactory(f-> new EditingDoubleCell());
+
+        maximumColumn.setCellValueFactory(new PropertyValueFactory<>("paramTwo"));
+        maximumColumn.setCellFactory(f-> new EditingDoubleCell());
+
+        exponentColumn.setCellValueFactory(new PropertyValueFactory<>("paramThree"));
+        exponentColumn.setCellFactory(f-> new EditingDoubleCell());
+
+        weightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
+        weightColumn.setCellFactory(f-> new EditingDoubleCell());
 
         List<ScoreTableModel> tableModels = ScoringCalculator.calcAllTableModels();
         tableView.setItems(FXCollections.observableList(tableModels));
-    }
 
-    private void onDoubleTableColumnKeyPressed() {
-        paramOneColumn.setOnEditCommit(event -> {
-            long value = event.getNewValue().longValue();
-            Logger.getGlobal().info("radius pressed");
-            if (value > 0) {
-                ScoreTableModel scoreTableModel = tableView.getItems().get(event.getTablePosition().getRow());
-                scoreTableModel.setParamOne(value);
-                Logger.getGlobal().info("set radius of type:" + scoreTableModel.getType().name() + ", value: " + value);
+        //TODO: Current only TEST purpose
+        tableView.setOnMouseClicked(click -> {
+
+            if (click.getClickCount() == 2) {
+                TablePosition pos = tableView.getSelectionModel().getSelectedCells().get(0);
+                int row = pos.getRow();
+                int col = pos.getColumn();
+
+                TableColumn column = pos.getTableColumn();
+                String val = column.getCellObservableValue(row).toString();
+                Logger.getGlobal().info("Selected Value, " + val + ", Column: " + col + ", Row: " + row);
             }
         });
-        paramTwoColumn.setOnEditCommit(event -> {
-            long value = event.getNewValue().longValue();
-            if (value > 0) {
-                tableView.getItems().get(event.getTablePosition().getRow()).setParamTwo(value);
-            }
-        });
-        paramThreeColumn.setOnEditCommit(event -> {
-            long value = event.getNewValue().longValue();
-            if (value > 0) {
-                tableView.getItems().get(event.getTablePosition().getRow()).setParamThree(value);
-            }
-        });
-        weightColumn.setOnEditCommit(event -> {
-            long value = event.getNewValue().longValue();
-            if (value > 0) {
-                tableView.getItems().get(event.getTablePosition().getRow()).setWeight(value);
-            }
-        });
+
     }
 
     private void initNumericTextFields(NumericTextField numericTextField, final int value) {

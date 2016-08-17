@@ -37,7 +37,7 @@ public final class ScoringCalculator {
         tableModels.addAll(INFRASTRUCTURE.getTypes().stream().map(t -> new ScoreTableModel(INFRASTRUCTURE, t))
                 .collect(Collectors.toList()));
         tableModels.forEach(ScoreTableModel::onClick);
-        //tableModels.forEach(ScoreTableModel::onKeyPressed);
+        tableModels.forEach(ScoreTableModel::onEnterCommit);
         return tableModels;
     }
 

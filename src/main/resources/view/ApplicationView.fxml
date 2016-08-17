@@ -28,16 +28,16 @@
                     <panes>
                         <TitledPane animated="false" text="Data">
                             <content>
-                                <TableView fx:id="tableView" editable="true" prefHeight="200.0" prefWidth="200.0">
+                                <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" editable="true">
                                     <columns>
                                         <TableColumn fx:id="enabled" editable="true" prefWidth="25.0" sortable="false" text="" />
-                                        <TableColumn fx:id="categoryColumn" editable="true" prefWidth="129.0" sortable="false" text="Category" />
-                                        <TableColumn fx:id="scoreColumn" editable="true" prefWidth="98.0" sortable="false" text="Scoretype" />
-                                        <TableColumn fx:id="fallOfColumn" editable="true" prefWidth="101.0" sortable="false" text="FallOf" />
-                                        <TableColumn fx:id="paramOneColumn" editable="true" prefWidth="101.0" sortable="false" text="Radius" />
-                                        <TableColumn fx:id="paramTwoColumn" editable="true" prefWidth="101.0" sortable="false" text="Maximum" />
-                                        <TableColumn fx:id="paramThreeColumn" editable="true" prefWidth="101.0" sortable="false" text="Exponent" />
-                                        <TableColumn fx:id="weightColumn" editable="true" prefWidth="91.0" sortable="false" text="Gewicht" />
+                                        <TableColumn fx:id="categoryColumn" editable="false" prefWidth="129.0" sortable="false" text="Category" />
+                                        <TableColumn fx:id="scoreColumn" editable="false" prefWidth="98.0" sortable="false" text="Scoretype" />
+                                        <TableColumn fx:id="fallOfColumn" prefWidth="101.0" sortable="false" text="FallOf" />
+                                        <TableColumn fx:id="radiusColumn" prefWidth="101.0" sortable="false" text="Radius" />
+                                        <TableColumn fx:id="maximumColumn" prefWidth="101.0" sortable="false" text="Maximum" />
+                                        <TableColumn fx:id="exponentColumn" prefWidth="101.0" sortable="false" text="Exponent" />
+                                        <TableColumn fx:id="weightColumn" prefWidth="91.0" sortable="false" text="Weight" />
                                     </columns>
                                 </TableView>
                             </content>

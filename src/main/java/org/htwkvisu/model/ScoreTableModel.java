@@ -6,7 +6,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.ScoreType;
+import org.htwkvisu.scoring.ConstantFallOf;
+import org.htwkvisu.scoring.ExponentialFallOf;
 import org.htwkvisu.scoring.IFallOf;
+import org.htwkvisu.scoring.LinearFallOf;
 
 import java.util.logging.Logger;
 
@@ -137,41 +140,65 @@ public class ScoreTableModel {
     public void onClick() {
         enabledProperty().addListener((observable, oldValue, newValue) -> {
             type.setEnabled(newValue);
-            Logger.getGlobal().info("set enabled of type:" + type.name() + ", value: " + newValue);
+            Logger.getGlobal().info("Set enabled of type:" + type.name() + ", value: " + newValue);
+        });
+
+        fallOfProperty().addListener((observable, oldValue, newValue) -> {
+            //TODO Switching Functions!
+            Logger.getGlobal().info("switcher");
+            double r = type.getFallOf().getRadius();
+            double max = type.getFallOf().getMaximumValue();
+            double exp = type.getFallOf().getExp();
+
+            if(type.getFallOf() instanceof ExponentialFallOf){
+                type.setFallOf(new ConstantFallOf(r,max));
+            }else if ( type.getFallOf() instanceof ConstantFallOf){
+                type.setFallOf(new LinearFallOf(r,max));
+            }else{
+                type.setFallOf(new ExponentialFallOf(r,max,exp));
+            }
         });
     }
 
-    public void onKeyPressed() {
+    public void onEnterCommit() {
         paramOneProperty().addListener((observable, oldValue, newValue) -> {
-            long value = newValue.longValue();
-            if (value > 0) {
-                type.getFallOf().setRadius((double) value);
+            double value = newValue.doubleValue();
+            if (value >= 0) {
+                type.getFallOf().setRadius(value);
+                Logger.getGlobal().info("Set radius of type:" + type.name() + ", value: " + newValue);
+            }else{
+                Logger.getGlobal().warning("Set radius of type:" + type.name() + " not set");
             }
-            Logger.getGlobal().info("set radius of type:" + type.name() + ", value: " + newValue);
         });
 
         paramTwoProperty().addListener((observable, oldValue, newValue) -> {
-            long value = newValue.longValue();
-            if (value > 0) {
-                type.getFallOf().setMaxVal((double) value);
+            double value = newValue.doubleValue();
+            if (value >= 0) {
+                type.getFallOf().setMaxVal(value);
+                Logger.getGlobal().info("Set maxval of type:" + type.name() + ", value: " + newValue);
+            }else{
+                Logger.getGlobal().warning("Set maxval of type:" + type.name() + " not set");
             }
-            Logger.getGlobal().info("set maxval of type:" + type.name() + ", value: " + newValue);
         });
 
         paramThreeProperty().addListener((observable, oldValue, newValue) -> {
-            long value = newValue.longValue();
-            if (value > 0) {
-                type.getFallOf().setExp((double) value);
+            double value = newValue.doubleValue();
+            if (value >= 0) {
+                type.getFallOf().setExp(value);
+                Logger.getGlobal().info("Set exp of type:" + type.name() + ", value: " + newValue);
+            }else{
+                Logger.getGlobal().warning("Set exp of type:" + type.name() + " not set");
             }
-            Logger.getGlobal().info("set exp of type:" + type.name() + ", value: " + newValue);
         });
 
         weightProperty().addListener((observable, oldValue, newValue) -> {
-            long value = newValue.longValue();
-            if (value > 0) {
-                type.setWeight((double) value);
+            double value = newValue.doubleValue();
+            if (value >= 1) {
+                type.setWeight(value);
+                Logger.getGlobal().info("Set weight of type:" + type.name() + ", value: " + newValue);
+            }else{
+                Logger.getGlobal().warning("Set weight of type:" + type.name() + " not set");
             }
-            Logger.getGlobal().info("set weight of type:" + type.name() + ", value: " + newValue);
         });
     }
 }
