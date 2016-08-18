@@ -77,6 +77,8 @@
                                         text="Redraw" textAlignment="CENTER"/>
                                 <CheckBox fx:id="autoScaledCheckBox" mnemonicParsing="false"
                                           text="Autoscaled Max-Score-Value"/>
+                                <CheckBox fx:id="colorModeCheckBox" mnemonicParsing="false"
+                                          text="Color-Mode"/>
                             </items>
                         </ToolBar>
                         <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />

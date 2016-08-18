@@ -1,7 +1,6 @@
 package org.htwkvisu.gui;
 
 import javafx.geometry.Point2D;
-import javafx.scene.paint.Color;
 import org.htwkvisu.org.IMapDrawable;
 
 public interface ScoringCanvas {
@@ -33,14 +32,6 @@ public interface ScoringCanvas {
      * @param center Point of map center.
      */
     void centerView(Point2D center);
-
-    /**
-     * Calculats a color for a given scoring value
-     *
-     * @param value the scoring value
-     * @return color for scoring value
-     */
-    Color getColorForValue(double value);
 
     Point2D getCenter();
 

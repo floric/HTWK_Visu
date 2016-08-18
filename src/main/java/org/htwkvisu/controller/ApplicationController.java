@@ -35,6 +35,8 @@ public class ApplicationController implements Initializable {
 
     private static final int FALL_OF_COLUMN_INDEX = 3;
     @FXML
+    private CheckBox colorModeCheckBox;
+    @FXML
     private CheckBox autoScaledCheckBox;
     @FXML
     private TableColumn<Double, Double> weightColumn;
@@ -164,6 +166,7 @@ public class ApplicationController implements Initializable {
     private void initCanvas() {
         config = new ScoringConfig(DEFAULT_PIXEL_DENSITY, DEFAULT_MIN_SCORING_VALUE, DEFAULT_MAX_SCORING_VALUE);
         canvas = new MapCanvas(config);
+        canvas.setColorModeCheckBox(colorModeCheckBox);
         canvasPane.getChildren().add(canvas);
         canvasPane.widthProperty().addListener((observable, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         canvasPane.heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
@@ -201,7 +204,9 @@ public class ApplicationController implements Initializable {
 
     private void handleRedrawButton() {
         if (autoScaledCheckBox.isSelected()) {
-            config.setMaxScoringValue(canvas.calculateMaxScore());
+            int maxScoringValue = canvas.calculateMaxScore();
+            config.setMaxScoringValue(maxScoringValue);
+            Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
         } else {
             canvas.redraw();
         }

@@ -92,6 +92,14 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
         return new Point2D(coordsBounds.getMinX(), coordsBounds.getMaxY());
     }
 
+    public ScoringConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(ScoringConfig config) {
+        this.config = config;
+    }
+
     /**
      * Add event handlers for mouse and keyboard interactions with map.
      */

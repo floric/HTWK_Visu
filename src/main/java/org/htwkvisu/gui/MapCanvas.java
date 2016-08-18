@@ -3,16 +3,17 @@ package org.htwkvisu.gui;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.org.pois.BasicPOI;
+import org.htwkvisu.org.pois.NormalizedColorCalculator;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,8 @@ public class MapCanvas extends BasicCanvas {
     private double widthDistance = 0;
     private double heightDistance = 0;
     private int displayedElems = 0;
+    private CheckBox colorModeCheckBox;
+
     /**
      * Construct and init canvas
      */
@@ -53,17 +56,18 @@ public class MapCanvas extends BasicCanvas {
     public void drawScoringValues() {
 // get sample points for canvas
         // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
-        Grid grid = new Grid(this);
-        List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
+        List<List<Point2D>> gridPoints = calculateGrid();
         // save previous colors
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
+
+        //TODO:enable/disable adjust checkbox if colormode enabled/disabled
+        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, colorModeCheckBox.isSelected());
         // now calculate the values
         for (List<Point2D> line : gridPoints) {
             for (Point2D pt : line) {
-                final double scoreForCoord = ScoringCalculator.calculateEnabledScoreValue(pt);
-                gc.setFill(getColorForValue(scoreForCoord));
+                gc.setFill(norm.calculateColor(pt));
 
                 Point2D pixelPos = transferCoordinateToPixel(pt);
                 gc.fillRect(pixelPos.getX(), pixelPos.getY(), config.getSamplingPixelDensity()
@@ -115,11 +119,11 @@ public class MapCanvas extends BasicCanvas {
     }
 
 
-    private void drawPOIS(){
+    private void drawPOIS() {
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
-        for (BasicPOI poi :  ScoringCalculator.generateEnabled()) {
+        for (BasicPOI poi : ScoringCalculator.generateEnabled()) {
             poi.draw(this.gc, this);
         }
 
@@ -152,21 +156,6 @@ public class MapCanvas extends BasicCanvas {
     @Override
     public Point2D getCenter() {
         return mapCenter;
-    }
-
-    @Override
-    public Color getColorForValue(double value) {
-        double hue;
-        if (value < config.getMinScoringValue()) {
-            hue = Color.BLUE.getHue();
-        } else if (value > config.getMaxScoringValue()) {
-            hue = Color.RED.getHue();
-        } else {
-            hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue())
-                    * (value - config.getMinScoringValue()) / (config.getMaxScoringValue() - config.getMinScoringValue());
-        }
-
-        return Color.hsb(hue, 1.0, 1.0);
     }
 
     @Override
@@ -205,12 +194,22 @@ public class MapCanvas extends BasicCanvas {
     }
 
     public int calculateMaxScore() {
-        Grid grid = new Grid(this);
-        List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
+        List<List<Point2D>> gridPoints = calculateGrid();
         //setMaxScoringValue calls redraw
-        int calculatedMaxScoringValue = (int) gridPoints.stream().flatMap(Collection::stream)
+        return (int) gridPoints.stream().flatMap(Collection::stream)
                 .mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
-        Logger.getGlobal().info("New auto-scaled maxScoreValue: " + calculatedMaxScoringValue);
-        return calculatedMaxScoringValue;
+    }
+
+    public List<List<Point2D>> calculateGrid() {
+        Grid grid = new Grid(this);
+        return grid.calcGridPoints(config.getSamplingPixelDensity());
+    }
+
+    public void setColorModeCheckBox(CheckBox colorModeCheckBox) {
+        this.colorModeCheckBox = colorModeCheckBox;
+    }
+
+    public CheckBox getColorModeCheckBox() {
+        return colorModeCheckBox;
     }
 }
