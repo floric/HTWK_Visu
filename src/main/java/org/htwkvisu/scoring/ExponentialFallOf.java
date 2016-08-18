@@ -28,4 +28,34 @@ public class ExponentialFallOf implements IFallOf {
     public double getRadius() {
         return radius;
     }
+
+    @Override
+    public double getExp() {
+        return exp;
+    }
+
+    @Override
+    public void setMaxVal(double maxVal) {
+        this.maxVal = maxVal;
+    }
+
+    @Override
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    @Override
+    public void setExp(double exp) {
+        this.exp = exp;
+    }
+
+    @Override
+    public IFallOf switchToNext() {
+        return new ConstantFallOf(this.getRadius(), this.getMaximumValue());
+    }
+
+    @Override
+    public String toString() {
+        return "exponential";
+    }
 }

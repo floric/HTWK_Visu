@@ -6,11 +6,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.org.pois.Category;
-import org.htwkvisu.org.pois.ScoreType;
+import org.htwkvisu.org.pois.BasicPOI;
+import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -18,9 +20,8 @@ import java.util.stream.Collectors;
  */
 public class MapCanvas extends BasicCanvas {
 
-    private Point2D mapCenter = new Point2D(51.343479, 12.387772);
+    private Point2D mapCenter = new Point2D(50.832222, 12.92416666); //Chemnitz
     private GraphicsContext gc = getGraphicsContext2D();
-    // cached values for faster drawing
     private double widthDistance = 0;
     private double heightDistance = 0;
     private int displayedElems = 0;
@@ -29,10 +30,6 @@ public class MapCanvas extends BasicCanvas {
      */
     public MapCanvas(ScoringConfig config) {
         super(config);
-        // add POIs
-        for (ScoreType scoreType : ScoreType.values()) {
-            scoreType.generateDrawable().forEach(this::addDrawableElement);
-        }
 
         // add test cities
         addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
@@ -58,18 +55,17 @@ public class MapCanvas extends BasicCanvas {
         // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
         Grid grid = new Grid(this);
         List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
-
         // save previous colors
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
         // now calculate the values
         for (List<Point2D> line : gridPoints) {
-            for (Point2D coord : line) {
-                final double scoreForCoord = Category.EDUCATION.calculateScoreValue(coord);
+            for (Point2D pt : line) {
+                final double scoreForCoord = ScoringCalculator.calculateEnabledScoreValue(pt);
                 gc.setFill(getColorForValue(scoreForCoord));
 
-                Point2D pixelPos = transferCoordinateToPixel(coord);
+                Point2D pixelPos = transferCoordinateToPixel(pt);
                 gc.fillRect(pixelPos.getX(), pixelPos.getY(), config.getSamplingPixelDensity()
                         , config.getSamplingPixelDensity());
             }
@@ -117,6 +113,20 @@ public class MapCanvas extends BasicCanvas {
 
         drawables.add(elem);
     }
+
+
+    private void drawPOIS(){
+        final Paint curFillPaint = gc.getFill();
+        final Paint curStrokePaint = gc.getStroke();
+
+        for (BasicPOI poi :  ScoringCalculator.generateEnabled()) {
+            poi.draw(this.gc, this);
+        }
+
+        gc.setFill(curFillPaint);
+        gc.setStroke(curStrokePaint);
+    }
+
 
     @Override
     public void drawElements() {
@@ -177,7 +187,9 @@ public class MapCanvas extends BasicCanvas {
         drawScoringValues();
         drawInfo();
         drawGrid();
+        drawPOIS();
         drawElements();
+
     }
 
     @Override
@@ -190,5 +202,15 @@ public class MapCanvas extends BasicCanvas {
     public Point2D transferPixelToCoordinate(double x, double y) {
         return new Point2D(coordsBounds.getMaxX() - (y / tmpHeight) * coordsBounds.getWidth(),
                 coordsBounds.getMinY() + (x / tmpWidth) * coordsBounds.getHeight());
+    }
+
+    public int calculateMaxScore() {
+        Grid grid = new Grid(this);
+        List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
+        //setMaxScoringValue calls redraw
+        int calculatedMaxScoringValue = (int) gridPoints.stream().flatMap(Collection::stream)
+                .mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
+        Logger.getGlobal().info("New auto-scaled maxScoreValue: " + calculatedMaxScoringValue);
+        return calculatedMaxScoringValue;
     }
 }

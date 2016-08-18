@@ -142,6 +142,7 @@ public class MapCanvasTest {
     @Test
     public void getSampleCoordPoints() throws Exception {
         // sample just one point and border samples
+        canvas.setScale(100000);
         canvas.setWidth(1);
         canvas.setHeight(1);
         Grid gridOne = new Grid(canvas);

@@ -43,6 +43,7 @@ public enum ScoreType implements IScorable{
     private IFallOf fallOf;
     private List<BasicPOI> customPOIs = new ArrayList<>();
     private double weight = NEUTRAL_WEIGHT;
+    private boolean enabled = false;
     private List<BasicPOI> drawable = new ArrayList<>();
 
     ScoreType(String namedQuery, IFallOf fallOf) {
@@ -134,5 +135,13 @@ public enum ScoreType implements IScorable{
             throw new IllegalArgumentException("Weight shouldn't be 0.0 .");
         }
         this.weight = weight;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

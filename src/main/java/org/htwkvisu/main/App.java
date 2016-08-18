@@ -57,7 +57,7 @@ public class App extends Application {
 
         primaryStage.setTitle(WINDOW_TITLE);
         primaryStage.setScene(scene);
-
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
