@@ -1,22 +1,17 @@
 package org.htwkvisu.controller;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 import org.htwkvisu.gui.EditingDoubleCell;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.gui.NumericTextField;
@@ -38,6 +33,7 @@ import java.util.logging.Logger;
  */
 public class ApplicationController implements Initializable {
 
+    private static final int FALL_OF_COLUMN_INDEX = 3;
     @FXML
     private TableColumn<Double, Double> weightColumn;
     @FXML
@@ -62,7 +58,6 @@ public class ApplicationController implements Initializable {
     private TableView<ScoreTableModel> tableView;
 
     private static final int DEFAULT_PIXEL_DENSITY = 30;
-    private static final int MAX_NUMERIC_FIELD_LENGTH = 6;
 
     @FXML
     private NumericTextField minScoringTextField;
@@ -113,9 +108,9 @@ public class ApplicationController implements Initializable {
         Category.EDUCATION.setEnabledForCategory(true);
 
         initCanvas();
-        initNumericTextFields(pixelDensityTextField, DEFAULT_PIXEL_DENSITY);
-        initNumericTextFields(minScoringTextField, DEFAULT_MIN_SCORING_VALUE);
-        initNumericTextFields(maxScoringTextField, DEFAULT_MAX_SCORING_VALUE);
+        pixelDensityTextField.init(DEFAULT_PIXEL_DENSITY);
+        minScoringTextField.init(DEFAULT_MIN_SCORING_VALUE);
+        maxScoringTextField.init(DEFAULT_MAX_SCORING_VALUE);
 
         initTable();
 
@@ -135,40 +130,34 @@ public class ApplicationController implements Initializable {
         //TODO setCellFactory
 
         radiusColumn.setCellValueFactory(new PropertyValueFactory<>("paramOne"));
-        radiusColumn.setCellFactory(f-> new EditingDoubleCell());
+        radiusColumn.setCellFactory(f -> new EditingDoubleCell(0));
 
         maximumColumn.setCellValueFactory(new PropertyValueFactory<>("paramTwo"));
-        maximumColumn.setCellFactory(f-> new EditingDoubleCell());
+        maximumColumn.setCellFactory(f -> new EditingDoubleCell(0));
 
         exponentColumn.setCellValueFactory(new PropertyValueFactory<>("paramThree"));
-        exponentColumn.setCellFactory(f-> new EditingDoubleCell());
+        exponentColumn.setCellFactory(f -> new EditingDoubleCell(0));
 
         weightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
-        weightColumn.setCellFactory(f-> new EditingDoubleCell());
+        weightColumn.setCellFactory(f -> new EditingDoubleCell(1));
 
         List<ScoreTableModel> tableModels = ScoringCalculator.calcAllTableModels();
         tableView.setItems(FXCollections.observableList(tableModels));
 
-        //TODO: Current only TEST purpose
         tableView.setOnMouseClicked(click -> {
-
             if (click.getClickCount() == 2) {
-                TablePosition pos = tableView.getSelectionModel().getSelectedCells().get(0);
-                int row = pos.getRow();
-                int col = pos.getColumn();
-
-                TableColumn column = pos.getTableColumn();
-                String val = column.getCellObservableValue(row).toString();
-                Logger.getGlobal().info("Selected Value, " + val + ", Column: " + col + ", Row: " + row);
+                TablePosition position = tableView.getSelectionModel().getSelectedCells().get(0);
+                final int column = position.getColumn();
+                //TODO: Positioncheck when column is moved
+                if (column == FALL_OF_COLUMN_INDEX) {
+                    final int index = position.getRow();
+                    ScoreTableModel model = tableModels.get(index);
+                    // model must be set the fallOf because of the event listening
+                    model.setFallOf(model.switchAndGetFallOfFromType(model.getFallOf()));
+                }
             }
+            //TODO: add category selection by double-click on the (category)-selection row
         });
-
-    }
-
-    private void initNumericTextFields(NumericTextField numericTextField, final int value) {
-        numericTextField.setMaxlength(MAX_NUMERIC_FIELD_LENGTH);
-        numericTextField.setDefaultValue(value);
-        numericTextField.setText(Integer.toString(value));
     }
 
     private void initCanvas() {
@@ -195,15 +184,16 @@ public class ApplicationController implements Initializable {
 
     /**
      * Redraw or Resets view of canvas
+     *
      * @param ev MouseEvent
      */
     @FXML
     public void onClicked(MouseEvent ev) {
         if (ev.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-           if(ev.getSource().equals(redrawButton)){
+            if (ev.getSource().equals(redrawButton)) {
                 canvas.redraw();
-            }else if(ev.getSource().equals(resetViewButton)){
-               canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
+            } else if (ev.getSource().equals(resetViewButton)) {
+                canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
             }
         }
     }

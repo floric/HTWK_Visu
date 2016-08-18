@@ -142,63 +142,39 @@ public class ScoreTableModel {
             type.setEnabled(newValue);
             Logger.getGlobal().info("Set enabled of type:" + type.name() + ", value: " + newValue);
         });
+    }
 
-        fallOfProperty().addListener((observable, oldValue, newValue) -> {
-            //TODO Switching Functions!
-            Logger.getGlobal().info("switcher");
-            double r = type.getFallOf().getRadius();
-            double max = type.getFallOf().getMaximumValue();
-            double exp = type.getFallOf().getExp();
+    public IFallOf switchAndGetFallOfFromType(IFallOf fallOf) {
+        double r = fallOf.getRadius();
+        double max = fallOf.getMaximumValue();
+        double exp = fallOf.getExp();
 
-            if(type.getFallOf() instanceof ExponentialFallOf){
-                type.setFallOf(new ConstantFallOf(r,max));
-            }else if ( type.getFallOf() instanceof ConstantFallOf){
-                type.setFallOf(new LinearFallOf(r,max));
-            }else{
-                type.setFallOf(new ExponentialFallOf(r,max,exp));
-            }
-        });
+        if (fallOf instanceof ExponentialFallOf) {
+            ConstantFallOf constFallOf = new ConstantFallOf(r, max);
+            type.setFallOf(constFallOf);
+            return constFallOf;
+        } else if (fallOf instanceof ConstantFallOf) {
+            LinearFallOf linearFallOf = new LinearFallOf(r, max);
+            type.setFallOf(linearFallOf);
+            return linearFallOf;
+        } else {
+            ExponentialFallOf expFallOf = new ExponentialFallOf(r, max, exp);
+            type.setFallOf(expFallOf);
+            return expFallOf;
+        }
     }
 
     public void onEnterCommit() {
-        paramOneProperty().addListener((observable, oldValue, newValue) -> {
-            double value = newValue.doubleValue();
-            if (value >= 0) {
-                type.getFallOf().setRadius(value);
-                Logger.getGlobal().info("Set radius of type:" + type.name() + ", value: " + newValue);
-            }else{
-                Logger.getGlobal().warning("Set radius of type:" + type.name() + " not set");
-            }
-        });
+        paramOneProperty().addListener((observable, oldValue, newValue) ->
+                type.getFallOf().setRadius(newValue.doubleValue()));
 
-        paramTwoProperty().addListener((observable, oldValue, newValue) -> {
-            double value = newValue.doubleValue();
-            if (value >= 0) {
-                type.getFallOf().setMaxVal(value);
-                Logger.getGlobal().info("Set maxval of type:" + type.name() + ", value: " + newValue);
-            }else{
-                Logger.getGlobal().warning("Set maxval of type:" + type.name() + " not set");
-            }
-        });
+        paramTwoProperty().addListener((observable, oldValue, newValue) ->
+                type.getFallOf().setMaxVal(newValue.doubleValue()));
 
-        paramThreeProperty().addListener((observable, oldValue, newValue) -> {
-            double value = newValue.doubleValue();
-            if (value >= 0) {
-                type.getFallOf().setExp(value);
-                Logger.getGlobal().info("Set exp of type:" + type.name() + ", value: " + newValue);
-            }else{
-                Logger.getGlobal().warning("Set exp of type:" + type.name() + " not set");
-            }
-        });
+        paramThreeProperty().addListener((observable, oldValue, newValue) ->
+                type.getFallOf().setExp(newValue.doubleValue()));
 
-        weightProperty().addListener((observable, oldValue, newValue) -> {
-            double value = newValue.doubleValue();
-            if (value >= 1) {
-                type.setWeight(value);
-                Logger.getGlobal().info("Set weight of type:" + type.name() + ", value: " + newValue);
-            }else{
-                Logger.getGlobal().warning("Set weight of type:" + type.name() + " not set");
-            }
-        });
+        weightProperty().addListener((observable, oldValue, newValue) ->
+                type.setWeight(newValue.doubleValue()));
     }
 }

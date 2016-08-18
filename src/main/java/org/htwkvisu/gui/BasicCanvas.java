@@ -29,7 +29,7 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
     protected LinkedList<IMapDrawable> drawables = new LinkedList<>();
 
     // canvas dragging
-    protected double scale = 100000;
+    protected double scale = 350;
     protected boolean isDragging = false;
     protected double dragX = 0;
     protected double dragY = 0;
