@@ -46,6 +46,11 @@ public class ConstantFallOf implements IFallOf {
     }
 
     @Override
+    public IFallOf switchToNext() {
+        return new LinearFallOf(this.getRadius(), this.getMaximumValue());
+    }
+
+    @Override
     public String toString() {
         return "constant";
     }

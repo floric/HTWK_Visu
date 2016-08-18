@@ -192,15 +192,18 @@ public class ApplicationController implements Initializable {
     public void onClicked(MouseEvent ev) {
         if (ev.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
             if (ev.getSource().equals(redrawButton)) {
-                if (autoScaledCheckBox.isSelected()) {
-                    config.setMaxScoringValue(canvas.calculateMaxScore());
-                } else {
-                    canvas.redraw();
-                }
+                handleRedrawButton();
             } else if (ev.getSource().equals(resetViewButton)) {
                 canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
             }
         }
     }
 
+    private void handleRedrawButton() {
+        if (autoScaledCheckBox.isSelected()) {
+            config.setMaxScoringValue(canvas.calculateMaxScore());
+        } else {
+            canvas.redraw();
+        }
+    }
 }

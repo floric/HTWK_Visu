@@ -7,6 +7,8 @@ import java.util.Optional;
 public class NumericTextField extends TextField {
 
     private static final int MAX_NUMERIC_FIELD_LENGTH = 6;
+    private static final int ZERO = 0;
+    private static final String NUMBER_REGEX = "[0-9]";
     private int maxlength;
 
     private Optional<Integer> defaultValue;
@@ -16,8 +18,8 @@ public class NumericTextField extends TextField {
         this.defaultValue = Optional.empty();
 
         this.focusedProperty().addListener(x -> {
-            if (getText().length() == 0 && this.defaultValue.isPresent()) {
-                replaceText(0, 0, this.defaultValue.get().toString());
+            if (getText().length() == ZERO && this.defaultValue.isPresent()) {
+                replaceText(ZERO, ZERO, this.defaultValue.get().toString());
             }
         });
     }
@@ -28,19 +30,19 @@ public class NumericTextField extends TextField {
         setText(Integer.toString(value));
     }
 
-    public void setMaxlength(int maxlength) {
+    private void setMaxlength(int maxlength) {
         this.maxlength = maxlength;
     }
 
-    public void setDefaultValue(int value) {
-        if (value < 0) {
+    private void setDefaultValue(int value) {
+        if (value < ZERO) {
             throw new IllegalArgumentException("Default Value must be greater or equal zero");
         }
         this.defaultValue = Optional.of(value);
     }
 
     public int getDefaultValue() {
-        return this.defaultValue.get();
+        return this.defaultValue.orElse(0);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class NumericTextField extends TextField {
             super.replaceSelection(text);
         }
 
-        if (text.matches("[0-9]") && this.getText().length() < maxlength) {
+        if (text.matches(NUMBER_REGEX) && this.getText().length() < maxlength) {
             super.replaceSelection(text);
         }
     }
@@ -66,7 +68,7 @@ public class NumericTextField extends TextField {
             return true;
         }
 
-        if (!text.matches("[0-9]")) {
+        if (!text.matches(NUMBER_REGEX)) {
             return false;
         }
 

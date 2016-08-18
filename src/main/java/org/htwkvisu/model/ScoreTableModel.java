@@ -6,10 +6,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.ScoreType;
-import org.htwkvisu.scoring.ConstantFallOf;
-import org.htwkvisu.scoring.ExponentialFallOf;
 import org.htwkvisu.scoring.IFallOf;
-import org.htwkvisu.scoring.LinearFallOf;
 
 import java.util.logging.Logger;
 
@@ -35,6 +32,33 @@ public class ScoreTableModel {
         this.paramTwo = new SimpleDoubleProperty(fallOf.getValue().getMaximumValue());
         this.paramThree = new SimpleDoubleProperty(fallOf.getValue().getExp());
         this.weight = new SimpleDoubleProperty(type.getWeight());
+    }
+
+    public void onClick() {
+        enabledProperty().addListener((observable, oldValue, newValue) -> {
+            type.setEnabled(newValue);
+            Logger.getGlobal().info("Set enabled of type:" + type.name() + ", value: " + newValue);
+        });
+    }
+
+    public IFallOf switchAndGetFallOfFromType(IFallOf fallOf) {
+        IFallOf nextFallOf = fallOf.switchToNext();
+        type.setFallOf(nextFallOf);
+        return nextFallOf;
+    }
+
+    public void onEnterCommit() {
+        paramOneProperty().addListener((observable, oldValue, newValue) ->
+                type.getFallOf().setRadius(newValue.doubleValue()));
+
+        paramTwoProperty().addListener((observable, oldValue, newValue) ->
+                type.getFallOf().setMaxVal(newValue.doubleValue()));
+
+        paramThreeProperty().addListener((observable, oldValue, newValue) ->
+                type.getFallOf().setExp(newValue.doubleValue()));
+
+        weightProperty().addListener((observable, oldValue, newValue) ->
+                type.setWeight(newValue.doubleValue()));
     }
 
     public boolean getEnabled() {
@@ -135,46 +159,5 @@ public class ScoreTableModel {
 
     public void setEnabled(boolean enabled) {
         this.enabled.set(enabled);
-    }
-
-    public void onClick() {
-        enabledProperty().addListener((observable, oldValue, newValue) -> {
-            type.setEnabled(newValue);
-            Logger.getGlobal().info("Set enabled of type:" + type.name() + ", value: " + newValue);
-        });
-    }
-
-    public IFallOf switchAndGetFallOfFromType(IFallOf fallOf) {
-        double r = fallOf.getRadius();
-        double max = fallOf.getMaximumValue();
-        double exp = fallOf.getExp();
-
-        if (fallOf instanceof ExponentialFallOf) {
-            ConstantFallOf constFallOf = new ConstantFallOf(r, max);
-            type.setFallOf(constFallOf);
-            return constFallOf;
-        } else if (fallOf instanceof ConstantFallOf) {
-            LinearFallOf linearFallOf = new LinearFallOf(r, max);
-            type.setFallOf(linearFallOf);
-            return linearFallOf;
-        } else {
-            ExponentialFallOf expFallOf = new ExponentialFallOf(r, max, exp);
-            type.setFallOf(expFallOf);
-            return expFallOf;
-        }
-    }
-
-    public void onEnterCommit() {
-        paramOneProperty().addListener((observable, oldValue, newValue) ->
-                type.getFallOf().setRadius(newValue.doubleValue()));
-
-        paramTwoProperty().addListener((observable, oldValue, newValue) ->
-                type.getFallOf().setMaxVal(newValue.doubleValue()));
-
-        paramThreeProperty().addListener((observable, oldValue, newValue) ->
-                type.getFallOf().setExp(newValue.doubleValue()));
-
-        weightProperty().addListener((observable, oldValue, newValue) ->
-                type.setWeight(newValue.doubleValue()));
     }
 }

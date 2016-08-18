@@ -19,4 +19,6 @@ public interface IFallOf {
     void setRadius(double radius);
 
     void setExp(double exp);
+
+    IFallOf switchToNext();
 }

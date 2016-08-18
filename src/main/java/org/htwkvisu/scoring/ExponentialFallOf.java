@@ -50,6 +50,11 @@ public class ExponentialFallOf implements IFallOf {
     }
 
     @Override
+    public IFallOf switchToNext() {
+        return new ConstantFallOf(this.getRadius(), this.getMaximumValue());
+    }
+
+    @Override
     public String toString() {
         return "exponential";
     }

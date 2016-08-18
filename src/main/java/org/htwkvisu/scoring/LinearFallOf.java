@@ -48,6 +48,11 @@ public class LinearFallOf implements IFallOf {
     }
 
     @Override
+    public IFallOf switchToNext() {
+        return new ExponentialFallOf(this.getRadius(), this.getMaximumValue(), this.getExp());
+    }
+
+    @Override
     public String toString() {
         return "linear";
     }

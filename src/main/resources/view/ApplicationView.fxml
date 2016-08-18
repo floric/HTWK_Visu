@@ -75,7 +75,8 @@
                                 <Button fx:id="resetViewButton" mnemonicParsing="false" onMouseClicked="#onClicked" text="Reset view" />
                                 <Button fx:id="redrawButton" mnemonicParsing="false" onMouseClicked="#onClicked"
                                         text="Redraw" textAlignment="CENTER"/>
-                                <CheckBox fx:id="autoScaledCheckBox" mnemonicParsing="false" text="Autoscaled-Color"/>
+                                <CheckBox fx:id="autoScaledCheckBox" mnemonicParsing="false"
+                                          text="Autoscaled Max-Score-Value"/>
                             </items>
                         </ToolBar>
                         <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
