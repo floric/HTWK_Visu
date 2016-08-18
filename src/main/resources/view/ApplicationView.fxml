@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.htwkvisu.gui.*?>
-
+<?import org.htwkvisu.gui.NumericTextField?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="581.0" prefWidth="969.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.htwkvisu.controller.ApplicationController">
     <bottom>
         <HBox prefHeight="0.0" prefWidth="0.0" BorderPane.alignment="CENTER">
@@ -28,7 +24,7 @@
                     <panes>
                         <TitledPane animated="false" text="Data">
                             <content>
-                                <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" editable="true">
+                                <TableView fx:id="tableView" editable="true" prefHeight="200.0" prefWidth="200.0">
                                     <columns>
                                         <TableColumn fx:id="enabled" editable="true" prefWidth="25.0" sortable="false" text="" />
                                         <TableColumn fx:id="categoryColumn" editable="false" prefWidth="129.0" sortable="false" text="Category" />
@@ -77,7 +73,9 @@
                         <ToolBar prefHeight="40.0" prefWidth="200.0">
                             <items>
                                 <Button fx:id="resetViewButton" mnemonicParsing="false" onMouseClicked="#onClicked" text="Reset view" />
-                        <Button fx:id="redrawButton" onMouseClicked="#onClicked" mnemonicParsing="false" text="Redraw" textAlignment="CENTER" />
+                                <Button fx:id="redrawButton" mnemonicParsing="false" onMouseClicked="#onClicked"
+                                        text="Redraw" textAlignment="CENTER"/>
+                                <CheckBox fx:id="autoScaledCheckBox" mnemonicParsing="false" text="Autoscaled-Color"/>
                             </items>
                         </ToolBar>
                         <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />

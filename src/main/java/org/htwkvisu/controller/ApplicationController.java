@@ -35,6 +35,8 @@ public class ApplicationController implements Initializable {
 
     private static final int FALL_OF_COLUMN_INDEX = 3;
     @FXML
+    private CheckBox autoScaledCheckBox;
+    @FXML
     private TableColumn<Double, Double> weightColumn;
     @FXML
     private TableColumn<Double, Double> radiusColumn;
@@ -127,7 +129,6 @@ public class ApplicationController implements Initializable {
         scoreColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 
         fallOfColumn.setCellValueFactory(new PropertyValueFactory<>("fallOf"));
-        //TODO setCellFactory
 
         radiusColumn.setCellValueFactory(new PropertyValueFactory<>("paramOne"));
         radiusColumn.setCellFactory(f -> new EditingDoubleCell(0));
@@ -191,7 +192,11 @@ public class ApplicationController implements Initializable {
     public void onClicked(MouseEvent ev) {
         if (ev.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
             if (ev.getSource().equals(redrawButton)) {
-                canvas.redraw();
+                if (autoScaledCheckBox.isSelected()) {
+                    config.setMaxScoringValue(canvas.calculateMaxScore());
+                } else {
+                    canvas.redraw();
+                }
             } else if (ev.getSource().equals(resetViewButton)) {
                 canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
             }

@@ -7,11 +7,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.org.pois.BasicPOI;
-import org.htwkvisu.org.pois.ScoreType;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +55,6 @@ public class MapCanvas extends BasicCanvas {
         // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
         Grid grid = new Grid(this);
         List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
-
         // save previous colors
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
@@ -202,5 +202,15 @@ public class MapCanvas extends BasicCanvas {
     public Point2D transferPixelToCoordinate(double x, double y) {
         return new Point2D(coordsBounds.getMaxX() - (y / tmpHeight) * coordsBounds.getWidth(),
                 coordsBounds.getMinY() + (x / tmpWidth) * coordsBounds.getHeight());
+    }
+
+    public int calculateMaxScore() {
+        Grid grid = new Grid(this);
+        List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
+        //setMaxScoringValue calls redraw
+        int calculatedMaxScoringValue = (int) gridPoints.stream().flatMap(Collection::stream)
+                .mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
+        Logger.getGlobal().info("New auto-scaled maxScoreValue: " + calculatedMaxScoringValue);
+        return calculatedMaxScoringValue;
     }
 }
