@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.htwkvisu.gui.NumericTextField?>
+<?import org.htwkvisu.gui.*?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="581.0" prefWidth="969.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.htwkvisu.controller.ApplicationController">
     <bottom>
         <HBox prefHeight="0.0" prefWidth="0.0" BorderPane.alignment="CENTER">
@@ -20,11 +20,11 @@
     <center>
         <SplitPane dividerPositions="0.45" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
-                <Accordion>
+                <Accordion expandedPane="$shownOnStart">
                     <panes>
-                        <TitledPane animated="false" text="Data">
+                        <TitledPane animated="true" text="Data" fx:id="shownOnStart">
                             <content>
-                                <TableView fx:id="tableView" editable="true" prefHeight="200.0" prefWidth="200.0">
+                                <TableView fx:id="tableView" editable="true"  prefHeight="200.0" prefWidth="200.0">
                                     <columns>
                                         <TableColumn fx:id="enabled" editable="true" prefWidth="25.0" sortable="false" text="" />
                                         <TableColumn fx:id="categoryColumn" editable="false" prefWidth="129.0" sortable="false" text="Category" />
@@ -38,7 +38,7 @@
                                 </TableView>
                             </content>
                         </TitledPane>
-                        <TitledPane animated="false" text="Settings">
+                        <TitledPane animated="true" text="Settings">
                             <content>
                                 <GridPane layoutY="-2.0" prefHeight="310.0" prefWidth="200.0">
                                     <columnConstraints>
@@ -61,11 +61,6 @@
                                 </GridPane>
                             </content>
                         </TitledPane>
-                        <TitledPane animated="false" text="Info">
-                            <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                            </content>
-                        </TitledPane>
                     </panes>
                 </Accordion>
                 <VBox fx:id="canvasBox" prefHeight="200.0" prefWidth="100.0">
@@ -78,7 +73,7 @@
                                 <CheckBox fx:id="autoScaledCheckBox" mnemonicParsing="false"
                                           text="Autoscaled Max-Score-Value"/>
                                 <CheckBox fx:id="colorModeCheckBox" mnemonicParsing="false"
-                                          text="Color-Mode"/>
+                                          text="Color-Mode" onMouseClicked="#onClicked"/>
                             </items>
                         </ToolBar>
                         <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />

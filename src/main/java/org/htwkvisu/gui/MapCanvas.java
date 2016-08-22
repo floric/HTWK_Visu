@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.NormalizedColorCalculator;
@@ -43,13 +44,13 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     protected void drawInfo() {
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.GRAY);
         gc.fillText("Center: " + MathUtils.roundToDecimalsAsString(mapCenter.getX(), 5) + " " +
                 MathUtils.roundToDecimalsAsString(mapCenter.getY(), 5), 10, 20);
         gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
         gc.fillText("Elements displayed: " + displayedElems, 10, 60);
         gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
-        gc.fillText("Bounds: " + coordsBounds, 10, 100);
+        gc.fillText("Bounds: " + getCoordsBoundsAsString() , 10, 100);
     }
 
     @Override
@@ -61,8 +62,6 @@ public class MapCanvas extends BasicCanvas {
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
-
-        //TODO:enable/disable adjust checkbox if colormode enabled/disabled
         NormalizedColorCalculator norm = new NormalizedColorCalculator(this, colorModeCheckBox.isSelected());
         // now calculate the values
         for (List<Point2D> line : gridPoints) {

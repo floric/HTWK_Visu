@@ -1,6 +1,8 @@
 package org.htwkvisu.controller;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -34,6 +36,9 @@ import java.util.logging.Logger;
 public class ApplicationController implements Initializable {
 
     private static final int FALL_OF_COLUMN_INDEX = 3;
+    private static final int CATEGORY_COLUMN_INDEX = 1;
+    private static final int DOUBLE_CLICK = 2;
+
     @FXML
     private CheckBox colorModeCheckBox;
     @FXML
@@ -147,19 +152,32 @@ public class ApplicationController implements Initializable {
         List<ScoreTableModel> tableModels = ScoringCalculator.calcAllTableModels();
         tableView.setItems(FXCollections.observableList(tableModels));
 
+        // deprecated, but easiest way to disable reorderable columns...,
+        // alternative were impl. of ListChangedlistener..
+        for (TableColumn col : tableView.getColumns()) {
+            col.impl_setReorderable(false);
+        }
+
+
         tableView.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2) {
-                TablePosition position = tableView.getSelectionModel().getSelectedCells().get(0);
-                final int column = position.getColumn();
-                //TODO: Positioncheck when column is moved
+                //TODO: If clicked outside of table, last value will be changed...
+                ScoreTableModel model = tableView.getSelectionModel().getSelectedItem();
+                final int column = tableView.getFocusModel().getFocusedCell().getColumn();
+
                 if (column == FALL_OF_COLUMN_INDEX) {
-                    final int index = position.getRow();
-                    ScoreTableModel model = tableModels.get(index);
                     // model must be set the fallOf because of the event listening
                     model.setFallOf(model.switchAndGetFallOfFromType(model.getFallOf()));
                 }
+
+                else if(column == CATEGORY_COLUMN_INDEX){
+                    final boolean newStatus = !model.getEnabled();
+                    tableView.getItems().stream().
+                            filter(scoreTableModel -> model.getCategory().equals(scoreTableModel.getCategory())).
+                            forEach(scoreTableModel -> scoreTableModel.setEnabled(newStatus));
+                    Logger.getGlobal().info("Set enabled of category: " + model.getCategory() + ", value: " + newStatus);
+                }
             }
-            //TODO: add category selection by double-click on the (category)-selection row
         });
     }
 
@@ -198,6 +216,8 @@ public class ApplicationController implements Initializable {
                 handleRedrawButton();
             } else if (ev.getSource().equals(resetViewButton)) {
                 canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
+            } else if (ev.getSource().equals(colorModeCheckBox)){
+               autoScaledCheckBox.setDisable(colorModeCheckBox.isSelected());
             }
         }
     }

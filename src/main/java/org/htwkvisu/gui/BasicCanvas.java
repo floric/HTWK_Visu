@@ -7,8 +7,10 @@ import javafx.scene.input.MouseButton;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.utils.MathUtils;
 
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -166,6 +168,17 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
 
     public BoundingBox getCoordsBounds() {
         return this.coordsBounds;
+    }
+
+    public String getCoordsBoundsAsString() {
+        DecimalFormat df = new DecimalFormat("####0.00");
+        String bounds = "MinX: " + df.format(coordsBounds.getMinX());
+        bounds += " MinY: " + df.format(coordsBounds.getMinY());
+        bounds += " MaxX: " + df.format(coordsBounds.getMaxX());
+        bounds += " MaxY: " + df.format(coordsBounds.getMaxY());
+        bounds += " H: " + df.format(coordsBounds.getHeight());
+        bounds += " W: " + df.format(coordsBounds.getWidth());
+        return bounds;
     }
 
     protected abstract void drawInfo();
