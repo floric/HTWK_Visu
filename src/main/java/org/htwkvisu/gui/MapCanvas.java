@@ -4,18 +4,18 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckBox;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.NormalizedColorCalculator;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Canvas for map.
@@ -28,6 +28,7 @@ public class MapCanvas extends BasicCanvas {
     private double heightDistance = 0;
     private int displayedElems = 0;
     private CheckBox colorModeCheckBox;
+    private Grid grid = new Grid(this);
 
     /**
      * Construct and init canvas
@@ -55,26 +56,50 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void drawScoringValues() {
-// get sample points for canvas
-        // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
-        List<List<Point2D>> gridPoints = calculateGrid();
+
+        // get sample points for canvas
+        List<Point2D> gridPoints = calculateGrid();
+        Color[] cols = new Color[gridPoints.size()];
+
         // save previous colors
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
         NormalizedColorCalculator norm = new NormalizedColorCalculator(this, colorModeCheckBox.isSelected());
-        // now calculate the values
-        for (List<Point2D> line : gridPoints) {
-            for (Point2D pt : line) {
-                gc.setFill(norm.calculateColor(pt));
 
+        final int pixelDensity = config.getSamplingPixelDensity();
+        final int xSize = grid.getxSize();
+        final int ySize = grid.getySize();
+
+        // calculate values
+        IntStream.range(0, ySize).parallel().forEach(y -> {
+            IntStream.range(0, xSize).forEach(x -> {
+                final int index = y * xSize + x;
+                Point2D pt = gridPoints.get(index);
+                cols[index] = norm.calculateColor(pt);
+            });
+        });
+
+        // draw linear interpolated values
+        PixelWriter pxWriter = gc.getPixelWriter();
+        for (int y = 1; y < ySize; y++) {
+            for (int x = 1; x < xSize; x++) {
+                Point2D pt = gridPoints.get(y * xSize + x);
                 Point2D pixelPos = transferCoordinateToPixel(pt);
-                gc.fillRect(pixelPos.getX(), pixelPos.getY(), config.getSamplingPixelDensity()
-                        , config.getSamplingPixelDensity());
+
+                for (int xStep = 0; xStep < pixelDensity; xStep++) {
+                    for (int yStep = 0; yStep < pixelDensity; yStep++) {
+                        float xNorm = (float) xStep / pixelDensity;
+                        float yNorm = (float) yStep / pixelDensity;
+
+                        Color upperCol = cols[y * xSize + x].interpolate(cols[(y - 1) * xSize + x], yNorm);
+                        Color lowerCol = cols[y * xSize + x - 1].interpolate(cols[(y - 1) * xSize + x - 1], yNorm);
+
+                        pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lowerCol.interpolate(upperCol, xNorm));
+                    }
+                }
             }
         }
-
-        // interpolate between the samples points with simple linear interpolation in our matrix/grid
 
         //Restore previous colors
         gc.setFill(curFillPaint);
@@ -193,14 +218,13 @@ public class MapCanvas extends BasicCanvas {
     }
 
     public int calculateMaxScore() {
-        List<List<Point2D>> gridPoints = calculateGrid();
+        List<Point2D> gridPoints = calculateGrid();
         //setMaxScoringValue calls redraw
-        return (int) gridPoints.stream().flatMap(Collection::stream)
-                .mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
+        //return (int) gridPoints.stream().mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
+        return 100000;
     }
 
-    public List<List<Point2D>> calculateGrid() {
-        Grid grid = new Grid(this);
+    public List<Point2D> calculateGrid() {
         return grid.calcGridPoints(config.getSamplingPixelDensity());
     }
 

@@ -4,7 +4,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import org.htwkvisu.gui.MapCanvas;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,22 +21,22 @@ public class NormalizedColorCalculator {
     }
 
     public List<Double> norm() {
-        return canvas.calculateGrid().stream().flatMap(Collection::stream)
+        return canvas.calculateGrid().stream()
                 .map(pt -> (ScoringCalculator.calculateScoreValue(pt) * COLOR_MAX_VAL) / maxScore).collect(Collectors.toList());
     }
 
     public List<Double> normEnabled() {
-        return canvas.calculateGrid().stream().flatMap(Collection::stream)
+        return canvas.calculateGrid().stream()
                 .map(pt -> (ScoringCalculator.calculateEnabledScoreValue(pt) * COLOR_MAX_VAL) / maxScore).collect(Collectors.toList());
     }
 
     public List<Double> norm(Category category) {
-        return canvas.calculateGrid().stream().flatMap(Collection::stream)
+        return canvas.calculateGrid().stream()
                 .map(pt -> (category.calculateScoreValue(pt) * COLOR_MAX_VAL) / maxScore).collect(Collectors.toList());
     }
 
     public List<Double> normEnabled(Category category) {
-        return canvas.calculateGrid().stream().flatMap(Collection::stream)
+        return canvas.calculateGrid().stream()
                 .map(pt -> (category.calculateEnabledScoreValue(pt) * COLOR_MAX_VAL) / maxScore).collect(Collectors.toList());
     }
 
@@ -59,14 +58,17 @@ public class NormalizedColorCalculator {
     private Color colorForEnabled(Point2D pt) {
         double value = ScoringCalculator.calculateEnabledScoreValue(pt);
         double hue;
-        if (value < canvas.getConfig().getMinScoringValue()) {
+        final double minVal = canvas.getConfig().getMinScoringValue();
+        final double maxVal = canvas.getConfig().getMaxScoringValue();
+
+        if (value < minVal) {
             hue = Color.BLUE.getHue();
-        } else if (value > canvas.getConfig().getMaxScoringValue()) {
+        } else if (value > maxVal) {
             hue = Color.RED.getHue();
         } else {
             hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue())
-                    * (value - canvas.getConfig().getMinScoringValue())
-                    / (canvas.getConfig().getMaxScoringValue() - canvas.getConfig().getMinScoringValue());
+                    * (value - minVal)
+                    / (maxVal - minVal);
         }
         return Color.hsb(hue, 1.0, 1.0);
     }
