@@ -31,6 +31,8 @@ public class MapCanvas extends BasicCanvas {
     private CheckBox colorModeCheckBox;
     private Grid grid = new Grid(this);
 
+    public static final Point2D CITY_LEIPZIG = new Point2D(51.340333, 12.37475);
+
     /**
      * Construct and init canvas
      */
@@ -38,7 +40,7 @@ public class MapCanvas extends BasicCanvas {
         super(config);
 
         // add test cities
-        addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
+        addDrawableElement(new City(CITY_LEIPZIG, "Leipzig", 0));
         addDrawableElement(new City(new Point2D(51.049259, 13.73836112), "Dresden", 0));
         addDrawableElement(new City(new Point2D(50.832222, 12.92416666), "Chemnitz", 0));
         addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
@@ -66,7 +68,8 @@ public class MapCanvas extends BasicCanvas {
         final Paint curFillPaint = gc.getFill();
         final Paint curStrokePaint = gc.getStroke();
 
-        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, colorModeCheckBox.isSelected());
+        boolean useNorm = colorModeCheckBox != null ? colorModeCheckBox.isSelected() : false;
+        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, useNorm);
 
         final int pixelDensity = config.getSamplingPixelDensity();
         final int xSize = grid.getxSize();
@@ -173,8 +176,11 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void centerView(Point2D center) {
-        mapCenter = center;
-
+        if (center != null) {
+            mapCenter = center;
+        } else {
+            mapCenter = CITY_LEIPZIG;
+        }
         redraw();
     }
 

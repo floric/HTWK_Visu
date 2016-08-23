@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -214,7 +213,7 @@ public class ApplicationController implements Initializable {
 
     @FXML
     public void onResetViewAction(ActionEvent ev) {
-        canvas.centerView(new Point2D(51.340333, 12.37475));
+        canvas.centerView(MapCanvas.CITY_LEIPZIG);
     }
 
     @FXML
