@@ -8,7 +8,13 @@ public class ScoringConfig {
     private int samplingPixelDensity;
     private int minScoringValue;
     private int maxScoringValue;
+    private InterpolationMode interpMode = InterpolationMode.BILINEAR;
     private ScoringCanvas canvas;
+
+    public enum InterpolationMode {
+        BILINEAR,
+        BICUBIC
+    }
 
     public ScoringConfig(int samplingPixelDensity, int minScoringValue, int maxScoringValue) {
         this.samplingPixelDensity = samplingPixelDensity;
@@ -57,6 +63,14 @@ public class ScoringConfig {
         } else {
             Logger.getGlobal().log(Level.INFO, "Max Score should be greater Min Score!");
         }
+    }
+
+    public void setInterpolationMode(InterpolationMode mode) {
+        this.interpMode = mode;
+    }
+
+    public InterpolationMode getInterpolationMode() {
+        return interpMode;
     }
 
     public void setCanvas(ScoringCanvas canvas) {

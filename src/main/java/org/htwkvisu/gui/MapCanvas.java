@@ -54,7 +54,7 @@ public class MapCanvas extends BasicCanvas {
         gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
         gc.fillText("Elements displayed: " + displayedElems, 10, 60);
         gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
-        gc.fillText("Bounds: " + getCoordsBoundsAsString() , 10, 100);
+        gc.fillText("Bounds: " + getCoordsBoundsAsString(), 10, 100);
     }
 
     @Override
@@ -86,8 +86,8 @@ public class MapCanvas extends BasicCanvas {
 
         // draw linear interpolated values
         PixelWriter pxWriter = gc.getPixelWriter();
-        for (int y = 1; y < ySize; y++) {
-            for (int x = 1; x < xSize; x++) {
+        for (int y = 2; y < ySize - 1; y++) {
+            for (int x = 2; x < xSize - 1; x++) {
                 Point2D pt = gridPoints.get(y * xSize + x);
                 Point2D pixelPos = transferCoordinateToPixel(pt);
 
@@ -96,10 +96,20 @@ public class MapCanvas extends BasicCanvas {
                         float xNorm = (float) xStep / pixelDensity;
                         float yNorm = (float) yStep / pixelDensity;
 
-                        Color upperCol = cols[y * xSize + x].interpolate(cols[(y - 1) * xSize + x], yNorm);
-                        Color lowerCol = cols[y * xSize + x - 1].interpolate(cols[(y - 1) * xSize + x - 1], yNorm);
+                        Color lerpedCol;
 
-                        pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lowerCol.interpolate(upperCol, xNorm));
+                        switch (config.getInterpolationMode()) {
+                            case BILINEAR:
+                                lerpedCol = interpolateBiLinear(cols, xSize, y, x, xNorm, yNorm);
+                                break;
+                            case BICUBIC:
+                                lerpedCol = interpolateCubic(cols, xSize, y, x, 1 - xNorm, yNorm);
+                                break;
+                            default:
+                                lerpedCol = Color.BLACK;
+                        }
+
+                        pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
                     }
                 }
             }
@@ -109,6 +119,55 @@ public class MapCanvas extends BasicCanvas {
         gc.setFill(curFillPaint);
         gc.setStroke(curStrokePaint);
     }
+
+    private Color interpolateBiLinear(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
+        Color upperCol = cols[y * xSize + x].interpolate(cols[(y - 1) * xSize + x], yNorm);
+        Color lowerCol = cols[y * xSize + x - 1].interpolate(cols[(y - 1) * xSize + x - 1], yNorm);
+
+        return lowerCol.interpolate(upperCol, xNorm);
+    }
+
+    private Color interpolateCubic(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
+
+        return Color.color(
+                MathUtils.getBicubicValue(new double[][]{
+                        {cols[(y + 1) * xSize + x + 1].getRed(), cols[y * xSize + x + 1].getRed(), cols[(y - 1) * xSize + x + 1].getRed(), cols[(y - 2) * xSize + x + 1].getRed()},
+                        {cols[(y + 1) * xSize + x].getRed(), cols[y * xSize + x].getRed(), cols[(y - 1) * xSize + x].getRed(), cols[(y - 2) * xSize + x].getRed()},
+                        {cols[(y + 1) * xSize + x - 1].getRed(), cols[y * xSize + x - 1].getRed(), cols[(y - 1) * xSize + x - 1].getRed(), cols[(y - 2) * xSize + x - 1].getRed()},
+                        {cols[(y + 1) * xSize + x - 2].getRed(), cols[y * xSize + x - 2].getRed(), cols[(y - 1) * xSize + x - 2].getRed(), cols[(y - 2) * xSize + x - 2].getRed()}
+                }, xNorm, yNorm),
+                MathUtils.getBicubicValue(new double[][]{
+                        {cols[(y + 1) * xSize + x + 1].getGreen(), cols[y * xSize + x + 1].getGreen(), cols[(y - 1) * xSize + x + 1].getGreen(), cols[(y - 2) * xSize + x + 1].getGreen()},
+                        {cols[(y + 1) * xSize + x].getGreen(), cols[y * xSize + x].getGreen(), cols[(y - 1) * xSize + x].getGreen(), cols[(y - 2) * xSize + x].getGreen()},
+                        {cols[(y + 1) * xSize + x - 1].getGreen(), cols[y * xSize + x - 1].getGreen(), cols[(y - 1) * xSize + x - 1].getGreen(), cols[(y - 2) * xSize + x - 1].getGreen()},
+                        {cols[(y + 1) * xSize + x - 2].getGreen(), cols[y * xSize + x - 2].getGreen(), cols[(y - 1) * xSize + x - 2].getGreen(), cols[(y - 2) * xSize + x - 2].getGreen()}
+                }, xNorm, yNorm),
+                MathUtils.getBicubicValue(new double[][]{
+                        {cols[(y + 1) * xSize + x + 1].getBlue(), cols[y * xSize + x + 1].getBlue(), cols[(y - 1) * xSize + x + 1].getBlue(), cols[(y - 2) * xSize + x + 1].getBlue()},
+                        {cols[(y + 1) * xSize + x].getBlue(), cols[y * xSize + x].getBlue(), cols[(y - 1) * xSize + x].getBlue(), cols[(y - 2) * xSize + x].getBlue()},
+                        {cols[(y + 1) * xSize + x - 1].getBlue(), cols[y * xSize + x - 1].getBlue(), cols[(y - 1) * xSize + x - 1].getBlue(), cols[(y - 2) * xSize + x - 1].getBlue()},
+                        {cols[(y + 1) * xSize + x - 2].getBlue(), cols[y * xSize + x - 2].getBlue(), cols[(y - 1) * xSize + x - 2].getBlue(), cols[(y - 2) * xSize + x - 2].getBlue()}
+                }, xNorm, yNorm));
+    }
+
+    public static double interpolateCubicFloat(double l, double lB, double r, double rA, double x) {
+        double val = l + 0.5 * x * (r - lB + x * (2.0 * lB - 5.0 * l + 4.0 * r - rA + x * (3.0 * (l - r) + rA - lB)));
+        if (val > 0 && val < 1) {
+            return val;
+        } else if (val <= 0) {
+            return 0;
+        } else {
+            return 1;
+        }
+
+    }
+
+    /*private float interpolateCubicFloat(float l, float lm, float r, float rm, float t) {
+        float t2 = t * t;
+        float t3 = t2 * t;
+
+        return (2 * t3 - 3 * t2) * l + (t3 - 2 * t2 + t) * lm + (-2 * t3 + 3 * t2) * r + (t3 - t2) * rm;
+    }*/
 
     @Override
     public void drawGrid() {

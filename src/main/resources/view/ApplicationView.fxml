@@ -65,6 +65,11 @@
                                                 <NumericTextField fx:id="maxScoringTextField"
                                                                   onKeyPressed="#onEnterPressed"
                                                                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                                <Label text="Interpolation Mode:" GridPane.rowIndex="3"/>
+                                                <Button fx:id="changeInterpMode" mnemonicParsing="false"
+                                                        onAction="#onInterpModeChanged"
+                                                        text="Next mode" GridPane.columnIndex="1"
+                                                        GridPane.rowIndex="3"/>
                                             </children>
                                         </GridPane>
                                     </children>

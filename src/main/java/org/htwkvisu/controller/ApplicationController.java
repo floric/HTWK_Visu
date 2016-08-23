@@ -212,6 +212,21 @@ public class ApplicationController implements Initializable {
     }
 
     @FXML
+    public void onInterpModeChanged(ActionEvent ev) {
+        switch (config.getInterpolationMode()) {
+            case BILINEAR:
+                config.setInterpolationMode(ScoringConfig.InterpolationMode.BICUBIC);
+                break;
+            case BICUBIC:
+                config.setInterpolationMode(ScoringConfig.InterpolationMode.BILINEAR);
+                break;
+        }
+
+        Logger.getGlobal().info("Interpolation Mode: " + config.getInterpolationMode());
+        canvas.redraw();
+    }
+
+    @FXML
     public void onResetViewAction(ActionEvent ev) {
         canvas.centerView(MapCanvas.CITY_LEIPZIG);
     }
