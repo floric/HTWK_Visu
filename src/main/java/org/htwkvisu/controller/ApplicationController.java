@@ -1,8 +1,7 @@
 package org.htwkvisu.controller;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -11,7 +10,6 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.htwkvisu.gui.EditingDoubleCell;
@@ -158,7 +156,6 @@ public class ApplicationController implements Initializable {
             col.impl_setReorderable(false);
         }
 
-
         tableView.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2) {
                 //TODO: If clicked outside of table, last value will be changed...
@@ -204,25 +201,8 @@ public class ApplicationController implements Initializable {
         }
     }
 
-    /**
-     * Redraw or Resets view of canvas
-     *
-     * @param ev MouseEvent
-     */
     @FXML
-    public void onClicked(MouseEvent ev) {
-        if (ev.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-            if (ev.getSource().equals(redrawButton)) {
-                handleRedrawButton();
-            } else if (ev.getSource().equals(resetViewButton)) {
-                canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
-            } else if (ev.getSource().equals(colorModeCheckBox)){
-               autoScaledCheckBox.setDisable(colorModeCheckBox.isSelected());
-            }
-        }
-    }
-
-    private void handleRedrawButton() {
+    public void onRedrawAction(ActionEvent ev) {
         if (autoScaledCheckBox.isSelected()) {
             int maxScoringValue = canvas.calculateMaxScore();
             config.setMaxScoringValue(maxScoringValue);
@@ -230,5 +210,15 @@ public class ApplicationController implements Initializable {
         } else {
             canvas.redraw();
         }
+    }
+
+    @FXML
+    public void onResetViewAction(ActionEvent ev) {
+        canvas.centerView(new Point2D(51.340333, 12.37475));
+    }
+
+    @FXML
+    public void onColorModeAction(ActionEvent ev) {
+        autoScaledCheckBox.setDisable(colorModeCheckBox.isSelected());
     }
 }

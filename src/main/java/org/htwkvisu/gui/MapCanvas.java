@@ -14,6 +14,7 @@ import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -72,7 +73,7 @@ public class MapCanvas extends BasicCanvas {
         final int ySize = grid.getySize();
 
         // calculate values
-        IntStream.range(0, ySize).forEach(y -> {
+        IntStream.range(0, ySize).parallel().forEach(y -> {
             IntStream.range(0, xSize).forEach(x -> {
                 final int index = y * xSize + x;
                 Point2D pt = gridPoints.get(index);
@@ -159,7 +160,7 @@ public class MapCanvas extends BasicCanvas {
     @Override
     public void drawElements() {
         List<IMapDrawable> toDraw = drawables.parallelStream()
-                .filter(p -> !isDragging || p.showDuringGrab())
+                .filter(p -> !isInDragMode() || p.showDuringGrab())
                 .filter(p -> p.getMinDrawScale() < scale)
                 .filter(p -> coordsBounds.contains(p.getCoordinates()))
                 .collect(Collectors.toList());
@@ -184,6 +185,8 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void redraw() {
+        long tStart = System.currentTimeMillis();
+
         tmpWidth = getWidth();
         tmpHeight = getHeight();
         double coveredWidth = tmpWidth / scale;
@@ -197,12 +200,15 @@ public class MapCanvas extends BasicCanvas {
         gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
         // draw map content
-        drawScoringValues();
+        if (!isInDragMode()) {
+            drawScoringValues();
+        }
         drawInfo();
         drawGrid();
         drawPOIS();
         drawElements();
 
+        Logger.getGlobal().info("Redraw took " + (System.currentTimeMillis() - tStart) + " ms");
     }
 
     @Override

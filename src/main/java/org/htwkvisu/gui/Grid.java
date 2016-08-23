@@ -40,7 +40,7 @@ public class Grid {
             }
             ySize++;
         }
-        xSize = matrix.size() / ySize;
+        xSize = ySize > 0 ? (matrix.size() / ySize) : 0;
 
         return matrix;
     }

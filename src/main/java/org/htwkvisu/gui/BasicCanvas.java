@@ -6,11 +6,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseButton;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.utils.MathUtils;
+import org.reactfx.util.FxTimer;
 
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
     private static final MouseButton MOUSE_BUTTON_DRAG = MouseButton.SECONDARY;
     private static final MouseButton MOUSE_BUTTON_SELECT = MouseButton.PRIMARY;
     private static final int SELECTION_MAX_PX_TOLERANCE = 10;
+    private static final long REDRAW_DELAY_SECONDS = 1L;
 
     // cached values for faster drawing
     protected double tmpWidth = 0;
@@ -32,9 +34,10 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
 
     // canvas dragging
     protected double scale = 350;
-    protected boolean isDragging = false;
-    protected double dragX = 0;
-    protected double dragY = 0;
+    private long lastScrollTime = 0;
+    private boolean isDragging = false;
+    private double dragX = 0;
+    private double dragY = 0;
     protected ScoringConfig config;
 
     /**
@@ -75,7 +78,27 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
         } else {
             this.scale = ZOOM_MAX;
         }
+
+        setDragMode(true);
         redraw();
+
+        lastScrollTime = System.currentTimeMillis();
+
+        FxTimer.runLater(Duration.ofSeconds(REDRAW_DELAY_SECONDS), () -> {
+            if (isInDragMode() && System.currentTimeMillis() - lastScrollTime > REDRAW_DELAY_SECONDS * 500) {
+                setDragMode(false);
+                redraw();
+            }
+
+        });
+    }
+
+    public void setDragMode(boolean isDragging) {
+        this.isDragging = isDragging;
+    }
+
+    public boolean isInDragMode() {
+        return isDragging;
     }
 
     public Point2D getLeftTopCorner() {
@@ -111,7 +134,6 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
         setOnScroll(event -> {
             double addedVal = event.getDeltaY() * (scale / ZOOM_SPEED);
             setScale(scale + addedVal);
-            redraw();
         });
 
         // drag press
@@ -119,7 +141,7 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
             if (event.getButton() == MOUSE_BUTTON_DRAG) {
                 dragX = event.getX();
                 dragY = event.getY();
-                isDragging = true;
+                setDragMode(true);
                 redraw();
             }
         });
@@ -140,7 +162,7 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
         // drag release
         setOnMouseReleased(event -> {
             if (event.getButton() == MOUSE_BUTTON_DRAG) {
-                isDragging = false;
+                setDragMode(false);
                 redraw();
             }
         });

@@ -13,10 +13,14 @@ public class NormalizedColorCalculator {
     private MapCanvas canvas;
     private int maxScore;
     private boolean colorModeUsed;
+    private double minVal = 0.0;
+    private double maxVal = Double.MAX_VALUE;
 
     public NormalizedColorCalculator(MapCanvas canvas, boolean colorModeUsed) {
         this.canvas = canvas;
         maxScore = canvas.calculateMaxScore(); //TODO: fix calculateMaxScore to fix the red color
+        minVal = canvas.getConfig().getMinScoringValue();
+        maxVal = canvas.getConfig().getMaxScoringValue();
         this.colorModeUsed = colorModeUsed;
     }
 
@@ -58,8 +62,6 @@ public class NormalizedColorCalculator {
     private Color colorForEnabled(Point2D pt) {
         double value = ScoringCalculator.calculateEnabledScoreValue(pt);
         double hue;
-        final double minVal = canvas.getConfig().getMinScoringValue();
-        final double maxVal = canvas.getConfig().getMaxScoringValue();
 
         if (value < minVal) {
             hue = Color.BLUE.getHue();
