@@ -16,7 +16,7 @@ public class NormalizedColorCalculator {
 
     public NormalizedColorCalculator(MapCanvas canvas, boolean colorModeUsed) {
         this.canvas = canvas;
-        maxScore = canvas.calculateMaxScore();
+        maxScore = canvas.calculateMaxScore(); //TODO: fix calculateMaxScore to fix the red color
         this.colorModeUsed = colorModeUsed;
     }
 

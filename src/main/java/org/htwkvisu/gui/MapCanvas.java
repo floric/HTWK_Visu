@@ -72,7 +72,7 @@ public class MapCanvas extends BasicCanvas {
         final int ySize = grid.getySize();
 
         // calculate values
-        IntStream.range(0, ySize).parallel().forEach(y -> {
+        IntStream.range(0, ySize).forEach(y -> {
             IntStream.range(0, xSize).forEach(x -> {
                 final int index = y * xSize + x;
                 Point2D pt = gridPoints.get(index);
@@ -219,9 +219,15 @@ public class MapCanvas extends BasicCanvas {
 
     public int calculateMaxScore() {
         List<Point2D> gridPoints = calculateGrid();
-        //setMaxScoringValue calls redraw
-        //return (int) gridPoints.stream().mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
-        return 100000;
+        double score = 0.0;
+        double tmp = 0.0;
+        for (Point2D point : gridPoints) {
+            tmp = ScoringCalculator.calculateEnabledScoreValue(point);
+            if (score < tmp) {
+                score = tmp;
+            }
+        }
+        return (int) score;
     }
 
     public List<Point2D> calculateGrid() {
