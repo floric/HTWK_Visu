@@ -19,7 +19,21 @@ import java.util.stream.Stream;
 import static org.htwkvisu.domain.NamedQueryConstants.*;
 
 public enum ScoreType implements IScorable{
-    TERMINAL(FIND_TERMINAL, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3)), HELIPAD(FIND_HELIPAD, new ExponentialFallOf(MathUtils.convertKilometresToUnits(10), 100, 3)), AERODROME(FIND_AERODROME, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3)), BUS(FIND_BUS, new LinearFallOf(MathUtils.convertKilometresToUnits(2), 50)), TRAIN(FIND_TRAIN, new LinearFallOf(MathUtils.convertKilometresToUnits(10), 100)), TRAM(FIND_TRAM, new ConstantFallOf(MathUtils.convertKilometresToUnits(1), 50)), HOSPITAL(FIND_HOSPITAL, new ExponentialFallOf(MathUtils.convertKilometresToUnits(30), 50, 3)), PHARMACY(FIND_PHARMACY, new LinearFallOf(MathUtils.convertKilometresToUnits(5), 50)), DENTIST(FIND_DENTIST, new LinearFallOf(MathUtils.convertKilometresToUnits(5), 70)), VETERINARY(FIND_VETERINARY, new LinearFallOf(MathUtils.convertKilometresToUnits(20), 70)), DOCTORS(FIND_DOCTORS, new LinearFallOf(MathUtils.convertKilometresToUnits(3), 70)), BLOOD_DONATION(FIND_BLOOD_DONATION, new LinearFallOf(MathUtils.convertKilometresToUnits(30), 100)), SCHOOL(FIND_SCHOOL, new ConstantFallOf(MathUtils.convertKilometresToUnits(3), 100)), COLLEGE(FIND_COLLEGE, new LinearFallOf(MathUtils.convertKilometresToUnits(20), 100)), LIBRARY(FIND_LIBRARY, new LinearFallOf(MathUtils.convertKilometresToUnits(15), 100))
+    TERMINAL(FIND_TERMINAL, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
+    , HELIPAD(FIND_HELIPAD, new ExponentialFallOf(MathUtils.convertKilometresToUnits(10), 100, 3))
+    , AERODROME(FIND_AERODROME, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
+    , BUS(FIND_BUS, new LinearFallOf(MathUtils.convertKilometresToUnits(2), 50))
+    , TRAIN(FIND_TRAIN, new LinearFallOf(MathUtils.convertKilometresToUnits(10), 100))
+    , TRAM(FIND_TRAM, new ConstantFallOf(MathUtils.convertKilometresToUnits(1), 50))
+    , HOSPITAL(FIND_HOSPITAL, new ExponentialFallOf(MathUtils.convertKilometresToUnits(30), 50, 3))
+    , PHARMACY(FIND_PHARMACY, new LinearFallOf(MathUtils.convertKilometresToUnits(5), 50))
+    , DENTIST(FIND_DENTIST, new LinearFallOf(MathUtils.convertKilometresToUnits(5), 70))
+    , VETERINARY(FIND_VETERINARY, new LinearFallOf(MathUtils.convertKilometresToUnits(20), 70))
+    , DOCTORS(FIND_DOCTORS, new LinearFallOf(MathUtils.convertKilometresToUnits(3), 70))
+    , BLOOD_DONATION(FIND_BLOOD_DONATION, new LinearFallOf(MathUtils.convertKilometresToUnits(30), 100))
+    , SCHOOL(FIND_SCHOOL, new ConstantFallOf(MathUtils.convertKilometresToUnits(3), 100))
+    , COLLEGE(FIND_COLLEGE, new LinearFallOf(MathUtils.convertKilometresToUnits(20), 100))
+    , LIBRARY(FIND_LIBRARY, new LinearFallOf(MathUtils.convertKilometresToUnits(15), 100))
     , MUSEUM(FIND_MUSEUM, new LinearFallOf(MathUtils.convertKilometresToUnits(50), 50))
     , RESEARCH_INSTITUTION(FIND_RESEARCH_INSTITUTION, new ExponentialFallOf(MathUtils.convertKilometresToUnits(100), 100, 3))
     , THEATRE(FIND_THEATRE, new LinearFallOf(MathUtils.convertKilometresToUnits(50), 50));

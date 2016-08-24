@@ -113,7 +113,6 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
-        //TODO: please remove this - read property-file and set value from them
         Category.EDUCATION.setEnabledForCategory(true);
 
         initCanvas();

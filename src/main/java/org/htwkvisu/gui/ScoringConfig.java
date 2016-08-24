@@ -62,7 +62,6 @@ public class ScoringConfig {
         }
     }
 
-    //TODO: Discuss: instead of set, better use a setNext? (state machine like)
     public void setInterpolationMode(InterpolationMode mode) {
         this.interpMode = mode;
     }
