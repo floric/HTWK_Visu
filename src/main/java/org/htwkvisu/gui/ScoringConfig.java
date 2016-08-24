@@ -54,7 +54,7 @@ public class ScoringConfig {
     }
 
     public void setMaxScoringValue(int maxScoringValue) {
-        if (maxScoringValue > minScoringValue) {
+        if (maxScoringValue >= minScoringValue) {
             this.maxScoringValue = maxScoringValue;
             canvas.redraw();
         } else {

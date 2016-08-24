@@ -21,36 +21,36 @@ import java.util.stream.IntStream;
  */
 public class MapCanvas extends BasicCanvas {
 
-    private Point2D mapCenter = new Point2D(50.832222, 12.92416666); //Chemnitz
+    public static final Point2D CITY_LEIPZIG = new Point2D(51.340333, 12.37475);
+    private Point2D mapCenter = CITY_LEIPZIG;
     private GraphicsContext gc = getGraphicsContext2D();
     private double widthDistance = 0;
     private double heightDistance = 0;
     private CheckBox colorModeCheckBox;
     private Grid grid = new Grid(this);
-
-    public static final Point2D CITY_LEIPZIG = new Point2D(51.340333, 12.37475);
+    private int displayedElements = 0;
 
     /**
      * Construct and init canvas
      */
     public MapCanvas(ScoringConfig config) {
         super(config);
-
-        // add test cities
-        addDrawableElement(new City(CITY_LEIPZIG, "Leipzig", 0));
-        addDrawableElement(new City(new Point2D(51.049259, 13.73836112), "Dresden", 0));
-        addDrawableElement(new City(new Point2D(50.832222, 12.92416666), "Chemnitz", 0));
-        addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
     }
 
     @Override
     protected void drawInfo() {
-        gc.setFill(Color.GRAY);
+        if(colorModeCheckBox.isSelected()){
+            gc.setFill(Color.GRAY);
+        }else{
+            gc.setFill(Color.BLACK);
+        }
+
         gc.fillText("Center: " + MathUtils.roundToDecimalsAsString(mapCenter.getX(), 5) + " " +
                 MathUtils.roundToDecimalsAsString(mapCenter.getY(), 5), 10, 20);
         gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
-        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 60);
-        gc.fillText("Bounds: " + getCoordsBoundsAsString(), 10, 80);
+        gc.fillText("Elements displayed: " + displayedElements, 10, 60);
+        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
+        gc.fillText("Bounds: " + getCoordsBoundsAsString(), 10, 100);
     }
 
     @Override
@@ -129,24 +129,31 @@ public class MapCanvas extends BasicCanvas {
         if (elem == null) {
             throw new IllegalArgumentException("No valid element!");
         }
-
         drawables.add(elem);
     }
 
-
-    private void drawPOIS() {
-        ScoringCalculator.generateEnabled().forEach(a -> a.draw(gc, this));
+    private void addTestCities() {
+        addDrawableElement(new City(CITY_LEIPZIG, "Leipzig", 0));
+        addDrawableElement(new City(new Point2D(51.049259, 13.73836112), "Dresden", 0));
+        addDrawableElement(new City(new Point2D(50.832222, 12.92416666), "Chemnitz", 0));
+        addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
     }
 
 
     @Override
     public void drawElements() {
+
+        drawables.clear();
+        addTestCities();
+        ScoringCalculator.generateEnabled().forEach(this::addDrawableElement);
+
         List<IMapDrawable> toDraw = drawables.parallelStream()
                 .filter(p -> !isInDragMode() || p.showDuringGrab())
                 .filter(p -> p.getMinDrawScale() < scale)
                 .filter(p -> coordsBounds.contains(p.getCoordinates()))
                 .collect(Collectors.toList());
 
+        displayedElements = toDraw.size();
         for (IMapDrawable elem : toDraw) {
             elem.draw(this.gc, this);
         }
@@ -187,12 +194,9 @@ public class MapCanvas extends BasicCanvas {
         if (!isInDragMode()) {
             drawScoringValues();
         }
-        drawInfo();
         drawGrid();
-        drawPOIS();
-        //TODO: Draw elements count
         drawElements();
-
+        drawInfo();
         //Logger.getGlobal().info("Redraw took " + (System.currentTimeMillis() - tStart) + " ms");
     }
 
@@ -211,7 +215,7 @@ public class MapCanvas extends BasicCanvas {
     public int calculateMaxScore() {
         List<Point2D> gridPoints = calculateGrid();
         double score = 0.0;
-        double tmp = 0.0;
+        double tmp = score;
         for (Point2D point : gridPoints) {
             tmp = ScoringCalculator.calculateEnabledScoreValue(point);
             if (score < tmp) {

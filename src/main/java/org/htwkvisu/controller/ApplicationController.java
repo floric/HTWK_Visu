@@ -205,6 +205,7 @@ public class ApplicationController implements Initializable {
         if (autoScaledCheckBox.isSelected()) {
             int maxScoringValue = canvas.calculateMaxScore();
             config.setMaxScoringValue(maxScoringValue);
+            maxScoringTextField.setText(Integer.toString(maxScoringValue));
             Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
         } else {
             canvas.redraw();
