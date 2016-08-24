@@ -5,15 +5,12 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseButton;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.utils.MathUtils;
 import org.reactfx.util.FxTimer;
 
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
 
@@ -22,15 +19,13 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
     // constants
     private static final double ZOOM_SPEED = 100;
     private static final MouseButton MOUSE_BUTTON_DRAG = MouseButton.SECONDARY;
-    private static final MouseButton MOUSE_BUTTON_SELECT = MouseButton.PRIMARY;
-    private static final int SELECTION_MAX_PX_TOLERANCE = 10;
     private static final long REDRAW_DELAY_SECONDS = 1L;
 
     // cached values for faster drawing
     protected double tmpWidth = 0;
     protected double tmpHeight = 0;
     protected BoundingBox coordsBounds = new BoundingBox(0, 0, tmpWidth, tmpHeight);
-    protected LinkedList<IMapDrawable> drawables = new LinkedList<>();
+    protected List<IMapDrawable> drawables = new LinkedList<>();
 
     // canvas dragging
     protected double scale = 350;
@@ -89,7 +84,6 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
                 setDragMode(false);
                 redraw();
             }
-
         });
     }
 
@@ -166,26 +160,6 @@ public abstract class BasicCanvas extends Canvas implements ScoringCanvas {
                 redraw();
             }
         });
-
-        // selection
-        setOnMouseClicked(event -> {
-            if (event.getButton() == MOUSE_BUTTON_SELECT) {
-                List<IMapDrawable> drawablesToSelect = drawables.parallelStream()
-                        .filter(elem -> elem.getMinDrawScale() < scale)
-                        .filter(elem -> coordsBounds.contains(elem.getCoordinates())).collect(Collectors.toList());
-
-                Point2D clickPos = new Point2D(event.getX(), event.getY());
-
-                for (IMapDrawable elem : drawablesToSelect) {
-                    Point2D lclPos = transferCoordinateToPixel(elem.getCoordinates());
-                    if (lclPos.distance(clickPos) < SELECTION_MAX_PX_TOLERANCE) {
-                        Logger.getGlobal().info("Selected: " + elem.getName() + " at " + MathUtils.formatCoordinates(elem.getCoordinates()));
-                        break;
-                    }
-                }
-            }
-        });
-
     }
 
     public BoundingBox getCoordsBounds() {

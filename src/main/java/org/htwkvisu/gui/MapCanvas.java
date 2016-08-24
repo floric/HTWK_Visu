@@ -27,7 +27,6 @@ public class MapCanvas extends BasicCanvas {
     private GraphicsContext gc = getGraphicsContext2D();
     private double widthDistance = 0;
     private double heightDistance = 0;
-    private int displayedElems = 0;
     private CheckBox colorModeCheckBox;
     private Grid grid = new Grid(this);
 
@@ -52,9 +51,8 @@ public class MapCanvas extends BasicCanvas {
         gc.fillText("Center: " + MathUtils.roundToDecimalsAsString(mapCenter.getX(), 5) + " " +
                 MathUtils.roundToDecimalsAsString(mapCenter.getY(), 5), 10, 20);
         gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
-        gc.fillText("Elements displayed: " + displayedElems, 10, 60);
-        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
-        gc.fillText("Bounds: " + getCoordsBoundsAsString(), 10, 100);
+        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 60);
+        gc.fillText("Bounds: " + getCoordsBoundsAsString(), 10, 80);
     }
 
     @Override
@@ -169,7 +167,6 @@ public class MapCanvas extends BasicCanvas {
                 .filter(p -> coordsBounds.contains(p.getCoordinates()))
                 .collect(Collectors.toList());
 
-        displayedElems = toDraw.size();
         for (IMapDrawable elem : toDraw) {
             elem.draw(this.gc, this);
         }
