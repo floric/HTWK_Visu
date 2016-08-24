@@ -34,7 +34,7 @@ public class Grid {
         ySize = 0;
 
         // longitude
-        for (double x = parent.getLeftBottomCorner().getX() - coordsDistance; x < parent.getLeftTopCorner().getX() + coordsDistance; x = x + coordsDistance) {
+        for (double x = parent.getLeftBottomCorner().getX() - coordsDistance; x < parent.getLeftTopCorner().getX() + 2 * coordsDistance; x = x + coordsDistance) {
             // latitude
             for (double y = parent.getLeftTopCorner().getY() - coordsDistance; y < parent.getRightTopCorner().getY() + coordsDistance; y = y + coordsDistance) {
                 matrix.add(new Point2D(x, y));

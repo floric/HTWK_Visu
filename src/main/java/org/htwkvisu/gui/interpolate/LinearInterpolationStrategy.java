@@ -5,10 +5,10 @@ import javafx.scene.paint.Color;
 public class LinearInterpolationStrategy implements InterpolationStrategy {
 
     private Color interpolateBiLinear(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
-        Color upperCol = cols[y * xSize + x].interpolate(cols[(y - 1) * xSize + x], yNorm);
-        Color lowerCol = cols[y * xSize + x - 1].interpolate(cols[(y - 1) * xSize + x - 1], yNorm);
+        Color upperCol = cols[(y + 1) * xSize + x].interpolate(cols[(y) * xSize + x], yNorm);
+        Color lowerCol = cols[(y + 1) * xSize + x + 1].interpolate(cols[(y) * xSize + x + 1], yNorm);
 
-        return lowerCol.interpolate(upperCol, xNorm);
+        return upperCol.interpolate(lowerCol, xNorm);
     }
 
     @Override

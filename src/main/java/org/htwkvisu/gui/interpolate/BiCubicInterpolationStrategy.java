@@ -29,13 +29,29 @@ public class BiCubicInterpolationStrategy implements InterpolationStrategy {
         return val;
     }
 
+    public static double interpolateCubicFloat(double l, double lB, double r, double rA, double x) {
+        double val = l + 0.5 * x * (r - lB + x * (2.0 * lB - 5.0 * l + 4.0 * r - rA + x * (3.0 * (l - r) + rA - lB)));
+        if (val > 0 && val < 1) {
+            return val;
+        } else if (val <= 0) {
+            return 0;
+        } else {
+            return 1;
+        }
+
+    }
+
     private Color interpolateCubic(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
 
+        final int rowOne = (y - 1) * xSize + x;
+        final int rowTwo = y * xSize + x;
+        final int rowThree = (y + 1) * xSize + x;
+        final int rowFour = (y + 2) * xSize + x;
         final int[][] indices = {
-                {(y + 1) * xSize + x + 1, y * xSize + x + 1, (y - 1) * xSize + x + 1, (y - 2) * xSize + x + 1},
-                {(y + 1) * xSize + x, y * xSize + x, (y - 1) * xSize + x, (y - 2) * xSize + x},
-                {(y + 1) * xSize + x - 1, y * xSize + x - 1, (y - 1) * xSize + x - 1, (y - 2) * xSize + x - 1},
-                {(y + 1) * xSize + x - 2, y * xSize + x - 2, (y - 1) * xSize + x - 2, (y - 2) * xSize + x - 2}
+                {rowOne - 1, rowTwo - 1, rowThree - 1, rowFour - 1},
+                {rowOne, rowTwo, rowThree, rowFour},
+                {rowOne + 1, rowTwo + 1, rowThree + 1, rowFour + 1},
+                {rowOne + 2, rowTwo + 2, rowThree + 2, rowFour + 2}
         };
         return Color.color(
                 getBicubicValue(new double[][]{
@@ -58,18 +74,6 @@ public class BiCubicInterpolationStrategy implements InterpolationStrategy {
                 }, xNorm, yNorm));
     }
 
-    public static double interpolateCubicFloat(double l, double lB, double r, double rA, double x) {
-        double val = l + 0.5 * x * (r - lB + x * (2.0 * lB - 5.0 * l + 4.0 * r - rA + x * (3.0 * (l - r) + rA - lB)));
-        if (val > 0 && val < 1) {
-            return val;
-        } else if (val <= 0) {
-            return 0;
-        } else {
-            return 1;
-        }
-
-    }
-
     /*private float interpolateCubicFloat(float l, float lm, float r, float rm, float t) {
         float t2 = t * t;
         float t3 = t2 * t;
@@ -79,7 +83,7 @@ public class BiCubicInterpolationStrategy implements InterpolationStrategy {
 
     @Override
     public Color interpolate(InterpolateConfig config) {
-        return interpolateCubic(config.getCols(), config.getxSize(), config.getY(), config.getX(), 1 - config.getxNorm()
-                , config.getyNorm());
+        return interpolateCubic(config.getCols(), config.getxSize(), config.getY(), config.getX(), config.getxNorm()
+                , 1 - config.getyNorm());
     }
 }

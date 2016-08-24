@@ -84,8 +84,8 @@ public class MapCanvas extends BasicCanvas {
 
         // draw linear interpolated values
         PixelWriter pxWriter = gc.getPixelWriter();
-        for (int y = 2; y < ySize - 1; y++) {
-            for (int x = 2; x < xSize - 1; x++) {
+        for (int y = 0; y < ySize - 1; y++) {
+            for (int x = 0; x < xSize - 1; x++) {
                 Point2D pt = gridPoints.get(y * xSize + x);
                 Point2D pixelPos = transferCoordinateToPixel(pt);
 
@@ -94,8 +94,7 @@ public class MapCanvas extends BasicCanvas {
                         float xNorm = (float) xStep / pixelDensity;
                         float yNorm = (float) yStep / pixelDensity;
 
-                        Color lerpedCol;
-                        lerpedCol = config.getInterpolationMode().interpolateColor(
+                        final Color lerpedCol = config.getInterpolationMode().interpolateColor(
                                 new InterpolateConfig(cols, xSize, y, x, xNorm, yNorm));
 
                         pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
