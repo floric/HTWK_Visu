@@ -5,14 +5,16 @@ import javafx.scene.paint.Color;
 public class InterpolateConfig {
     private Color[] cols;
     private int xSize;
+    private int ySize;
     private int y;
     private int x;
     private float xNorm;
     private float yNorm;
 
-    public InterpolateConfig(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
+    public InterpolateConfig(Color[] cols, int xSize, int ySize, int x, int y, float xNorm, float yNorm) {
         this.cols = cols;
         this.xSize = xSize;
+        this.ySize = ySize;
         this.y = y;
         this.x = x;
         this.xNorm = xNorm;
@@ -65,5 +67,13 @@ public class InterpolateConfig {
 
     public void setyNorm(float yNorm) {
         this.yNorm = yNorm;
+    }
+
+    public int getySize() {
+        return ySize;
+    }
+
+    public void setySize(int ySize) {
+        this.ySize = ySize;
     }
 }

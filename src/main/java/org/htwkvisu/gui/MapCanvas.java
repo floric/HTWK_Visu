@@ -6,10 +6,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import org.htwkvisu.gui.interpolate.InterpolateConfig;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.NormalizedColorCalculator;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
@@ -57,16 +55,11 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void drawScoringValues() {
-
         // get sample points for canvas
         List<Point2D> gridPoints = calculateGrid();
         Color[] cols = new Color[gridPoints.size()];
 
-        // save previous colors
-        final Paint curFillPaint = gc.getFill();
-        final Paint curStrokePaint = gc.getStroke();
-
-        boolean useNorm = colorModeCheckBox != null ? colorModeCheckBox.isSelected() : false;
+        boolean useNorm = colorModeCheckBox != null && colorModeCheckBox.isSelected();
         NormalizedColorCalculator norm = new NormalizedColorCalculator(this, useNorm);
 
         final int pixelDensity = config.getSamplingPixelDensity();
@@ -95,17 +88,13 @@ public class MapCanvas extends BasicCanvas {
                         float yNorm = (float) yStep / pixelDensity;
 
                         final Color lerpedCol = config.getInterpolationMode().interpolateColor(
-                                new InterpolateConfig(cols, xSize, y, x, xNorm, yNorm));
+                                new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, yNorm));
 
                         pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
                     }
                 }
             }
         }
-
-        //Restore previous colors
-        gc.setFill(curFillPaint);
-        gc.setStroke(curStrokePaint);
     }
 
     @Override
@@ -146,15 +135,7 @@ public class MapCanvas extends BasicCanvas {
 
 
     private void drawPOIS() {
-        final Paint curFillPaint = gc.getFill();
-        final Paint curStrokePaint = gc.getStroke();
-
-        for (BasicPOI poi : ScoringCalculator.generateEnabled()) {
-            poi.draw(this.gc, this);
-        }
-
-        gc.setFill(curFillPaint);
-        gc.setStroke(curStrokePaint);
+        ScoringCalculator.generateEnabled().forEach(a -> a.draw(gc, this));
     }
 
 

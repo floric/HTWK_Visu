@@ -21,13 +21,10 @@ public enum InterpolationMode {
         InterpolationMode[] values = InterpolationMode.values();
         for (int i = 0; i < values.length; i++) {
             if (values[i].equals(this)) {
-                if (i == 1) {
-                    System.out.println("error here");
-                }
                 return values[(i + 1) % (values.length)];
             }
 
         }
-        throw new RuntimeException("No interpolationMode found");
+        throw new RuntimeException("No interpolation mode found");
     }
 }
