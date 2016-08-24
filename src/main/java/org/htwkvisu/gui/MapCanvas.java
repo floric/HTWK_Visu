@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import org.htwkvisu.gui.interpolate.InterpolateConfig;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.org.pois.BasicPOI;
 import org.htwkvisu.org.pois.NormalizedColorCalculator;
@@ -14,7 +15,6 @@ import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -97,17 +97,8 @@ public class MapCanvas extends BasicCanvas {
                         float yNorm = (float) yStep / pixelDensity;
 
                         Color lerpedCol;
-
-                        switch (config.getInterpolationMode()) {
-                            case BILINEAR:
-                                lerpedCol = interpolateBiLinear(cols, xSize, y, x, xNorm, yNorm);
-                                break;
-                            case BICUBIC:
-                                lerpedCol = interpolateCubic(cols, xSize, y, x, 1 - xNorm, yNorm);
-                                break;
-                            default:
-                                lerpedCol = Color.BLACK;
-                        }
+                        lerpedCol = config.getInterpolationMode().interpolateColor(
+                                new InterpolateConfig(cols, xSize, y, x, xNorm, yNorm));
 
                         pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
                     }
@@ -119,55 +110,6 @@ public class MapCanvas extends BasicCanvas {
         gc.setFill(curFillPaint);
         gc.setStroke(curStrokePaint);
     }
-
-    private Color interpolateBiLinear(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
-        Color upperCol = cols[y * xSize + x].interpolate(cols[(y - 1) * xSize + x], yNorm);
-        Color lowerCol = cols[y * xSize + x - 1].interpolate(cols[(y - 1) * xSize + x - 1], yNorm);
-
-        return lowerCol.interpolate(upperCol, xNorm);
-    }
-
-    private Color interpolateCubic(Color[] cols, int xSize, int y, int x, float xNorm, float yNorm) {
-
-        return Color.color(
-                MathUtils.getBicubicValue(new double[][]{
-                        {cols[(y + 1) * xSize + x + 1].getRed(), cols[y * xSize + x + 1].getRed(), cols[(y - 1) * xSize + x + 1].getRed(), cols[(y - 2) * xSize + x + 1].getRed()},
-                        {cols[(y + 1) * xSize + x].getRed(), cols[y * xSize + x].getRed(), cols[(y - 1) * xSize + x].getRed(), cols[(y - 2) * xSize + x].getRed()},
-                        {cols[(y + 1) * xSize + x - 1].getRed(), cols[y * xSize + x - 1].getRed(), cols[(y - 1) * xSize + x - 1].getRed(), cols[(y - 2) * xSize + x - 1].getRed()},
-                        {cols[(y + 1) * xSize + x - 2].getRed(), cols[y * xSize + x - 2].getRed(), cols[(y - 1) * xSize + x - 2].getRed(), cols[(y - 2) * xSize + x - 2].getRed()}
-                }, xNorm, yNorm),
-                MathUtils.getBicubicValue(new double[][]{
-                        {cols[(y + 1) * xSize + x + 1].getGreen(), cols[y * xSize + x + 1].getGreen(), cols[(y - 1) * xSize + x + 1].getGreen(), cols[(y - 2) * xSize + x + 1].getGreen()},
-                        {cols[(y + 1) * xSize + x].getGreen(), cols[y * xSize + x].getGreen(), cols[(y - 1) * xSize + x].getGreen(), cols[(y - 2) * xSize + x].getGreen()},
-                        {cols[(y + 1) * xSize + x - 1].getGreen(), cols[y * xSize + x - 1].getGreen(), cols[(y - 1) * xSize + x - 1].getGreen(), cols[(y - 2) * xSize + x - 1].getGreen()},
-                        {cols[(y + 1) * xSize + x - 2].getGreen(), cols[y * xSize + x - 2].getGreen(), cols[(y - 1) * xSize + x - 2].getGreen(), cols[(y - 2) * xSize + x - 2].getGreen()}
-                }, xNorm, yNorm),
-                MathUtils.getBicubicValue(new double[][]{
-                        {cols[(y + 1) * xSize + x + 1].getBlue(), cols[y * xSize + x + 1].getBlue(), cols[(y - 1) * xSize + x + 1].getBlue(), cols[(y - 2) * xSize + x + 1].getBlue()},
-                        {cols[(y + 1) * xSize + x].getBlue(), cols[y * xSize + x].getBlue(), cols[(y - 1) * xSize + x].getBlue(), cols[(y - 2) * xSize + x].getBlue()},
-                        {cols[(y + 1) * xSize + x - 1].getBlue(), cols[y * xSize + x - 1].getBlue(), cols[(y - 1) * xSize + x - 1].getBlue(), cols[(y - 2) * xSize + x - 1].getBlue()},
-                        {cols[(y + 1) * xSize + x - 2].getBlue(), cols[y * xSize + x - 2].getBlue(), cols[(y - 1) * xSize + x - 2].getBlue(), cols[(y - 2) * xSize + x - 2].getBlue()}
-                }, xNorm, yNorm));
-    }
-
-    public static double interpolateCubicFloat(double l, double lB, double r, double rA, double x) {
-        double val = l + 0.5 * x * (r - lB + x * (2.0 * lB - 5.0 * l + 4.0 * r - rA + x * (3.0 * (l - r) + rA - lB)));
-        if (val > 0 && val < 1) {
-            return val;
-        } else if (val <= 0) {
-            return 0;
-        } else {
-            return 1;
-        }
-
-    }
-
-    /*private float interpolateCubicFloat(float l, float lm, float r, float rm, float t) {
-        float t2 = t * t;
-        float t3 = t2 * t;
-
-        return (2 * t3 - 3 * t2) * l + (t3 - 2 * t2 + t) * lm + (-2 * t3 + 3 * t2) * r + (t3 - t2) * rm;
-    }*/
 
     @Override
     public void drawGrid() {

@@ -1,5 +1,7 @@
 package org.htwkvisu.gui;
 
+import org.htwkvisu.gui.interpolate.InterpolationMode;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,11 +12,6 @@ public class ScoringConfig {
     private int maxScoringValue;
     private InterpolationMode interpMode = InterpolationMode.BILINEAR;
     private ScoringCanvas canvas;
-
-    public enum InterpolationMode {
-        BILINEAR,
-        BICUBIC
-    }
 
     public ScoringConfig(int samplingPixelDensity, int minScoringValue, int maxScoringValue) {
         this.samplingPixelDensity = samplingPixelDensity;

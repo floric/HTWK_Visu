@@ -68,28 +68,4 @@ public class MathUtils {
         return distInKMs / KM_PER_COORD;
     }
 
-    public static double getCubicValue(double[] p, double x) {
-        return p[1] + 0.5 * x * (p[2] - p[0] + x * (2.0 * p[0] - 5.0 * p[1] + 4.0 * p[2] - p[3] + x * (3.0 * (p[1] - p[2]) + p[3] - p[0])));
-    }
-
-    public static double getBicubicValue(double[][] p, double x, double y) {
-        double[] arr = new double[4];
-
-        arr[0] = getCubicValue(p[0], y);
-        arr[1] = getCubicValue(p[1], y);
-        arr[2] = getCubicValue(p[2], y);
-        arr[3] = getCubicValue(p[3], y);
-
-        double val = getCubicValue(arr, x);
-
-        if (val <= 0) {
-            return 0;
-        }
-
-        if (val >= 1) {
-            return 1;
-        }
-
-        return val;
-    }
 }
