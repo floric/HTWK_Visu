@@ -31,11 +31,8 @@ public class BasicPOI implements IMapDrawable {
      */
     @Override
     public void draw(GraphicsContext gc, MapCanvas canvas) {
-        //TODO:Discuss how this should be displayed
         Point2D lclPt = canvas.transferCoordinateToPixel(position);
-        //gc.setFill(Color.BLACK);
-        //gc.fillText(type.toString(), lclPt.getX(), lclPt.getY() - 10);
-        gc.setFill(Color.WHEAT);
+        gc.setFill(Color.WHITE);
         gc.fillOval(lclPt.getX() - POINT_SIZE / 2, lclPt.getY() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
     }
 

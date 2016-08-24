@@ -250,7 +250,7 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void redraw() {
-        long tStart = System.currentTimeMillis();
+        //long tStart = System.currentTimeMillis();
 
         tmpWidth = getWidth();
         tmpHeight = getHeight();
@@ -271,9 +271,10 @@ public class MapCanvas extends BasicCanvas {
         drawInfo();
         drawGrid();
         drawPOIS();
+        //TODO: Draw elements count
         drawElements();
 
-        Logger.getGlobal().info("Redraw took " + (System.currentTimeMillis() - tStart) + " ms");
+        //Logger.getGlobal().info("Redraw took " + (System.currentTimeMillis() - tStart) + " ms");
     }
 
     @Override

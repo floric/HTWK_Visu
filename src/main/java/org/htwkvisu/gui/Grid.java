@@ -3,6 +3,7 @@ package org.htwkvisu.gui;
 import javafx.geometry.Point2D;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Grid {
 
@@ -22,8 +23,8 @@ public class Grid {
      * @param pixelDensity Distance between samples in pixels
      * @return Sample positions in a grid
      */
-    public ArrayList<Point2D> calcGridPoints(float pixelDensity) {
-        ArrayList<Point2D> matrix = new ArrayList<>();
+    public List<Point2D> calcGridPoints(float pixelDensity) {
+        List<Point2D> matrix = new ArrayList<>();
 
         final double coordsDistance = calcCoordDistanceFromPixelDistance(pixelDensity);
 

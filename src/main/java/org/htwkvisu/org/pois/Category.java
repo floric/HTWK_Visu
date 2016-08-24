@@ -54,7 +54,7 @@ public enum Category implements IScorable {
     }
 
     public void setEnabledForCategory(boolean enabled) {
-        types.stream().forEach(t -> t.setEnabled(enabled));
+        types.parallelStream().forEach(t -> t.setEnabled(enabled));
     }
 
     @Override

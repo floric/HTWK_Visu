@@ -74,6 +74,9 @@ public class ApplicationController implements Initializable {
     private static final int DEFAULT_MAX_SCORING_VALUE = 100000;
 
     @FXML
+    private Button changeInterpMode;
+
+    @FXML
     private Button resetViewButton;
     @FXML
     private Button redrawButton;
@@ -119,7 +122,7 @@ public class ApplicationController implements Initializable {
         maxScoringTextField.init(DEFAULT_MAX_SCORING_VALUE);
 
         initTable();
-
+        changeInterpMode.setText(config.getInterpolationMode().toString());
         Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
 
     }
@@ -156,7 +159,7 @@ public class ApplicationController implements Initializable {
         }
 
         tableView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2) {
+            if (click.getClickCount() == DOUBLE_CLICK) {
                 //TODO: If clicked outside of table, last value will be changed...
                 ScoreTableModel model = tableView.getSelectionModel().getSelectedItem();
                 final int column = tableView.getFocusModel().getFocusedCell().getColumn();
@@ -221,7 +224,7 @@ public class ApplicationController implements Initializable {
                 config.setInterpolationMode(ScoringConfig.InterpolationMode.BILINEAR);
                 break;
         }
-
+        changeInterpMode.setText(config.getInterpolationMode().toString());
         Logger.getGlobal().info("Interpolation Mode: " + config.getInterpolationMode());
         canvas.redraw();
     }
