@@ -75,8 +75,23 @@ public class MapCanvas extends BasicCanvas {
             });
         });
 
+        Color[][] screen = new Color[pixelDensity * xSize][pixelDensity * ySize];
+        IntStream.range(0, (ySize - 1)).parallel().forEach(y -> {
+            IntStream.range(0, (xSize - 1)).forEach(x -> {
+                for (int xStep = 0; xStep < pixelDensity; xStep++) {
+                    for (int yStep = 0; yStep < pixelDensity; yStep++) {
+                        float xNorm = (float) xStep / pixelDensity;
+                        float yNorm = (float) yStep / pixelDensity;
+
+                        screen[x * pixelDensity + xStep][y * pixelDensity + yStep] = config.getInterpolationMode().interpolateColor(
+                                new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, 1 - yNorm));
+                    }
+                }
+            });
+        });
+
         // draw linear interpolated values
-        PixelWriter pxWriter = gc.getPixelWriter();
+        /*PixelWriter pxWriter = gc.getPixelWriter();
         for (int y = 0; y < ySize - 1; y++) {
             for (int x = 0; x < xSize - 1; x++) {
                 Point2D pt = gridPoints.get(y * xSize + x);
@@ -93,6 +108,12 @@ public class MapCanvas extends BasicCanvas {
                         pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
                     }
                 }
+            }
+        }*/
+        PixelWriter pxWriter = gc.getPixelWriter();
+        for (int x = 0; x < (xSize - 1) * pixelDensity; x++) {
+            for (int y = 0; y < (ySize - 1) * pixelDensity; y++) {
+                pxWriter.setColor(x, (ySize - 1) * pixelDensity - y, screen[x][y]);
             }
         }
     }
