@@ -3,17 +3,18 @@ package org.htwkvisu.gui;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import org.htwkvisu.gui.interpolate.InterpolateConfig;
 import org.htwkvisu.org.IMapDrawable;
-import org.htwkvisu.org.pois.BasicPOI;
+import org.htwkvisu.org.pois.NormalizedColorCalculator;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.MathUtils;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Canvas for map.
@@ -24,7 +25,11 @@ public class MapCanvas extends BasicCanvas {
     private GraphicsContext gc = getGraphicsContext2D();
     private double widthDistance = 0;
     private double heightDistance = 0;
-    private int displayedElems = 0;
+    private CheckBox colorModeCheckBox;
+    private Grid grid = new Grid(this);
+
+    public static final Point2D CITY_LEIPZIG = new Point2D(51.340333, 12.37475);
+
     /**
      * Construct and init canvas
      */
@@ -32,7 +37,7 @@ public class MapCanvas extends BasicCanvas {
         super(config);
 
         // add test cities
-        addDrawableElement(new City(new Point2D(51.340333, 12.37475), "Leipzig", 0));
+        addDrawableElement(new City(CITY_LEIPZIG, "Leipzig", 0));
         addDrawableElement(new City(new Point2D(51.049259, 13.73836112), "Dresden", 0));
         addDrawableElement(new City(new Point2D(50.832222, 12.92416666), "Chemnitz", 0));
         addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
@@ -40,42 +45,56 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     protected void drawInfo() {
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.GRAY);
         gc.fillText("Center: " + MathUtils.roundToDecimalsAsString(mapCenter.getX(), 5) + " " +
                 MathUtils.roundToDecimalsAsString(mapCenter.getY(), 5), 10, 20);
         gc.fillText("Distance: " + MathUtils.roundToDecimalsAsString(widthDistance, 3) + " km x " + MathUtils.roundToDecimalsAsString(heightDistance, 3) + " km", 10, 40);
-        gc.fillText("Elements displayed: " + displayedElems, 10, 60);
-        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 80);
-        gc.fillText("Bounds: " + coordsBounds, 10, 100);
+        gc.fillText("Scale: " + MathUtils.roundToDecimalsAsString(scale, 2), 10, 60);
+        gc.fillText("Bounds: " + getCoordsBoundsAsString(), 10, 80);
     }
 
     @Override
     public void drawScoringValues() {
-// get sample points for canvas
-        // sample points will be drawn every "samplingPixelDensity" pixels in x and y direction
-        Grid grid = new Grid(this);
-        List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
-        // save previous colors
-        final Paint curFillPaint = gc.getFill();
-        final Paint curStrokePaint = gc.getStroke();
+        // get sample points for canvas
+        List<Point2D> gridPoints = calculateGrid();
+        Color[] cols = new Color[gridPoints.size()];
 
-        // now calculate the values
-        for (List<Point2D> line : gridPoints) {
-            for (Point2D pt : line) {
-                final double scoreForCoord = ScoringCalculator.calculateEnabledScoreValue(pt);
-                gc.setFill(getColorForValue(scoreForCoord));
+        boolean useNorm = colorModeCheckBox != null && colorModeCheckBox.isSelected();
+        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, useNorm);
 
+        final int pixelDensity = config.getSamplingPixelDensity();
+        final int xSize = grid.getxSize();
+        final int ySize = grid.getySize();
+
+        // calculate values
+        IntStream.range(0, ySize).parallel().forEach(y -> {
+            IntStream.range(0, xSize).forEach(x -> {
+                final int index = y * xSize + x;
+                Point2D pt = gridPoints.get(index);
+                cols[index] = norm.calculateColor(pt);
+            });
+        });
+
+        // draw linear interpolated values
+        PixelWriter pxWriter = gc.getPixelWriter();
+        for (int y = 0; y < ySize - 1; y++) {
+            for (int x = 0; x < xSize - 1; x++) {
+                Point2D pt = gridPoints.get(y * xSize + x);
                 Point2D pixelPos = transferCoordinateToPixel(pt);
-                gc.fillRect(pixelPos.getX(), pixelPos.getY(), config.getSamplingPixelDensity()
-                        , config.getSamplingPixelDensity());
+
+                for (int xStep = 0; xStep < pixelDensity; xStep++) {
+                    for (int yStep = 0; yStep < pixelDensity; yStep++) {
+                        float xNorm = (float) xStep / pixelDensity;
+                        float yNorm = (float) yStep / pixelDensity;
+
+                        final Color lerpedCol = config.getInterpolationMode().interpolateColor(
+                                new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, yNorm));
+
+                        pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
+                    }
+                }
             }
         }
-
-        // interpolate between the samples points with simple linear interpolation in our matrix/grid
-
-        //Restore previous colors
-        gc.setFill(curFillPaint);
-        gc.setStroke(curStrokePaint);
     }
 
     @Override
@@ -115,28 +134,19 @@ public class MapCanvas extends BasicCanvas {
     }
 
 
-    private void drawPOIS(){
-        final Paint curFillPaint = gc.getFill();
-        final Paint curStrokePaint = gc.getStroke();
-
-        for (BasicPOI poi :  ScoringCalculator.generateEnabled()) {
-            poi.draw(this.gc, this);
-        }
-
-        gc.setFill(curFillPaint);
-        gc.setStroke(curStrokePaint);
+    private void drawPOIS() {
+        ScoringCalculator.generateEnabled().forEach(a -> a.draw(gc, this));
     }
 
 
     @Override
     public void drawElements() {
         List<IMapDrawable> toDraw = drawables.parallelStream()
-                .filter(p -> !isDragging || p.showDuringGrab())
+                .filter(p -> !isInDragMode() || p.showDuringGrab())
                 .filter(p -> p.getMinDrawScale() < scale)
                 .filter(p -> coordsBounds.contains(p.getCoordinates()))
                 .collect(Collectors.toList());
 
-        displayedElems = toDraw.size();
         for (IMapDrawable elem : toDraw) {
             elem.draw(this.gc, this);
         }
@@ -144,8 +154,11 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void centerView(Point2D center) {
-        mapCenter = center;
-
+        if (center != null) {
+            mapCenter = center;
+        } else {
+            mapCenter = CITY_LEIPZIG;
+        }
         redraw();
     }
 
@@ -155,22 +168,9 @@ public class MapCanvas extends BasicCanvas {
     }
 
     @Override
-    public Color getColorForValue(double value) {
-        double hue;
-        if (value < config.getMinScoringValue()) {
-            hue = Color.BLUE.getHue();
-        } else if (value > config.getMaxScoringValue()) {
-            hue = Color.RED.getHue();
-        } else {
-            hue = Color.BLUE.getHue() + (Color.RED.getHue() - Color.BLUE.getHue())
-                    * (value - config.getMinScoringValue()) / (config.getMaxScoringValue() - config.getMinScoringValue());
-        }
-
-        return Color.hsb(hue, 1.0, 1.0);
-    }
-
-    @Override
     public void redraw() {
+        //long tStart = System.currentTimeMillis();
+
         tmpWidth = getWidth();
         tmpHeight = getHeight();
         double coveredWidth = tmpWidth / scale;
@@ -184,12 +184,16 @@ public class MapCanvas extends BasicCanvas {
         gc.clearRect(0, 0, tmpWidth, tmpHeight);
 
         // draw map content
-        drawScoringValues();
+        if (!isInDragMode()) {
+            drawScoringValues();
+        }
         drawInfo();
         drawGrid();
         drawPOIS();
+        //TODO: Draw elements count
         drawElements();
 
+        //Logger.getGlobal().info("Redraw took " + (System.currentTimeMillis() - tStart) + " ms");
     }
 
     @Override
@@ -205,12 +209,27 @@ public class MapCanvas extends BasicCanvas {
     }
 
     public int calculateMaxScore() {
-        Grid grid = new Grid(this);
-        List<List<Point2D>> gridPoints = grid.calcGridPoints(config.getSamplingPixelDensity());
-        //setMaxScoringValue calls redraw
-        int calculatedMaxScoringValue = (int) gridPoints.stream().flatMap(Collection::stream)
-                .mapToDouble(ScoringCalculator::calculateEnabledScoreValue).max().orElse(0.0);
-        Logger.getGlobal().info("New auto-scaled maxScoreValue: " + calculatedMaxScoringValue);
-        return calculatedMaxScoringValue;
+        List<Point2D> gridPoints = calculateGrid();
+        double score = 0.0;
+        double tmp = 0.0;
+        for (Point2D point : gridPoints) {
+            tmp = ScoringCalculator.calculateEnabledScoreValue(point);
+            if (score < tmp) {
+                score = tmp;
+            }
+        }
+        return (int) score;
+    }
+
+    public List<Point2D> calculateGrid() {
+        return grid.calcGridPoints(config.getSamplingPixelDensity());
+    }
+
+    public void setColorModeCheckBox(CheckBox colorModeCheckBox) {
+        this.colorModeCheckBox = colorModeCheckBox;
+    }
+
+    public CheckBox getColorModeCheckBox() {
+        return colorModeCheckBox;
     }
 }

@@ -1,5 +1,7 @@
 package org.htwkvisu.gui;
 
+import org.htwkvisu.gui.interpolate.InterpolationMode;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,6 +10,7 @@ public class ScoringConfig {
     private int samplingPixelDensity;
     private int minScoringValue;
     private int maxScoringValue;
+    private InterpolationMode interpMode = InterpolationMode.BILINEAR;
     private ScoringCanvas canvas;
 
     public ScoringConfig(int samplingPixelDensity, int minScoringValue, int maxScoringValue) {
@@ -57,6 +60,14 @@ public class ScoringConfig {
         } else {
             Logger.getGlobal().log(Level.INFO, "Max Score should be greater Min Score!");
         }
+    }
+
+    public void setInterpolationMode(InterpolationMode mode) {
+        this.interpMode = mode;
+    }
+
+    public InterpolationMode getInterpolationMode() {
+        return interpMode;
     }
 
     public void setCanvas(ScoringCanvas canvas) {

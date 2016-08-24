@@ -67,4 +67,5 @@ public class MathUtils {
     public static double convertKilometresToUnits(double distInKMs) {
         return distInKMs / KM_PER_COORD;
     }
+
 }

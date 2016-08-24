@@ -54,11 +54,16 @@ public enum Category implements IScorable {
     }
 
     public void setEnabledForCategory(boolean enabled) {
-        types.stream().forEach(t -> t.setEnabled(enabled));
+        types.parallelStream().forEach(t -> t.setEnabled(enabled));
     }
+
     @Override
     public double calculateScoreValue(Point2D pt) {
         return types.stream().mapToDouble(t -> t.calculateScoreValue(pt)).sum();
+    }
+
+    public double calculateEnabledScoreValue(Point2D pt) {
+        return types.stream().filter(ScoreType::isEnabled).mapToDouble(t -> t.calculateScoreValue(pt)).sum();
     }
 
     @Override

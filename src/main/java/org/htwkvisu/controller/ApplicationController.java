@@ -1,15 +1,14 @@
 package org.htwkvisu.controller;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.htwkvisu.gui.EditingDoubleCell;
@@ -34,6 +33,11 @@ import java.util.logging.Logger;
 public class ApplicationController implements Initializable {
 
     private static final int FALL_OF_COLUMN_INDEX = 3;
+    private static final int CATEGORY_COLUMN_INDEX = 1;
+    private static final int DOUBLE_CLICK = 2;
+
+    @FXML
+    private CheckBox colorModeCheckBox;
     @FXML
     private CheckBox autoScaledCheckBox;
     @FXML
@@ -68,6 +72,9 @@ public class ApplicationController implements Initializable {
     @FXML
     private NumericTextField maxScoringTextField;
     private static final int DEFAULT_MAX_SCORING_VALUE = 100000;
+
+    @FXML
+    private Button changeInterpMode;
 
     @FXML
     private Button resetViewButton;
@@ -106,7 +113,6 @@ public class ApplicationController implements Initializable {
      * @param resources Resources
      */
     public void initialize(URL location, ResourceBundle resources) {
-        //TODO: please remove this - read property-file and set value from them
         Category.EDUCATION.setEnabledForCategory(true);
 
         initCanvas();
@@ -115,7 +121,7 @@ public class ApplicationController implements Initializable {
         maxScoringTextField.init(DEFAULT_MAX_SCORING_VALUE);
 
         initTable();
-
+        changeInterpMode.setText(config.getInterpolationMode().toString());
         Logger.getGlobal().log(Level.INFO, "ApplicationController initialized!");
 
     }
@@ -145,25 +151,36 @@ public class ApplicationController implements Initializable {
         List<ScoreTableModel> tableModels = ScoringCalculator.calcAllTableModels();
         tableView.setItems(FXCollections.observableList(tableModels));
 
+        // deprecated, but easiest way to disable reorderable columns...,
+        // alternative were impl. of ListChangedlistener..
+        for (TableColumn col : tableView.getColumns()) {
+            col.impl_setReorderable(false);
+        }
+
         tableView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2) {
-                TablePosition position = tableView.getSelectionModel().getSelectedCells().get(0);
-                final int column = position.getColumn();
-                //TODO: Positioncheck when column is moved
+            if (click.getClickCount() == DOUBLE_CLICK) {
+                //TODO: If clicked outside of table, last value will be changed...
+                ScoreTableModel model = tableView.getSelectionModel().getSelectedItem();
+                final int column = tableView.getFocusModel().getFocusedCell().getColumn();
+
                 if (column == FALL_OF_COLUMN_INDEX) {
-                    final int index = position.getRow();
-                    ScoreTableModel model = tableModels.get(index);
                     // model must be set the fallOf because of the event listening
                     model.setFallOf(model.switchAndGetFallOfFromType(model.getFallOf()));
+                } else if (column == CATEGORY_COLUMN_INDEX) {
+                    final boolean newStatus = !model.getEnabled();
+                    tableView.getItems().stream().
+                            filter(scoreTableModel -> model.getCategory().equals(scoreTableModel.getCategory())).
+                            forEach(scoreTableModel -> scoreTableModel.setEnabled(newStatus));
+                    Logger.getGlobal().info("Set enabled of category: " + model.getCategory() + ", value: " + newStatus);
                 }
             }
-            //TODO: add category selection by double-click on the (category)-selection row
         });
     }
 
     private void initCanvas() {
         config = new ScoringConfig(DEFAULT_PIXEL_DENSITY, DEFAULT_MIN_SCORING_VALUE, DEFAULT_MAX_SCORING_VALUE);
         canvas = new MapCanvas(config);
+        canvas.setColorModeCheckBox(colorModeCheckBox);
         canvasPane.getChildren().add(canvas);
         canvasPane.widthProperty().addListener((observable, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         canvasPane.heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
@@ -183,27 +200,32 @@ public class ApplicationController implements Initializable {
         }
     }
 
-    /**
-     * Redraw or Resets view of canvas
-     *
-     * @param ev MouseEvent
-     */
     @FXML
-    public void onClicked(MouseEvent ev) {
-        if (ev.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-            if (ev.getSource().equals(redrawButton)) {
-                handleRedrawButton();
-            } else if (ev.getSource().equals(resetViewButton)) {
-                canvas.centerView(new Point2D(51.340333, 12.37475)); // test value as an example!Leipzig
-            }
-        }
-    }
-
-    private void handleRedrawButton() {
+    public void onRedrawAction(ActionEvent ev) {
         if (autoScaledCheckBox.isSelected()) {
-            config.setMaxScoringValue(canvas.calculateMaxScore());
+            int maxScoringValue = canvas.calculateMaxScore();
+            config.setMaxScoringValue(maxScoringValue);
+            Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
         } else {
             canvas.redraw();
         }
+    }
+
+    @FXML
+    public void onInterpModeChanged(ActionEvent ev) {
+        config.setInterpolationMode(config.getInterpolationMode().next());
+        changeInterpMode.setText(config.getInterpolationMode().toString());
+        Logger.getGlobal().info("Interpolation Mode: " + config.getInterpolationMode());
+        canvas.redraw();
+    }
+
+    @FXML
+    public void onResetViewAction(ActionEvent ev) {
+        canvas.centerView(MapCanvas.CITY_LEIPZIG);
+    }
+
+    @FXML
+    public void onColorModeAction(ActionEvent ev) {
+        autoScaledCheckBox.setDisable(colorModeCheckBox.isSelected());
     }
 }

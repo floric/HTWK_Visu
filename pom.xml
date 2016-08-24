@@ -88,6 +88,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>6.0.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.reactfx/reactfx -->
+        <dependency>
+            <groupId>org.reactfx</groupId>
+            <artifactId>reactfx</artifactId>
+            <version>2.0-M5</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.vividsolutions/jts -->
         <dependency>
             <groupId>com.vividsolutions</groupId>

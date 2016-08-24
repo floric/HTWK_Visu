@@ -14,14 +14,14 @@ import static org.htwkvisu.org.pois.Category.*;
 public final class ScoringCalculator {
 
     public static List<ScoreValue> findAll() {
-        return Arrays.asList(Category.values()).stream()
+        return Arrays.stream(Category.values())
                 .flatMap(category -> category.getTypes().stream()).filter(ScoreType::isEnabled)
                 .flatMap(t -> t.findAll().stream())
                 .collect(Collectors.toList());
     }
 
     public static List<BasicPOI> generateEnabled() {
-        return Arrays.asList(Category.values()).stream()
+        return Arrays.stream(Category.values())
                 .flatMap(category -> category.getTypes().stream()).filter(ScoreType::isEnabled)
                 .flatMap(t -> t.generateDrawable().stream())
                 .collect(Collectors.toList());
@@ -42,26 +42,26 @@ public final class ScoringCalculator {
     }
 
     public static List<Boolean> enabledList() {
-        return Arrays.asList(Category.values()).stream().flatMap(category -> category.getTypes().stream())
+        return Arrays.stream(Category.values()).flatMap(category -> category.getTypes().stream())
                 .map(ScoreType::isEnabled).collect(Collectors.toList());
     }
 
     public static double calculateScoreValue(Point2D pt) {
-        return Arrays.asList(Category.values()).stream().mapToDouble(t -> t.calculateScoreValue(pt)).sum();
+        return Arrays.stream(Category.values()).mapToDouble(t -> t.calculateScoreValue(pt)).sum();
     }
 
     public static double calculateScoreValueForCustom(Point2D pt) {
-        return Arrays.asList(Category.values()).stream().mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
+        return Arrays.stream(Category.values()).mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
     }
 
     public static double calculateEnabledScoreValue(Point2D pt) {
-        return Arrays.asList(Category.values()).stream()
+        return Arrays.stream(Category.values())
                 .flatMap(category -> category.getTypes().stream()).filter(ScoreType::isEnabled)
                 .mapToDouble(t -> t.calculateScoreValue(pt)).sum();
     }
 
     public static double calculateCustomEnabledScoreValue(Point2D pt) {
-        return Arrays.asList(Category.values()).stream()
+        return Arrays.stream(Category.values())
                 .flatMap(category -> category.getTypes().stream()).filter(ScoreType::isEnabled)
                 .mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
     }
