@@ -68,7 +68,7 @@ public class MapCanvas extends BasicCanvas {
         final int xSize = grid.getxSize();
         final int ySize = grid.getySize();
 
-        // calculate values
+        // calculate values, parallel
         IntStream.range(0, ySize).parallel().forEach(y -> {
             IntStream.range(0, xSize).forEach(x -> {
                 final int index = y * xSize + x;
@@ -77,45 +77,39 @@ public class MapCanvas extends BasicCanvas {
             });
         });
 
-        Color[][] screen = new Color[pixelDensity * xSize][pixelDensity * ySize];
+        // calculate interpolated pixels in screen, parallel
+        Color[][] screen = new Color[(int) getWidth()][(int) getHeight()];
         IntStream.range(0, (ySize - 1)).parallel().forEach(y -> {
             IntStream.range(0, (xSize - 1)).forEach(x -> {
+                final Point2D pxPos = transferCoordinateToPixel(gridPoints.get(y * xSize + x));
+
                 for (int xStep = 0; xStep < pixelDensity; xStep++) {
                     for (int yStep = 0; yStep < pixelDensity; yStep++) {
                         float xNorm = (float) xStep / pixelDensity;
                         float yNorm = (float) yStep / pixelDensity;
 
-                        screen[x * pixelDensity + xStep][y * pixelDensity + yStep] = config.getInterpolationMode().interpolateColor(
-                                new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, 1 - yNorm));
+                        // pixel positions in screenspace
+                        final int pixX = (int) (pxPos.getX() + xStep);
+                        final int pixY = (int) (pxPos.getY() + yStep);
+
+                        // skip pixels out of screen
+                        if (pixX >= 0 && pixY >= 0 && pixX < getWidth() && pixY < getHeight()) {
+                            screen[pixX][pixY] = config.getInterpolationMode().interpolateColor(
+                                    new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, yNorm));
+                        }
                     }
                 }
             });
         });
 
         // draw linear interpolated values
-        /*PixelWriter pxWriter = gc.getPixelWriter();
-        for (int y = 0; y < ySize - 1; y++) {
-            for (int x = 0; x < xSize - 1; x++) {
-                Point2D pt = gridPoints.get(y * xSize + x);
-                Point2D pixelPos = transferCoordinateToPixel(pt);
-
-                for (int xStep = 0; xStep < pixelDensity; xStep++) {
-                    for (int yStep = 0; yStep < pixelDensity; yStep++) {
-                        float xNorm = (float) xStep / pixelDensity;
-                        float yNorm = (float) yStep / pixelDensity;
-
-                        final Color lerpedCol = config.getInterpolationMode().interpolateColor(
-                                new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, yNorm));
-
-                        pxWriter.setColor((int) pixelPos.getX() + xStep, (int) pixelPos.getY() + yStep, lerpedCol);
-                    }
-                }
-            }
-        }*/
         PixelWriter pxWriter = gc.getPixelWriter();
-        for (int x = 0; x < (xSize - 1) * pixelDensity; x++) {
-            for (int y = 0; y < (ySize - 1) * pixelDensity; y++) {
-                pxWriter.setColor(x, (ySize - 1) * pixelDensity - y, screen[x][y]);
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
+                // skip unrendered pixels after resizing
+                if (screen[x][y] != null) {
+                    pxWriter.setColor(x, y, screen[x][y]);
+                }
             }
         }
     }
