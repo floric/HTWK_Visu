@@ -39,8 +39,10 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     protected void drawInfo() {
-        if(colorModeCheckBox.isSelected()){
-            gc.setFill(Color.GRAY);
+        if(colorModeCheckBox != null && colorModeCheckBox.isSelected()){
+            if(colorModeCheckBox.isSelected()) {
+                gc.setFill(Color.GRAY);
+            }
         }else{
             gc.setFill(Color.BLACK);
         }
