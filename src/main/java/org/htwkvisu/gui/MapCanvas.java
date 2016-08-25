@@ -70,45 +70,38 @@ public class MapCanvas extends BasicCanvas {
 
         // calculate values, parallel
         IntStream.range(0, ySize).parallel().forEach(y -> {
-            IntStream.range(0, xSize).forEach(x -> {
+            for (int x = 0; x < xSize; x++) {
                 final int index = y * xSize + x;
                 Point2D pt = gridPoints.get(index);
                 cols[index] = norm.calculateColor(pt);
-            });
+            }
         });
 
-        // calculate interpolated pixels in screen, parallel
-        Color[][] screen = new Color[(int) getWidth()][(int) getHeight()];
-        IntStream.range(0, (ySize - 1)).parallel().forEach(y -> {
-            IntStream.range(0, (xSize - 1)).forEach(x -> {
-                final Point2D pxPos = transferCoordinateToPixel(gridPoints.get(y * xSize + x));
+        PixelWriter pxWriter = gc.getPixelWriter();
 
+        // go through grid cells
+        for (int y = 0; y < (ySize - 1); y++) {
+            for (int x = 0; x < xSize - 1; x++) {
+                final Point2D pxPos = transferCoordinateToPixel(gridPoints.get(y * xSize + x));
+                final int posX = (int) pxPos.getX();
+                final int posY = (int) pxPos.getY();
+
+                // calculate pixels in grid cells
                 for (int xStep = 0; xStep < pixelDensity; xStep++) {
                     for (int yStep = 0; yStep < pixelDensity; yStep++) {
                         final float xNorm = (float) xStep / pixelDensity;
                         final float yNorm = (float) yStep / pixelDensity;
 
                         // pixel positions in screenspace
-                        final int pixX = (int) (pxPos.getX() + xStep);
-                        final int pixY = (int) (pxPos.getY() + yStep);
+                        final int pixX = posX + xStep;
+                        final int pixY = posY + yStep;
 
                         // skip pixels out of screen
                         if (pixX >= 0 && pixY >= 0 && pixX < getWidth() && pixY < getHeight()) {
-                            screen[pixX][pixY] = config.getInterpolationMode().interpolateColor(
-                                    new InterpolateConfig(cols, xSize, ySize, x, y, xNorm, yNorm));
+                            pxWriter.setColor(pixX, pixY, config.getInterpolationMode().interpolateColor(
+                                    new InterpolateConfig(cols, xSize, ySize, x, y, xNorm, yNorm)));
                         }
                     }
-                }
-            });
-        });
-
-        // draw linear interpolated values
-        PixelWriter pxWriter = gc.getPixelWriter();
-        for (int x = 0; x < getWidth(); x++) {
-            for (int y = 0; y < getHeight(); y++) {
-                // skip unrendered pixels after resizing
-                if (screen[x][y] != null) {
-                    pxWriter.setColor(x, y, screen[x][y]);
                 }
             }
         }
@@ -154,8 +147,16 @@ public class MapCanvas extends BasicCanvas {
         addDrawableElement(new City(new Point2D(51.049259, 13.73836112), "Dresden", 0));
         addDrawableElement(new City(new Point2D(50.832222, 12.92416666), "Chemnitz", 0));
         addDrawableElement(new City(new Point2D(50.718888, 12.492222), "Zwickau", 0));
+        addDrawableElement(new City(new Point2D(50.495, 12.138333), "Plauen", 0));
+        addDrawableElement(new City(new Point2D(50.911944, 13.342778), "Freiberg", 0));
+        addDrawableElement(new City(new Point2D(51.238333, 12.725), "Grimma", 0));
+        addDrawableElement(new City(new Point2D(51.558333, 13.004167), "Torgau", 0));
+        addDrawableElement(new City(new Point2D(51.181389, 14.423889), "Bautzen", 0));
+        addDrawableElement(new City(new Point2D(51.163611, 13.4775), "Meißen", 0));
+        addDrawableElement(new City(new Point2D(50.585278, 12.700833), "Aue", 0));
+        addDrawableElement(new City(new Point2D(51.308056, 13.293889), "Riesa", 0));
+        addDrawableElement(new City(new Point2D(51.152778, 14.987222), "Görlitz", 0));
     }
-
 
     @Override
     public void drawElements() {
