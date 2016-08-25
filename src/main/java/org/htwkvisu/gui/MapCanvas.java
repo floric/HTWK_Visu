@@ -83,8 +83,8 @@ public class MapCanvas extends BasicCanvas {
 
                 for (int xStep = 0; xStep < pixelDensity; xStep++) {
                     for (int yStep = 0; yStep < pixelDensity; yStep++) {
-                        float xNorm = (float) xStep / pixelDensity;
-                        float yNorm = (float) yStep / pixelDensity;
+                        final float xNorm = (float) xStep / pixelDensity;
+                        final float yNorm = (float) yStep / pixelDensity;
 
                         // pixel positions in screenspace
                         final int pixX = (int) (pxPos.getX() + xStep);
@@ -93,7 +93,7 @@ public class MapCanvas extends BasicCanvas {
                         // skip pixels out of screen
                         if (pixX >= 0 && pixY >= 0 && pixX < getWidth() && pixY < getHeight()) {
                             screen[pixX][pixY] = config.getInterpolationMode().interpolateColor(
-                                    new InterpolateConfig(cols, xSize, cols.length / xSize, x, y, xNorm, yNorm));
+                                    new InterpolateConfig(cols, xSize, ySize, x, y, xNorm, yNorm));
                         }
                     }
                 }
