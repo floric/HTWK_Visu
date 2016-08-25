@@ -31,7 +31,7 @@ public class BiCubicInterpolationStrategy implements InterpolationStrategy {
 
     private Color interpolateCubic(Color[] cols, int xSize, int ySize, int x, int y, float xNorm, float yNorm) {
 
-        final int[][] indices = calcColorIndices(xSize, ySize, x, y);
+        final int[][] indices = calcColorIndices(xSize, ySize, x, y - 1);
         return Color.color(
                 calcBicubicValue(new double[][]{
                         {cols[indices[0][0]].getRed(), cols[indices[0][1]].getRed(), cols[indices[0][2]].getRed(), cols[indices[0][3]].getRed()},
