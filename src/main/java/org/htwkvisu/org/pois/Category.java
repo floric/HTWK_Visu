@@ -1,6 +1,7 @@
 package org.htwkvisu.org.pois;
 
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
 import org.htwkvisu.domain.ScoreValue;
 
 import java.util.ArrayList;
@@ -13,14 +14,16 @@ import java.util.stream.Collectors;
 import static org.htwkvisu.org.pois.ScoreType.*;
 
 public enum Category implements IScorable {
-    HEALTH(PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION)
-    , INFRASTRUCTURE(TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM)
-    , EDUCATION(SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE);
+    HEALTH(Color.GREEN, PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION)
+    , INFRASTRUCTURE(Color.BLUE, TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM)
+    , EDUCATION(Color.RED, SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE);
 
     private List<ScoreType> types = new ArrayList<>();
+    private final Color color;
 
-    Category(ScoreType... subcategories) {
+    Category(Color color, ScoreType... subcategories) {
         types.addAll(Arrays.asList(subcategories));
+        this.color = color;
     }
 
     public List<ScoreType> getTypes() {
@@ -69,5 +72,9 @@ public enum Category implements IScorable {
     @Override
     public double calculateScoreValueForCustom(Point2D pt) {
         return types.stream().mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

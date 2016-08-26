@@ -3,7 +3,6 @@ package org.htwkvisu.org.pois;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import org.hibernate.mapping.Array;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.org.IMapDrawable;
 
@@ -20,27 +19,14 @@ public class BasicPOI implements IMapDrawable {
     }
 
     private Color calcTypeColor() {
-        Color tmpColor = Color.BLACK;
-        for (Category cat : Category.values()) {
-            for (ScoreType scoreType : cat.getTypes()) {
+        for (Category category : Category.values()) {
+            for (ScoreType scoreType : category.getTypes()) {
                 if (type == scoreType) {
-                    tmpColor = getColorForCategory(cat);
+                     return category.getColor();
                 }
             }
         }
-        return tmpColor;
-    }
-
-    private Color getColorForCategory(Category cat) {
-        Color tmpColor;
-        if (cat == Category.EDUCATION) {
-            tmpColor = Color.RED;
-        } else if (cat == Category.HEALTH) {
-            tmpColor = Color.GREEN;
-        } else {
-            tmpColor = Color.BLUE;
-        }
-        return tmpColor;
+        return Color.BLACK;
     }
 
     @Override
