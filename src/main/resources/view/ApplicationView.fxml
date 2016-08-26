@@ -76,6 +76,73 @@
                                 </VBox>
                             </content>
                         </TitledPane>
+                        <TitledPane animated="true" text="Info">
+                            <content>
+                                <VBox>
+
+                                    <children>
+                                        <Label text="Lifequality visualization" style="-fx-font-weight: bold;">
+                                            <VBox.margin>
+                                                <Insets>
+                                                    <bottom>10</bottom>
+                                                </Insets>
+                                            </VBox.margin>
+                                        </Label>
+                                        <Label text="by Michael Horn, Matthias Zober, Florian Richter | 08/2016">
+                                            <VBox.margin>
+                                                <Insets>
+                                                    <bottom>30</bottom>
+                                                </Insets>
+                                            </VBox.margin>
+                                        </Label>
+                                        <Label wrapText="true"
+                                               text="This software creates a colored map to visualize a lifequality index. The index is currently based based on health, education and infrastructure, but could be extended easily. The canvas supports two modes: the heatmap mode and a color mode. The heat map is useful to visualize the sum of all categories on the shown region. The color mode shows the differences in regions between the categories, coded into the main color channels. The color values are calculated in a grid based on scattered data and interpolated bilinear or bicubic in the grid cells pixelwise.">
+                                            <VBox.margin>
+                                                <Insets>
+                                                    <bottom>30</bottom>
+                                                </Insets>
+                                            </VBox.margin>
+                                        </Label>
+                                        <Label text="Third party code" style="-fx-font-weight: bolder;">
+                                            <VBox.margin>
+                                                <Insets>
+                                                    <bottom>10</bottom>
+                                                </Insets>
+                                            </VBox.margin>
+                                        </Label>
+                                        <GridPane VBox.vgrow="NEVER">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Hiberate:"/>
+                                                <Hyperlink text="http://hibernate.org/" GridPane.columnIndex="1"/>
+                                                <Label text="MySQL:" GridPane.rowIndex="1"/>
+                                                <Hyperlink text="https://www.mysql.de/" GridPane.columnIndex="1"
+                                                           GridPane.rowIndex="1"/>
+                                                <Label text="ReactFX:" GridPane.rowIndex="2"/>
+                                                <Hyperlink text="https://github.com/TomasMikula/ReactFX"
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                                <Label text="Vividsolutions JTS:" GridPane.rowIndex="3"/>
+                                                <Hyperlink text="http://www.vividsolutions.com/"
+                                                           GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                                                <Label text="JavaFX:" GridPane.rowIndex="4"/>
+                                                <Hyperlink
+                                                        text="http://docs.oracle.com/javase/8/javase-clienttechnologies.htm"
+                                                        GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </TitledPane>
                     </panes>
                 </Accordion>
                 <VBox fx:id="canvasBox" prefHeight="200.0" prefWidth="100.0">
@@ -87,9 +154,9 @@
                                 <Button fx:id="redrawButton" mnemonicParsing="false" onAction="#onRedrawAction"
                                         text="Redraw" textAlignment="CENTER"/>
                                 <CheckBox fx:id="autoScaledCheckBox" mnemonicParsing="false"
-                                          text="Autoscaled Max-Score-Value"/>
+                                          text="Autoscaled Max Score"/>
                                 <CheckBox fx:id="colorModeCheckBox" mnemonicParsing="false"
-                                          text="Color-Mode" onAction="#onColorModeAction"/>
+                                          text="Color Mode" onAction="#onColorModeAction"/>
                             </items>
                         </ToolBar>
                         <Pane fx:id="canvasPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
