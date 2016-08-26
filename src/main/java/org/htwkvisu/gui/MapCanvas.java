@@ -162,9 +162,8 @@ public class MapCanvas extends BasicCanvas {
     public void drawElements() {
 
         drawables.clear();
-        addTestCities();
         ScoringCalculator.generateEnabled().forEach(this::addDrawableElement);
-
+        addTestCities();
         List<IMapDrawable> toDraw = drawables.parallelStream()
                 .filter(p -> !isInDragMode() || p.showDuringGrab())
                 .filter(p -> p.getMinDrawScale() < scale)

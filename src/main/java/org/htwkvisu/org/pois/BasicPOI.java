@@ -8,12 +8,14 @@ import org.htwkvisu.org.IMapDrawable;
 
 public class BasicPOI implements IMapDrawable {
     private final ScoreType type;
-    private Point2D position = new Point2D(0, 0);
-    private static final double POINT_SIZE = 3;
+    private final Point2D position;
+    private static final double POINT_SIZE = 2;
+    private final Color color;
 
     public BasicPOI(ScoreType type, Point2D position) {
         this.type = type;
         this.position = position;
+        this.color = type.getCategory().getColor();
     }
 
     @Override
@@ -26,13 +28,10 @@ public class BasicPOI implements IMapDrawable {
         return 0;
     }
 
-    /**
-     * Test Implementierung für BASIC_POI zeichnen
-     */
     @Override
     public void draw(GraphicsContext gc, MapCanvas canvas) {
         Point2D lclPt = canvas.transferCoordinateToPixel(position);
-        gc.setFill(Color.WHITE);
+        gc.setFill(color);
         gc.fillOval(lclPt.getX() - POINT_SIZE / 2, lclPt.getY() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
     }
 

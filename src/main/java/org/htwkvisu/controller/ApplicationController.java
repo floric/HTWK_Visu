@@ -22,8 +22,7 @@ import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.scoring.IFallOf;
 
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +34,16 @@ public class ApplicationController implements Initializable {
     private static final int FALL_OF_COLUMN_INDEX = 3;
     private static final int CATEGORY_COLUMN_INDEX = 1;
     private static final int DOUBLE_CLICK = 2;
+    private static final String BORDER = "-fx-border-color: ";
+    private static final String RED = "red";
+    private static final String BLUE = "blue";
+    private static final String GREEN = "green";
+    
+    private static final Map<Color,String> colorMap = new HashMap<Color, String>(){{
+        put(Category.HEALTH.getColor(),GREEN);
+        put(Category.INFRASTRUCTURE.getColor(),BLUE);
+        put(Category.EDUCATION.getColor(),RED);
+    }};
 
     @FXML
     private CheckBox colorModeCheckBox;
@@ -132,6 +141,22 @@ public class ApplicationController implements Initializable {
         enabled.setCellFactory(CheckBoxTableCell.forTableColumn(enabled));
 
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+        categoryColumn.setCellFactory(column -> new TableCell<Category, String>() {
+            @Override
+            protected void updateItem(String text, boolean empty) {
+                super.updateItem(text, empty);
+                if (text != null || !empty) {
+                    setText(text);
+                    for (Map.Entry<Color, String> entry : colorMap.entrySet()) {
+                        if (Category.valueOf(text).getColor().equals(entry.getKey())) {
+                            setStyle(BORDER + entry.getValue());
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
         scoreColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 
         fallOfColumn.setCellValueFactory(new PropertyValueFactory<>("fallOf"));
