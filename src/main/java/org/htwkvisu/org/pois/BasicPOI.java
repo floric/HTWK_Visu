@@ -15,18 +15,7 @@ public class BasicPOI implements IMapDrawable {
     public BasicPOI(ScoreType type, Point2D position) {
         this.type = type;
         this.position = position;
-        this.color = calcTypeColor();
-    }
-
-    private Color calcTypeColor() {
-        for (Category category : Category.values()) {
-            for (ScoreType scoreType : category.getTypes()) {
-                if (type == scoreType) {
-                     return category.getColor();
-                }
-            }
-        }
-        return Color.BLACK;
+        this.color = type.getCategory().getColor();
     }
 
     @Override

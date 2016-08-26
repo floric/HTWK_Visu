@@ -45,6 +45,7 @@ public enum ScoreType implements IScorable{
     private double weight = NEUTRAL_WEIGHT;
     private boolean enabled = false;
     private List<BasicPOI> drawable = new ArrayList<>();
+    private Category category;
 
     ScoreType(String namedQuery, IFallOf fallOf) {
         this.namedQuery = namedQuery;
@@ -143,5 +144,13 @@ public enum ScoreType implements IScorable{
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

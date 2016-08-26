@@ -23,6 +23,7 @@ public enum Category implements IScorable {
 
     Category(Color color, ScoreType... subcategories) {
         types.addAll(Arrays.asList(subcategories));
+        types.stream().forEach(t -> t.setCategory(this));
         this.color = color;
     }
 
