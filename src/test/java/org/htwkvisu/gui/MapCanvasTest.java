@@ -137,29 +137,4 @@ public class MapCanvasTest {
         Point2D pt = canvas.transferPixelToCoordinate(testPt);
         assertEquals(ZERO_DOUBLE, pt.distance(expPt), TINY_DELTA);
     }
-
-    @Test
-    public void getSampleCoordPoints() throws Exception {
-        // sample just one point and border samples
-        canvas.setScale(100000);
-        canvas.setWidth(1);
-        canvas.setHeight(1);
-        /*Grid gridOne = new Grid(canvas);
-        List<Point2D> pts = gridOne.calcGridPoints(1000);
-        assertEquals(3, pts.size());
-        assertEquals(3, pts.get(0).size());
-
-        // sample two points and border samples
-        canvas.setWidth(10);
-        canvas.setHeight(10);
-        Grid gridTwo = new Grid(canvas);
-        pts = gridTwo.calcGridPoints(5);
-        assertEquals(4, pts.size());
-        assertEquals(4, pts.get(0).size());
-
-        // distance between samples is equal
-        assertEquals(0, Math.abs(pts.get(1).get(0).distance(pts.get(0).get(0)) - (pts.get(2).get(0).distance(pts.get(1).get(0)))), TINY_DELTA);
-        assertEquals(canvas.transferPixelToCoordinate(5, 0).getX() / canvas.getScale(), pts.get(1).get(0).distance(pts.get(0).get(0)), TINY_DELTA);
-        assertEquals(canvas.transferPixelToCoordinate(0, 5).getY() / canvas.getScale(), pts.get(1).get(1).distance(pts.get(1).get(0)), TINY_DELTA);*/
-    }
 }

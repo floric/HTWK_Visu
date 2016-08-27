@@ -24,6 +24,9 @@ public class Grid {
      * @return Sample positions in a grid
      */
     public List<Point2D> calcGridPoints(float pixelDensity) {
+        if (pixelDensity < 1) {
+            throw new IllegalArgumentException("To low pixelDensity, for grid-point-calculation: " + pixelDensity);
+        }
         List<Point2D> matrix = new ArrayList<>();
 
         final double coordsDistance = calcCoordDistanceFromPixelDistance(pixelDensity);
