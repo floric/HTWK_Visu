@@ -39,7 +39,7 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     protected void drawInfo() {
-        if(colorModeCheckBox != null && colorModeCheckBox.isSelected()){
+        if (colorModeCheckBox != null) {
             if(colorModeCheckBox.isSelected()) {
                 gc.setFill(Color.GRAY);
             }
@@ -61,8 +61,8 @@ public class MapCanvas extends BasicCanvas {
         List<Point2D> gridPoints = calculateGrid();
         Color[] cols = new Color[gridPoints.size()];
 
-        boolean useNorm = colorModeCheckBox != null && colorModeCheckBox.isSelected();
-        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, useNorm);
+        boolean useColorMode = colorModeCheckBox != null && colorModeCheckBox.isSelected();
+        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, useColorMode);
 
         final int pixelDensity = config.getSamplingPixelDensity();
         final int xSize = grid.getxSize();
