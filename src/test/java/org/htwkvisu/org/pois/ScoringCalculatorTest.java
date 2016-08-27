@@ -3,11 +3,19 @@ package org.htwkvisu.org.pois;
 import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.model.ScoreTableModel;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 public class ScoringCalculatorTest {
+
+    @Before
+    public void setUp() {
+        Category.EDUCATION.setEnabledForCategory(false);
+        Category.INFRASTRUCTURE.setEnabledForCategory(false);
+        Category.HEALTH.setEnabledForCategory(false);
+    }
 
     @Test
     public void generateEnabledWorks() throws Exception {

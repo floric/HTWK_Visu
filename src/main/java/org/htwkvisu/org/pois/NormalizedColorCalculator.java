@@ -45,7 +45,12 @@ public class NormalizedColorCalculator {
     }
 
     public double normEnabled(Category category, Point2D pt) {
-        return (category.calculateEnabledScoreValue(pt) * COLOR_MAX_VAL) / maxScore;
+        final int score = (int) category.calculateEnabledScoreValue(pt);
+        if (score > maxScore) {
+            throw new IllegalArgumentException("Norm-calculation fails! Score: " + score + " of point: "
+                    + pt + " is higher as the maxScore: " + maxScore + ".");
+        }
+        return (score * COLOR_MAX_VAL) / maxScore;
     }
 
     public Color calculateColor(Point2D pt) {
