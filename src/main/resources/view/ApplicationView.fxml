@@ -51,6 +51,7 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                             </rowConstraints>
                                             <children>
                                                 <Label text="Pixel Density:"/>
@@ -70,6 +71,10 @@
                                                         onAction="#onInterpModeChanged"
                                                         text="BILINEAR" GridPane.columnIndex="1"
                                                         GridPane.rowIndex="3"/>
+                                                <Label text="Time Logging" GridPane.rowIndex="4"/>
+                                                <CheckBox fx:id="timeLoggingCheckBox" mnemonicParsing="false"
+                                                          text="" onAction="#onTimeLoggingAction" GridPane.columnIndex="1"
+                                                          GridPane.rowIndex="4"/>
                                             </children>
                                         </GridPane>
                                     </children>

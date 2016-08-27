@@ -10,6 +10,7 @@ import org.htwkvisu.gui.interpolate.InterpolateConfig;
 import org.htwkvisu.org.IMapDrawable;
 import org.htwkvisu.org.pois.NormalizedColorCalculator;
 import org.htwkvisu.org.pois.ScoringCalculator;
+import org.htwkvisu.utils.ActiveTimer;
 import org.htwkvisu.utils.MathUtils;
 
 import java.util.List;
@@ -29,21 +30,23 @@ public class MapCanvas extends BasicCanvas {
     private CheckBox colorModeCheckBox;
     private Grid grid = new Grid(this);
     private int displayedElements = 0;
+    private final ActiveTimer timer;
 
     /**
      * Construct and init canvas
      */
     public MapCanvas(ScoringConfig config) {
         super(config);
+        timer = new ActiveTimer();
     }
 
     @Override
     protected void drawInfo() {
         if (colorModeCheckBox != null) {
-            if(colorModeCheckBox.isSelected()) {
+            if (colorModeCheckBox.isSelected()) {
                 gc.setFill(Color.GRAY);
             }
-        }else{
+        } else {
             gc.setFill(Color.BLACK);
         }
 
@@ -193,8 +196,7 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void redraw() {
-        //long tStart = System.currentTimeMillis();
-
+        timer.reset();
         tmpWidth = getWidth();
         tmpHeight = getHeight();
         double coveredWidth = tmpWidth / scale;
@@ -214,7 +216,7 @@ public class MapCanvas extends BasicCanvas {
         drawGrid();
         drawElements();
         drawInfo();
-        //Logger.getGlobal().info("Redraw took " + (System.currentTimeMillis() - tStart) + " ms");
+        timer.logInfo();
     }
 
     @Override
@@ -252,5 +254,9 @@ public class MapCanvas extends BasicCanvas {
 
     public CheckBox getColorModeCheckBox() {
         return colorModeCheckBox;
+    }
+
+    public ActiveTimer getTimer() {
+        return timer;
     }
 }

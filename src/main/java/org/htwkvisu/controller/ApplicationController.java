@@ -46,6 +46,8 @@ public class ApplicationController implements Initializable {
     }};
 
     @FXML
+    private CheckBox timeLoggingCheckBox;
+    @FXML
     private CheckBox colorModeCheckBox;
     @FXML
     private CheckBox autoScaledCheckBox;
@@ -229,9 +231,9 @@ public class ApplicationController implements Initializable {
     public void onRedrawAction(ActionEvent ev) {
         if (autoScaledCheckBox.isSelected()) {
             int maxScoringValue = canvas.calculateMaxScore();
+            Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
             config.setMaxScoringValue(maxScoringValue);
             maxScoringTextField.setText(Integer.toString(maxScoringValue));
-            Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
         } else {
             canvas.redraw();
         }
@@ -253,5 +255,10 @@ public class ApplicationController implements Initializable {
     @FXML
     public void onColorModeAction(ActionEvent ev) {
         autoScaledCheckBox.setDisable(colorModeCheckBox.isSelected());
+    }
+
+    @FXML
+    public void onTimeLoggingAction(ActionEvent ev) {
+        canvas.getTimer().setEnable(timeLoggingCheckBox.isSelected());
     }
 }
