@@ -4,17 +4,17 @@ import javafx.scene.paint.Color;
 
 public class BiCubicInterpolationStrategy implements InterpolationStrategy {
 
+    private static final int DIMENSION = 4;
+
     private static double calcCubicValue(double[] line, double val) {
         return line[1] + 0.5 * val * (line[2] - line[0] + val * (2.0 * line[0] - 5.0 * line[1] + 4.0 * line[2] - line[3] + val * (3.0 * (line[1] - line[2]) + line[3] - line[0])));
     }
 
     private static double calcBicubicValue(double[][] matrix, double x, double y) {
-        double[] calcedLines = new double[4];
-
-        calcedLines[0] = calcCubicValue(matrix[0], y);
-        calcedLines[1] = calcCubicValue(matrix[1], y);
-        calcedLines[2] = calcCubicValue(matrix[2], y);
-        calcedLines[3] = calcCubicValue(matrix[3], y);
+        double[] calcedLines = new double[DIMENSION];
+        for (int i = 0; i < DIMENSION; i++) {
+            calcedLines[i] = calcCubicValue(matrix[i], y);
+        }
 
         double val = calcCubicValue(calcedLines, x);
 
@@ -30,27 +30,23 @@ public class BiCubicInterpolationStrategy implements InterpolationStrategy {
     }
 
     private Color interpolateCubic(Color[] cols, int xSize, int ySize, int x, int y, float xNorm, float yNorm) {
-
         final int[][] indices = calcColorIndices(xSize, ySize, x, y - 1);
+        final double[][] red = new double[DIMENSION][DIMENSION];
+        final double[][] green = new double[DIMENSION][DIMENSION];
+        final double[][] blue = new double[DIMENSION][DIMENSION];
+
+        for (int i = 0; i < DIMENSION; i++) {
+            for (int j = 0; j < DIMENSION; j++) {
+                red[i][j] = cols[indices[i][j]].getRed();
+                green[i][j] = cols[indices[i][j]].getGreen();
+                blue[i][j] = cols[indices[i][j]].getBlue();
+            }
+        }
+
         return Color.color(
-                calcBicubicValue(new double[][]{
-                        {cols[indices[0][0]].getRed(), cols[indices[0][1]].getRed(), cols[indices[0][2]].getRed(), cols[indices[0][3]].getRed()},
-                        {cols[indices[1][0]].getRed(), cols[indices[1][1]].getRed(), cols[indices[1][2]].getRed(), cols[indices[1][3]].getRed()},
-                        {cols[indices[2][0]].getRed(), cols[indices[2][1]].getRed(), cols[indices[2][2]].getRed(), cols[indices[2][3]].getRed()},
-                        {cols[indices[3][0]].getRed(), cols[indices[3][1]].getRed(), cols[indices[3][2]].getRed(), cols[indices[3][3]].getRed()}
-                }, xNorm, yNorm),
-                calcBicubicValue(new double[][]{
-                        {cols[indices[0][0]].getGreen(), cols[indices[0][1]].getGreen(), cols[indices[0][2]].getGreen(), cols[indices[0][3]].getGreen()},
-                        {cols[indices[1][0]].getGreen(), cols[indices[1][1]].getGreen(), cols[indices[1][2]].getGreen(), cols[indices[1][3]].getGreen()},
-                        {cols[indices[2][0]].getGreen(), cols[indices[2][1]].getGreen(), cols[indices[2][2]].getGreen(), cols[indices[2][3]].getGreen()},
-                        {cols[indices[3][0]].getGreen(), cols[indices[3][1]].getGreen(), cols[indices[3][2]].getGreen(), cols[indices[3][3]].getGreen()}
-                }, xNorm, yNorm),
-                calcBicubicValue(new double[][]{
-                        {cols[indices[0][0]].getBlue(), cols[indices[0][1]].getBlue(), cols[indices[0][2]].getBlue(), cols[indices[0][3]].getBlue()},
-                        {cols[indices[1][0]].getBlue(), cols[indices[1][1]].getBlue(), cols[indices[1][2]].getBlue(), cols[indices[1][3]].getBlue()},
-                        {cols[indices[2][0]].getBlue(), cols[indices[2][1]].getBlue(), cols[indices[2][2]].getBlue(), cols[indices[2][3]].getBlue()},
-                        {cols[indices[3][0]].getBlue(), cols[indices[3][1]].getBlue(), cols[indices[3][2]].getBlue(), cols[indices[3][3]].getBlue()},
-                }, xNorm, yNorm));
+                calcBicubicValue(red, xNorm, yNorm),
+                calcBicubicValue(green, xNorm, yNorm),
+                calcBicubicValue(blue, xNorm, yNorm));
     }
 
     private int[][] calcColorIndices(int xSize, int ySize, int x, int y) {
