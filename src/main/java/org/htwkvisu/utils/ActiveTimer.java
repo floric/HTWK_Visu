@@ -11,7 +11,7 @@ public class ActiveTimer {
         start = System.currentTimeMillis();
     }
 
-    public long stopTimer() {
+    public long currentState() {
         long now = System.currentTimeMillis();
         return now - start;
     }
@@ -22,7 +22,7 @@ public class ActiveTimer {
 
     public void logInfo() {
         if(enable){
-            Logger.getGlobal().info("Redraw took " + stopTimer() + " ms");
+            Logger.getGlobal().info("Redraw took " + currentState() + " ms");
         }
     }
 

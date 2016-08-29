@@ -41,8 +41,8 @@ public class ScoreTableModel {
         });
     }
 
-    public IFallOf switchAndGetFallOfFromType(IFallOf fallOf) {
-        IFallOf nextFallOf = fallOf.switchToNext();
+    public IFallOf switchAndGetFallOf() {
+        IFallOf nextFallOf = fallOf.getValue().switchToNext();
         type.setFallOf(nextFallOf);
         return nextFallOf;
     }

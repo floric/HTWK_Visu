@@ -192,7 +192,7 @@ public class ApplicationController implements Initializable {
 
                 if (column == FALL_OF_COLUMN_INDEX) {
                     // model must be set the fallOf because of the event listening
-                    model.setFallOf(model.switchAndGetFallOfFromType(model.getFallOf()));
+                    model.setFallOf(model.switchAndGetFallOf());
                 } else if (column == CATEGORY_COLUMN_INDEX) {
                     final boolean newStatus = !model.getEnabled();
                     tableView.getItems().stream().
