@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.util.Objects;
 
-public class ScoreValueTest {
+public class ScoreValueIntegrationTest {
     @Test
     public void notNullableObjectsExists() {
         Assert.assertTrue(ScoreType.TRAIN.allScoreTypes().stream()
