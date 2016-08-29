@@ -4,15 +4,15 @@ import javafx.scene.paint.Color;
 
 public class BiCubicInterpolationStrategy implements InterpolationStrategy {
 
-    private static final int DIMENSION = 4;
+    private static final int DEGREE = 4;
 
     private static double calcCubicValue(double[] line, double val) {
         return line[1] + 0.5 * val * (line[2] - line[0] + val * (2.0 * line[0] - 5.0 * line[1] + 4.0 * line[2] - line[3] + val * (3.0 * (line[1] - line[2]) + line[3] - line[0])));
     }
 
     private static double calcBicubicValue(double[][] matrix, double x, double y) {
-        double[] calcedLines = new double[DIMENSION];
-        for (int i = 0; i < DIMENSION; i++) {
+        double[] calcedLines = new double[DEGREE];
+        for (int i = 0; i < DEGREE; i++) {
             calcedLines[i] = calcCubicValue(matrix[i], y);
         }
 
@@ -31,12 +31,12 @@ public class BiCubicInterpolationStrategy implements InterpolationStrategy {
 
     private Color interpolateCubic(Color[] cols, int xSize, int ySize, int x, int y, float xNorm, float yNorm) {
         final int[][] indices = calcColorIndices(xSize, ySize, x, y - 1);
-        final double[][] red = new double[DIMENSION][DIMENSION];
-        final double[][] green = new double[DIMENSION][DIMENSION];
-        final double[][] blue = new double[DIMENSION][DIMENSION];
+        final double[][] red = new double[DEGREE][DEGREE];
+        final double[][] green = new double[DEGREE][DEGREE];
+        final double[][] blue = new double[DEGREE][DEGREE];
 
-        for (int i = 0; i < DIMENSION; i++) {
-            for (int j = 0; j < DIMENSION; j++) {
+        for (int i = 0; i < DEGREE; i++) {
+            for (int j = 0; j < DEGREE; j++) {
                 red[i][j] = cols[indices[i][j]].getRed();
                 green[i][j] = cols[indices[i][j]].getGreen();
                 blue[i][j] = cols[indices[i][j]].getBlue();
