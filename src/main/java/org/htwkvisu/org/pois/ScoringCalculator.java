@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.htwkvisu.org.pois.Category.*;
-
 public final class ScoringCalculator {
 
     public static List<ScoreValue> findAll() {
@@ -27,15 +25,12 @@ public final class ScoringCalculator {
                 .collect(Collectors.toList());
     }
 
-
     public static List<ScoreTableModel> calcAllTableModels() {
         List<ScoreTableModel> tableModels = new ArrayList<>();
-        tableModels.addAll(EDUCATION.getTypes().stream().map(t -> new ScoreTableModel(EDUCATION, t))
-                .collect(Collectors.toList()));
-        tableModels.addAll(HEALTH.getTypes().stream().map(t -> new ScoreTableModel(HEALTH, t))
-                .collect(Collectors.toList()));
-        tableModels.addAll(INFRASTRUCTURE.getTypes().stream().map(t -> new ScoreTableModel(INFRASTRUCTURE, t))
-                .collect(Collectors.toList()));
+        for (Category category : Category.values()) {
+            tableModels.addAll(category.getTypes().stream().map(t -> new ScoreTableModel(category, t))
+                    .collect(Collectors.toList()));
+        }
         tableModels.forEach(ScoreTableModel::onClick);
         tableModels.forEach(ScoreTableModel::onEnterCommit);
         return tableModels;

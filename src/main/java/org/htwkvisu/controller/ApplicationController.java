@@ -46,6 +46,8 @@ public class ApplicationController implements Initializable {
     }};
 
     @FXML
+    private CheckBox timeLoggingCheckBox;
+    @FXML
     private CheckBox colorModeCheckBox;
     @FXML
     private CheckBox autoScaledCheckBox;
@@ -190,7 +192,7 @@ public class ApplicationController implements Initializable {
 
                 if (column == FALL_OF_COLUMN_INDEX) {
                     // model must be set the fallOf because of the event listening
-                    model.setFallOf(model.switchAndGetFallOfFromType(model.getFallOf()));
+                    model.setFallOf(model.switchAndGetFallOf());
                 } else if (column == CATEGORY_COLUMN_INDEX) {
                     final boolean newStatus = !model.getEnabled();
                     tableView.getItems().stream().
@@ -229,9 +231,9 @@ public class ApplicationController implements Initializable {
     public void onRedrawAction(ActionEvent ev) {
         if (autoScaledCheckBox.isSelected()) {
             int maxScoringValue = canvas.calculateMaxScore();
+            Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
             config.setMaxScoringValue(maxScoringValue);
             maxScoringTextField.setText(Integer.toString(maxScoringValue));
-            Logger.getGlobal().info("New auto-scaled maxScoreValue: " + maxScoringValue);
         } else {
             canvas.redraw();
         }
@@ -253,5 +255,10 @@ public class ApplicationController implements Initializable {
     @FXML
     public void onColorModeAction(ActionEvent ev) {
         autoScaledCheckBox.setDisable(colorModeCheckBox.isSelected());
+    }
+
+    @FXML
+    public void onTimeLoggingAction(ActionEvent ev) {
+        canvas.getTimer().setEnable(timeLoggingCheckBox.isSelected());
     }
 }

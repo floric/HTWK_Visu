@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 import static org.htwkvisu.org.pois.ScoreType.*;
 
 public enum Category implements IScorable {
-    HEALTH(Color.GREEN, PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION)
-    , INFRASTRUCTURE(Color.BLUE, TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM)
-    , EDUCATION(Color.RED, SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE);
+     EDUCATION(Color.RED, SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE)
+    , HEALTH(Color.GREEN, PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION)
+    , INFRASTRUCTURE(Color.BLUE, TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM);
 
     private List<ScoreType> types = new ArrayList<>();
     private final Color color;
