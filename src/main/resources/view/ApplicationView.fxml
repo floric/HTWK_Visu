@@ -52,6 +52,7 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                             </rowConstraints>
                                             <children>
                                                 <Label text="Pixel Density:"/>
@@ -75,6 +76,11 @@
                                                 <CheckBox fx:id="timeLoggingCheckBox" mnemonicParsing="false"
                                                           text="" onAction="#onTimeLoggingAction" GridPane.columnIndex="1"
                                                           GridPane.rowIndex="4"/>
+                                                <Label text="Show POIs" GridPane.rowIndex="5"/>
+                                                <CheckBox fx:id="showPOTsCheckBox" mnemonicParsing="false"
+                                                          selected="true"
+                                                          text="" onAction="#onShowPOIsAction" GridPane.columnIndex="1"
+                                                          GridPane.rowIndex="5"/>
                                             </children>
                                         </GridPane>
                                     </children>

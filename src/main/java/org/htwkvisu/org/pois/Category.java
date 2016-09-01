@@ -3,6 +3,7 @@ package org.htwkvisu.org.pois;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import org.htwkvisu.domain.ScoreValue;
+import org.htwkvisu.gui.MapCanvas;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +15,12 @@ import java.util.stream.Collectors;
 import static org.htwkvisu.org.pois.ScoreType.*;
 
 public enum Category implements IScorable {
-     EDUCATION(Color.RED, SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE)
-    , HEALTH(Color.GREEN, PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION)
-    , INFRASTRUCTURE(Color.BLUE, TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM);
+    EDUCATION(Color.RED, SCHOOL, COLLEGE, LIBRARY, MUSEUM, RESEARCH_INSTITUTION, THEATRE), HEALTH(Color.GREEN, PHARMACY, HOSPITAL, DENTIST, VETERINARY, DOCTORS, BLOOD_DONATION), INFRASTRUCTURE(Color.BLUE, TERMINAL, HELIPAD, AERODROME, BUS, TRAIN, TRAM);
 
+    private static final int NEUTRAL_ELEMENT_DIV = 1;
     private List<ScoreType> types = new ArrayList<>();
     private final Color color;
+    private int maxScoreValue = 1;
 
     Category(Color color, ScoreType... subcategories) {
         types.addAll(Arrays.asList(subcategories));
@@ -77,5 +78,19 @@ public enum Category implements IScorable {
 
     public Color getColor() {
         return color;
+    }
+
+    public int getMaxScoreValue() {
+        return maxScoreValue < NEUTRAL_ELEMENT_DIV ? NEUTRAL_ELEMENT_DIV : maxScoreValue;
+    }
+
+    public void setMaxScoreValue(int maxScoreValue) {
+        this.maxScoreValue = maxScoreValue;
+    }
+
+    public void updateMaxScoreValue(MapCanvas canvas) {
+        if (Arrays.stream(ScoreType.values()).anyMatch(ScoreType::isEnabled)) {
+            this.maxScoreValue = canvas.calculateMaxScore(this);
+        }
     }
 }

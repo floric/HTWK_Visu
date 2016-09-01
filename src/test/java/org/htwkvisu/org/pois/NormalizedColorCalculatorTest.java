@@ -32,34 +32,22 @@ public class NormalizedColorCalculatorTest {
         Category.EDUCATION.setEnabledForCategory(true);
         Category.HEALTH.setEnabledForCategory(false);
         Category.INFRASTRUCTURE.setEnabledForCategory(false);
-        calculator = new NormalizedColorCalculator(canvas, true);
+        calculator = new NormalizedColorCalculator(canvas);
     }
 
     @Test
-    public void normEnabledWorks() throws Exception {
-        final List<Double> normedValues = calculator.normEnabled();
-
-        Assert.assertEquals(SIZE_OF_NORM_VALUES, normedValues.size());
-        normedValues.stream().allMatch(x -> x < 256 && x >= 0);
-
-        Category.INFRASTRUCTURE.setEnabledForCategory(true);
-        final List<Double> normedValuesAfter = calculator.normEnabled();
-        Assert.assertEquals(SIZE_OF_NORM_VALUES, normedValuesAfter.size());
-        Assert.assertNotEquals(normedValues, normedValuesAfter);
-        Assert.assertNotEquals(normedValues.get(0), normedValuesAfter.get(0));
-    }
-
-    @Test
-    public void calculateColorWithColorModeWorks() throws Exception {
+    public void normedColorForEnabledWithColorModeWorks() throws Exception {
         final List<Point2D> grid = canvas.calculateGrid();
 
-        Assert.assertTrue(grid.stream().map(calculator::calculateColor).anyMatch(c -> c.getRed() != 0));
-        Assert.assertTrue(grid.stream().map(calculator::calculateColor).allMatch(c -> c.getGreen() == 0));
-        Assert.assertTrue(grid.stream().map(calculator::calculateColor).allMatch(c -> c.getBlue() == 0));
+        Assert.assertTrue(grid.stream().map(calculator::normedColorForEnabled).anyMatch(c -> c.getRed() != 0));
+        Assert.assertTrue(grid.stream().map(calculator::normedColorForEnabled).allMatch(c -> c.getGreen() == 0));
+        Assert.assertTrue(grid.stream().map(calculator::normedColorForEnabled).allMatch(c -> c.getBlue() == 0));
+
 
         ScoreType.BUS.setEnabled(true);
-        Assert.assertTrue(grid.stream().map(calculator::calculateColor).anyMatch(c -> c.getRed() != 0));
-        Assert.assertTrue(grid.stream().map(calculator::calculateColor).allMatch(c -> c.getGreen() == 0));
-        Assert.assertTrue(grid.stream().map(calculator::calculateColor).anyMatch(c -> c.getBlue() != 0));
+        calculator = new NormalizedColorCalculator(canvas);
+        Assert.assertTrue(grid.stream().map(calculator::normedColorForEnabled).anyMatch(c -> c.getRed() != 0));
+        Assert.assertTrue(grid.stream().map(calculator::normedColorForEnabled).allMatch(c -> c.getGreen() == 0));
+        Assert.assertTrue(grid.stream().map(calculator::normedColorForEnabled).anyMatch(c -> c.getBlue() != 0));
     }
 }

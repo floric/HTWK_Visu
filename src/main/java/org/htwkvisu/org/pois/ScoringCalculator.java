@@ -2,6 +2,7 @@ package org.htwkvisu.org.pois;
 
 import javafx.geometry.Point2D;
 import org.htwkvisu.domain.ScoreValue;
+import org.htwkvisu.gui.MapCanvas;
 import org.htwkvisu.model.ScoreTableModel;
 
 import java.util.ArrayList;
@@ -59,5 +60,9 @@ public final class ScoringCalculator {
         return Arrays.stream(Category.values())
                 .flatMap(category -> category.getTypes().stream()).filter(ScoreType::isEnabled)
                 .mapToDouble(t -> t.calculateScoreValueForCustom(pt)).sum();
+    }
+
+    public static void updateMaxScoreValue(MapCanvas canvas) {
+        Arrays.stream(Category.values()).forEach(c -> c.updateMaxScoreValue(canvas));
     }
 }

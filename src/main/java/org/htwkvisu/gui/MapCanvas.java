@@ -8,6 +8,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import org.htwkvisu.gui.interpolate.InterpolateConfig;
 import org.htwkvisu.org.IMapDrawable;
+import org.htwkvisu.org.pois.Category;
 import org.htwkvisu.org.pois.NormalizedColorCalculator;
 import org.htwkvisu.org.pois.ScoringCalculator;
 import org.htwkvisu.utils.ActiveTimer;
@@ -31,6 +32,7 @@ public class MapCanvas extends BasicCanvas {
     private Grid grid = new Grid(this);
     private int displayedElements = 0;
     private final ActiveTimer timer;
+    private boolean showPOIs = true;
 
     /**
      * Construct and init canvas
@@ -62,7 +64,7 @@ public class MapCanvas extends BasicCanvas {
         List<Point2D> gridPoints = calculateGrid();
         Color[] cols = new Color[gridPoints.size()];
 
-        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, isColorModeActive());
+        NormalizedColorCalculator norm = new NormalizedColorCalculator(this);
 
         final int pixelDensity = config.getSamplingPixelDensity();
         final int xSize = grid.getxSize();
@@ -165,8 +167,13 @@ public class MapCanvas extends BasicCanvas {
     @Override
     public void drawElements() {
         drawables.clear();
-        ScoringCalculator.generateEnabled().forEach(this::addDrawableElement);
+        if (showPOIs) {
+            ScoringCalculator.generateEnabled().forEach(this::addDrawableElement);
+        }
+
         addTestCities();
+
+        // filter drawables
         List<IMapDrawable> toDraw = drawables.parallelStream()
                 .filter(p -> !isInDragMode() || p.showDuringGrab())
                 .filter(p -> p.getMinDrawScale() < scale)
@@ -244,6 +251,19 @@ public class MapCanvas extends BasicCanvas {
         return (int) score;
     }
 
+    public int calculateMaxScore(Category category) {
+        List<Point2D> gridPoints = calculateGrid();
+        double score = 0.0;
+        double tmp = score;
+        for (Point2D point : gridPoints) {
+            tmp = category.calculateEnabledScoreValue(point);
+            if (score < tmp) {
+                score = tmp;
+            }
+        }
+        return (int) score;
+    }
+
     public List<Point2D> calculateGrid() {
         return grid.calcGridPoints(config.getSamplingPixelDensity());
     }
@@ -258,5 +278,13 @@ public class MapCanvas extends BasicCanvas {
 
     public void setColorModeCheckBox(CheckBox colorModeCheckBox) {
         this.colorModeCheckBox = colorModeCheckBox;
+    }
+
+    public boolean isShowPOIs() {
+        return showPOIs;
+    }
+
+    public void setShowPOIs(boolean showPOIs) {
+        this.showPOIs = showPOIs;
     }
 }

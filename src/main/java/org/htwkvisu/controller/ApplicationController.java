@@ -52,6 +52,8 @@ public class ApplicationController implements Initializable {
     @FXML
     private CheckBox autoScaledCheckBox;
     @FXML
+    private CheckBox showPOTsCheckBox;
+    @FXML
     private TableColumn<Double, Double> weightColumn;
     @FXML
     private TableColumn<Double, Double> radiusColumn;
@@ -260,5 +262,10 @@ public class ApplicationController implements Initializable {
     @FXML
     public void onTimeLoggingAction(ActionEvent ev) {
         canvas.getTimer().setEnable(timeLoggingCheckBox.isSelected());
+    }
+
+    @FXML
+    public void onShowPOIsAction(ActionEvent ev) {
+        canvas.setShowPOIs(showPOTsCheckBox.isSelected());
     }
 }
