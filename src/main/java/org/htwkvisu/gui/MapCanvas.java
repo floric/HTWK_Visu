@@ -42,10 +42,8 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     protected void drawInfo() {
-        if (colorModeCheckBox != null) {
-            if (colorModeCheckBox.isSelected()) {
-                gc.setFill(Color.GRAY);
-            }
+        if (isColorModeActive()) {
+            gc.setFill(Color.GRAY);
         } else {
             gc.setFill(Color.BLACK);
         }
@@ -64,8 +62,7 @@ public class MapCanvas extends BasicCanvas {
         List<Point2D> gridPoints = calculateGrid();
         Color[] cols = new Color[gridPoints.size()];
 
-        boolean useColorMode = colorModeCheckBox != null && colorModeCheckBox.isSelected();
-        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, useColorMode);
+        NormalizedColorCalculator norm = new NormalizedColorCalculator(this, isColorModeActive());
 
         final int pixelDensity = config.getSamplingPixelDensity();
         final int xSize = grid.getxSize();
@@ -114,7 +111,11 @@ public class MapCanvas extends BasicCanvas {
     public void drawGrid() {
         double northPos;
         double eastPos;
-        gc.setStroke(Color.BLACK);
+        if (isColorModeActive()) {
+            gc.setStroke(Color.GRAY);
+        } else {
+            gc.setStroke(Color.BLACK);
+        }
 
         // Latitude
         double x = coordsBounds.getMinX();
@@ -163,7 +164,6 @@ public class MapCanvas extends BasicCanvas {
 
     @Override
     public void drawElements() {
-
         drawables.clear();
         ScoringCalculator.generateEnabled().forEach(this::addDrawableElement);
         addTestCities();
@@ -248,15 +248,15 @@ public class MapCanvas extends BasicCanvas {
         return grid.calcGridPoints(config.getSamplingPixelDensity());
     }
 
-    public void setColorModeCheckBox(CheckBox colorModeCheckBox) {
-        this.colorModeCheckBox = colorModeCheckBox;
-    }
-
-    public CheckBox getColorModeCheckBox() {
-        return colorModeCheckBox;
+    public boolean isColorModeActive() {
+        return colorModeCheckBox != null && colorModeCheckBox.isSelected();
     }
 
     public ActiveTimer getTimer() {
         return timer;
+    }
+
+    public void setColorModeCheckBox(CheckBox colorModeCheckBox) {
+        this.colorModeCheckBox = colorModeCheckBox;
     }
 }
